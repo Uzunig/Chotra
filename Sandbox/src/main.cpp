@@ -1,12 +1,28 @@
 #include <iostream>
+#include <memory>
 
-#include "Chotra/test.h"
+#include "Chotra/application.h"
+
+class Sandbox : public Chotra::Application {
+    
+    int frame = 0;
+
+    virtual void OnUpdate() override {
+        std::cout << "Frame N." << frame++ <<std::endl;
+
+    }
+
+};
 
 int main() {
-	std::cout << "Hello from Chotra Engine Editor!" << std::endl;
-	ChotraEngine::sayHello();
 
+    std::cout << "Hello from Chotra Engine Editor!" << std::endl;
+	
+    auto sandbox = std::make_unique<Sandbox>();
+    int return_code = sandbox->Start();
 
 	std::cin.get();
+
+    return return_code;
 
 }

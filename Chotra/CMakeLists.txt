@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.5)
 project(Chotra)
 
 add_library(Chotra STATIC
-	src/test.cpp
-	includes/Chotra/test.h
+	src/application.cpp
+	includes/Chotra/application.h
 )
 
 target_include_directories(Chotra PUBLIC includes)
