@@ -2,7 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include "ChotraEngine/test.h"
+#include "Chotra/test.h"
 
 namespace ChotraEngine {
      int sayHello() {

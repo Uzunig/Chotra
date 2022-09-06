@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "ChotraEngine/test.h"
+#include "Chotra/test.h"
 
 int main() {
 	std::cout << "Hello from Chotra Engine Editor!" << std::endl;
