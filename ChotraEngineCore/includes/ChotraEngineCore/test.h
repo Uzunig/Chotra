@@ -1,4 +1,0 @@
-
-namespace ChotraEngine {
-	void sayHello();
-}
