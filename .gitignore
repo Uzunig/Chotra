@@ -1,6 +1,9 @@
 # Directories
 build
 
+#
+*.swp
+
 # Prerequisites
 *.d
 

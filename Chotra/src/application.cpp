@@ -1,6 +1,7 @@
-#include <iostream>
-
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include <iostream>
 
 #include "Chotra/application.h"
 
@@ -34,10 +35,16 @@ namespace Chotra {
         /* Make the window's context current */
         glfwMakeContextCurrent(window);
 
+        // glad: load all OpenGL function pointers
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+            std::cout << "Failed to initialize GLAD" << std::endl;
+            return -1;
+        }
+
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window)) {
             /* Render here */
-           // glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT);
 
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
