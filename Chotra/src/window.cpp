@@ -27,7 +27,7 @@ namespace Chotra {
         }
     
         /* Create a windowed mode window and its OpenGL context */
-        window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+        window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
 
         if (!window) {
             glfwTerminate();
