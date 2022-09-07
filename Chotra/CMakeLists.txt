@@ -3,11 +3,16 @@ cmake_minimum_required(VERSION 3.5)
 project(Chotra)
 
 add_library(Chotra STATIC
-	src/application.cpp
 	includes/Chotra/application.h
+    src/application.cpp
+    src/window.h
+    src/window.cpp
 )
 
 target_include_directories(Chotra PUBLIC includes)
+target_include_directories(Chotra PRIVATE src)
+
+
 target_compile_features(Chotra PUBLIC cxx_std_17)
 
 add_subdirectory(../external/glfw ${CMAKE_CURRENT_BINARY_DIR}/glfw)

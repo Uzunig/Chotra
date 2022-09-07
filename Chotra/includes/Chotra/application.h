@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 namespace Chotra {
 
     class Application {
@@ -16,7 +18,8 @@ namespace Chotra {
         virtual int Start();
         virtual void OnUpdate();
 
-
+    private:
+        std::unique_ptr<class Window> window;
     };
 
 
