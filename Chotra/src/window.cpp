@@ -6,16 +6,16 @@ namespace Chotra {
     static bool GLFW_initialized = false;
 
     Window::Window(std::string title, unsigned int width, unsigned int height) 
-        : title(title), width(width), height(height) {
+        : window_data({title, width, height}) {
     
-        Init(title, width, height);
+        Init();
     }
 
     Window::~Window() {
     
     }
 
-    int Window::Init(std::string title, unsigned int width, unsigned int height) {
+    int Window::Init() {
         
         /* Initialize GLFW */
         if (!GLFW_initialized) {
@@ -27,7 +27,7 @@ namespace Chotra {
         }
     
         /* Create a windowed mode window and its OpenGL context */
-        window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
+        window = glfwCreateWindow(window_data.width, window_data.height, window_data.title.c_str(), NULL, NULL);
 
         if (!window) {
             glfwTerminate();
@@ -43,6 +43,23 @@ namespace Chotra {
             std::cout << "Failed to initialize GLAD" << std::endl;
             return -3;
         }
+
+        glfwSetWindowUserPointer(window, &window_data);
+
+        glfwSetWindowSizeCallback(window,
+            [](GLFWwindow* window, int width, int height) {
+               
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+                data.width = width;
+                data.height = height;
+
+                Event event;
+                event.width = width;
+                event.height = height;
+                data.eventCallbackFn(event);
+            }
+        );
+
         return 0;
     }
 
@@ -59,6 +76,11 @@ namespace Chotra {
  
         glfwSwapBuffers(window);
         glfwPollEvents();
+    }
+
+    void Window::SetEventCallback(const EventCallbackFn& callback) {
+
+        window_data.eventCallbackFn = callback;
     }
     
 }

@@ -4,9 +4,10 @@ project(Chotra)
 
 add_library(Chotra STATIC
 	includes/Chotra/application.h
-    src/application.cpp
-    src/window.h
-    src/window.cpp
+      src/application.cpp
+      src/window.h
+      src/window.cpp
+	src/event.h
 )
 
 target_include_directories(Chotra PUBLIC includes)

@@ -8,7 +8,7 @@ class Sandbox : public Chotra::Application {
     int frame = 0;
 
     virtual void OnUpdate() override {
-        std::cout << "Frame N." << frame++ <<std::endl;
+       
 
     }
 
