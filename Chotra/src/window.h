@@ -7,7 +7,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "event.h"
+#include "Events/event.h"
 
 namespace Chotra {
     
@@ -25,10 +25,10 @@ namespace Chotra {
         Window& operator=(Window&&) = delete;
 
         void OnUpdate();
-        unsigned int GetWidth() { return window_data.width; }
-        unsigned int GetHeight() { return window_data.height; }
+        unsigned int GetWidth() { return windowData.width; }
+        unsigned int GetHeight() { return windowData.height; }
 
-        void SetEventCallback(const EventCallbackFn& callback);
+        void SetEventCallbackFn(const EventCallbackFn& callback);
 
     private:
 
@@ -42,8 +42,8 @@ namespace Chotra {
         int Init();
         void Shutdown();
 
-        GLFWwindow* window = nullptr;
-        WindowData window_data;
+        GLFWwindow* glfwWindow = nullptr;
+        WindowData windowData;
          
     };
 }

@@ -18,7 +18,8 @@ namespace Chotra {
     int Application::Start() {
         
         window = std::make_unique<Window>("Chotra Engine", 720, 480);
-        window->SetEventCallback(
+
+        window->SetEventCallbackFn(
             [](Event& event) {
                 std::cout << "Window: size changed to " << event.width << " " << event.height << std::endl;
             }

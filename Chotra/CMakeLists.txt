@@ -7,7 +7,7 @@ add_library(Chotra STATIC
       src/application.cpp
       src/window.h
       src/window.cpp
-	src/event.h
+	src/Events/event.h
 )
 
 target_include_directories(Chotra PUBLIC includes)

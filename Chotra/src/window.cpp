@@ -6,7 +6,7 @@ namespace Chotra {
     static bool GLFW_initialized = false;
 
     Window::Window(std::string title, unsigned int width, unsigned int height) 
-        : window_data({title, width, height}) {
+        : windowData({title, width, height}) {
     
         Init();
     }
@@ -16,7 +16,6 @@ namespace Chotra {
     }
 
     int Window::Init() {
-        
         /* Initialize GLFW */
         if (!GLFW_initialized) {
             if (!glfwInit()) {
@@ -27,16 +26,16 @@ namespace Chotra {
         }
     
         /* Create a windowed mode window and its OpenGL context */
-        window = glfwCreateWindow(window_data.width, window_data.height, window_data.title.c_str(), NULL, NULL);
+        glfwWindow = glfwCreateWindow(windowData.width, windowData.height, windowData.title.c_str(), NULL, NULL);
 
-        if (!window) {
+        if (!glfwWindow) {
             glfwTerminate();
             std::cout << "Failed to create the window" << std::endl;
             return -2;
         }
  
         /* Make the window's context current */
-        glfwMakeContextCurrent(window);
+        glfwMakeContextCurrent(glfwWindow);
  
         // glad: load all OpenGL function pointers
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -44,9 +43,9 @@ namespace Chotra {
             return -3;
         }
 
-        glfwSetWindowUserPointer(window, &window_data);
+        glfwSetWindowUserPointer(glfwWindow, &windowData);
 
-        glfwSetWindowSizeCallback(window,
+        glfwSetWindowSizeCallback(glfwWindow,
             [](GLFWwindow* window, int width, int height) {
                
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
@@ -65,7 +64,7 @@ namespace Chotra {
 
     void Window::Shutdown() {
 
-        glfwDestroyWindow(window);
+        glfwDestroyWindow(glfwWindow);
         glfwTerminate();
     }
 
@@ -74,13 +73,12 @@ namespace Chotra {
         glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
  
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(glfwWindow);
         glfwPollEvents();
     }
-
-    void Window::SetEventCallback(const EventCallbackFn& callback) {
-
-        window_data.eventCallbackFn = callback;
-    }
     
+    void Window::SetEventCallbackFn(const EventCallbackFn& callback) {
+
+        windowData.eventCallbackFn = callback;
+    }
 }
