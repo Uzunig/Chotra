@@ -20,6 +20,9 @@ namespace Chotra {
 
     private:
         std::unique_ptr<class Window> window;
+
+        //EventDispatcher eventDispatcher;
+        bool closeWindow = false;
     };
 
 

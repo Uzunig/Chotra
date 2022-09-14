@@ -5,6 +5,7 @@
 
 #include "Chotra/application.h"
 #include "window.h"
+
 namespace Chotra {
     
     Application::Application() {
@@ -21,7 +22,7 @@ namespace Chotra {
 
         window->SetEventCallbackFn(
             [](Event& event) {
-                std::cout << "Window: size changed to " << event.width << " " << event.height << std::endl;
+                std::cout << "Event " << std::endl;
             }
         );
 

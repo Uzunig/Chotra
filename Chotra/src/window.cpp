@@ -52,9 +52,27 @@ namespace Chotra {
                 data.width = width;
                 data.height = height;
 
-                Event event;
-                event.width = width;
-                event.height = height;
+                WindowResizeEvent event(width, height);
+                data.eventCallbackFn(event);
+            }
+        );
+
+        glfwSetWindowCloseCallback(glfwWindow,
+            [](GLFWwindow* window) {
+
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+                
+                WindowCloseEvent event;
+                data.eventCallbackFn(event);
+            }
+        );
+
+        glfwSetCursorPosCallback(glfwWindow,
+            [](GLFWwindow* window, double newX, double newY) {
+
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+                
+                MouseMovedEvent event(newX, newY);
                 data.eventCallbackFn(event);
             }
         );
