@@ -9,6 +9,7 @@
 
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/backends/imgui_impl_glfw.h>
 
 #include "Chotra/Events/event.h"
  
@@ -47,6 +48,8 @@ namespace Chotra {
 
         GLFWwindow* glfwWindow = nullptr;
         WindowData windowData;
+
+        float backgroundColor[4] = {0.2f, 0.2f, 0.3f, 1.0f};
          
     };
 }

@@ -13,6 +13,7 @@ namespace Chotra {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui_ImplOpenGL3_Init();
+        ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true);
     }
 
     Window::~Window() {
@@ -93,7 +94,7 @@ namespace Chotra {
 
     void Window::OnUpdate() {
         
-        glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
+        glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT);
 
         ImGuiIO& io = ImGui::GetIO();
@@ -101,9 +102,14 @@ namespace Chotra {
         io.DisplaySize.y = static_cast<float>(GetHeight());
 
         ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
         ImGui::ShowDemoWindow();
+
+        ImGui::Begin("Background color");
+        ImGui::ColorEdit4("Color", backgroundColor);
+        ImGui::End();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
