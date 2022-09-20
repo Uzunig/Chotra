@@ -8,11 +8,16 @@ namespace Chotra {
     Window::Window(std::string title, unsigned int width, unsigned int height) 
         : windowData({title, width, height}) {
     
-        Init();
+        int resultCode = Init();
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui_ImplOpenGL3_Init();
     }
 
     Window::~Window() {
-    
+
+        Shutdown();
     }
 
     int Window::Init() {
@@ -90,6 +95,20 @@ namespace Chotra {
         
         glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        ImGuiIO& io = ImGui::GetIO();
+        io.DisplaySize.x = static_cast<float>(GetWidth());
+        io.DisplaySize.y = static_cast<float>(GetHeight());
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::ShowDemoWindow();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
  
         glfwSwapBuffers(glfwWindow);
         glfwPollEvents();

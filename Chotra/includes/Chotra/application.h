@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "Chotra/Events/event.h"
+
 namespace Chotra {
 
     class Application {
@@ -19,9 +21,9 @@ namespace Chotra {
         virtual void OnUpdate();
 
     private:
-        std::unique_ptr<class Window> window;
+        std::unique_ptr<class Window> mainWindow;
 
-        //EventDispatcher eventDispatcher;
+        EventDispatcher eventDispatcher;
         bool closeWindow = false;
     };
 

@@ -7,7 +7,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Events/event.h"
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
+#include "Chotra/Events/event.h"
  
 namespace Chotra {
     
