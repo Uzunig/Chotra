@@ -23,7 +23,7 @@ namespace Chotra {
 
         eventDispatcher.addEventListener<MouseMovedEvent>(
             [](MouseMovedEvent& event) {
-                std::cout << "Mous moved to  " << event.x << " " << event.y << std::endl;
+                std::cout << "Mouse moved to  " << event.x << " " << event.y << std::endl;
             });
 
         eventDispatcher.addEventListener<WindowResizeEvent>(

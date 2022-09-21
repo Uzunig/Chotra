@@ -6,7 +6,8 @@ namespace Chotra {
     static bool GLFW_initialized = false;
 
     Window::Window(std::string title, unsigned int width, unsigned int height) 
-        : windowData({title, width, height}) {
+              : windowData({title, width, height}), 
+                camera(glm::vec3(0.0f, 5.0f, 25.0f)) {
     
         int resultCode = Init();
 
@@ -82,6 +83,9 @@ namespace Chotra {
                 data.eventCallbackFn(event);
             }
         );
+
+        Scene scene(windowData.width, windowData.height, camera);
+        scene.Init(glfwWindow);
 
         return 0;
     }
