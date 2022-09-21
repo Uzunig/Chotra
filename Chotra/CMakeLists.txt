@@ -7,6 +7,40 @@ add_library(Chotra STATIC
 	includes/Chotra/Events/event.h      
 	
 	src/application.cpp
+
+	src/background.cpp
+	src/background.h
+
+	src/camera.cpp
+	src/camera.h
+
+	src/cylinder.cpp
+	src/cylinder.h
+
+	src/dashboard.cpp
+	src/dashboard.h
+
+	src/mesh.cpp
+	src/mesh.h
+
+	src/obj_model.cpp
+	src/obj_model.h
+
+	src/scene.cpp
+	src/scene.h
+
+	src/scene_object.cpp
+	src/scene_object.h
+
+	src/shader.cpp
+	src/shader.h
+
+	src/sphere.cpp
+	src/sphere.h
+
+	src/stb_image.cpp
+	src/stb_image.h
+
       src/window.h
       src/window.cpp
 )

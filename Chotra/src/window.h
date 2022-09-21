@@ -12,6 +12,9 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 
 #include "Chotra/Events/event.h"
+
+#include "camera.h"
+#include "scene.h"
  
 namespace Chotra {
     
@@ -49,7 +52,10 @@ namespace Chotra {
         GLFWwindow* glfwWindow = nullptr;
         WindowData windowData;
 
-        float backgroundColor[4] = {0.2f, 0.2f, 0.3f, 1.0f};
-         
+        float backgroundColor[4] = { 0.2f, 0.2f, 0.3f, 1.0f };
+        Camera camera;
+        std::unique_ptr<Scene> scene;
+
+                         
     };
 }

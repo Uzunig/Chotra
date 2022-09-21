@@ -6,7 +6,8 @@ namespace Chotra {
     static bool GLFW_initialized = false;
 
     Window::Window(std::string title, unsigned int width, unsigned int height) 
-        : windowData({title, width, height}) {
+              : windowData({title, width, height}), 
+                camera(glm::vec3(0.0f, 5.0f, 25.0f)){
     
         int resultCode = Init();
 
@@ -28,6 +29,7 @@ namespace Chotra {
                 std::cout << "Failed to initialize GLFW" << std::endl;
                 return -1;
             }
+            glfwWindowHint(GLFW_SAMPLES, 4);
             GLFW_initialized = true;
         }
     
@@ -49,6 +51,10 @@ namespace Chotra {
             return -3;
         }
 
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+        glEnable(GL_MULTISAMPLE);
+
         glfwSetWindowUserPointer(glfwWindow, &windowData);
 
         glfwSetWindowSizeCallback(glfwWindow,
@@ -57,7 +63,7 @@ namespace Chotra {
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
                 data.width = width;
                 data.height = height;
-
+ 
                 WindowResizeEvent event(width, height);
                 data.eventCallbackFn(event);
             }
@@ -83,6 +89,9 @@ namespace Chotra {
             }
         );
 
+        scene = std::make_unique<Scene>(windowData.width, windowData.height, camera);
+        scene->Init(glfwWindow);
+
         return 0;
     }
 
@@ -96,6 +105,10 @@ namespace Chotra {
         
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        scene->ProcessInput(glfwWindow, 0.05);
+        scene->Update(0.05);
+        scene->Render();
 
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize.x = static_cast<float>(GetWidth());

@@ -63,7 +63,8 @@ namespace Chotra {
 
         WindowResizeEvent(const unsigned int newWidth, const unsigned int newHeight) 
             : width(newWidth), height(newHeight) {
-                        
+
+                                    
         }
 
         virtual EventType GetEventType() const override{
