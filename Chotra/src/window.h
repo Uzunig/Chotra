@@ -52,11 +52,10 @@ namespace Chotra {
         GLFWwindow* glfwWindow = nullptr;
         WindowData windowData;
 
+        float backgroundColor[4] = { 0.2f, 0.2f, 0.3f, 1.0f };
         Camera camera;
-        //Scene* scene = nullptr;
+        std::unique_ptr<Scene> scene;
 
-
-        float backgroundColor[4] = {0.2f, 0.2f, 0.3f, 1.0f};
-         
+                         
     };
 }

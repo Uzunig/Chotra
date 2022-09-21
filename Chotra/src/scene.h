@@ -28,8 +28,10 @@
 // Он объединяет все игровые данные в один класс, обеспечивая тем самым простой доступ к каждому из компонентов класса и возможность управления ими
 class Scene {
 public:
-    // Игровое состояние
-    unsigned int width, height;
+   
+    unsigned int& width;
+    unsigned int& height;
+
     Camera& camera;
     float currentTime; 
     std::string background_path = "hdr/studio_small_08_4k.hdr";
@@ -68,7 +70,7 @@ public:
 
  
     // Конструктор
-    Scene(unsigned int width, unsigned int height, Camera& camera);
+    Scene(unsigned int& width, unsigned int& height, Camera& camera);
  
     // Деструктор
     ~Scene();

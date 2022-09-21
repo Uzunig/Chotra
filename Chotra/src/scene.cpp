@@ -1,7 +1,6 @@
-#include <filesystem>
 #include "scene.h"
      
-Scene::Scene(unsigned int width, unsigned int height, Camera& camera) 
+Scene::Scene(unsigned int& width, unsigned int& height, Camera& camera) 
     : width(width), height(height), camera(camera), 
       cylinder(), sphere(),
       pbrShader("shaders/pbr_shader.vs", "shaders/pbr_shader.fs"), 
@@ -12,7 +11,7 @@ Scene::Scene(unsigned int width, unsigned int height, Camera& camera)
       backgroundShader("shaders/background.vs", "shaders/background.fs"), 
       background(background_path) {
    
-    LoadSceneFromFile("D:/level1.lv");
+    LoadSceneFromFile("level1.lv");
     for (unsigned int i = 0; i <= 35; ++i) {
         sceneObjects.push_back(SceneObject(objModels[0], 
                      glm::vec3(7.0f * cos(10.0f * i / 180.0f * 3.14159f), 0.0f, 7.0f * sin(10.0f * i / 180.0f * 3.14159f)), 
@@ -287,6 +286,8 @@ void Scene::DrawDashboards(Shader& shader) {
  
 void Scene::Render() {
 
+    std::cout << "Common scene rndering" << std::endl;
+
     // 2. Рендерим сцену как обычно, но используем при этом сгенерированную карту глубины/тени
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -333,14 +334,14 @@ void Scene::Render() {
 
     pbrCylinderTangentShader1.Use();
     pbrCylinderTangentShader1.SetMat4("model", model);
-
+    
     if (spheres[0].visible) {
         spheres[0].Draw(pbrSphereTangentShader, pbrShader, pbrSphereTangentShader);
     }
     if (cylinders[0].visible) {
         cylinders[0].Draw(pbrCylinderTangentShader, pbrShader, pbrCylinderTangentShader1);    
     }
-
+    
     DrawScene(pbrShader);
     
     // Рендеринг скайбокса
@@ -355,7 +356,6 @@ void Scene::Render() {
 
 void Scene::LoadSceneFromFile(std::string const &path) {
 
-    std::cout << std::filesystem::current_path() << std::endl;
     std::ifstream level_file(path);
     if (!level_file) {
         std::cout << "The level file could not open for writing!" << std::endl;

@@ -19,7 +19,7 @@ namespace Chotra {
 
     int Application::Start() {
         
-        mainWindow = std::make_unique<Window>("Chotra Engine", 800, 600);
+        mainWindow = std::make_unique<Window>("Chotra Engine", 1280, 720);
 
         eventDispatcher.addEventListener<MouseMovedEvent>(
             [](MouseMovedEvent& event) {
@@ -27,7 +27,7 @@ namespace Chotra {
             });
 
         eventDispatcher.addEventListener<WindowResizeEvent>(
-            [](WindowResizeEvent& event) {
+            [&](WindowResizeEvent& event) {
                 std::cout << "Window resized to  " << event.width << " " << event.height << std::endl;
             });
 
