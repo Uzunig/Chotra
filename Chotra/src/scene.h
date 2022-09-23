@@ -24,68 +24,71 @@
 #include "dashboard.h"
 #include "obj_model.h"
 
-// Класс Game содержит все связанные с игрой параметры состояния и различный функционал. 
-// Он объединяет все игровые данные в один класс, обеспечивая тем самым простой доступ к каждому из компонентов класса и возможность управления ими
-class Scene {
-public:
-   
-    unsigned int& width;
-    unsigned int& height;
+namespace Chotra {
 
-    Camera& camera;
-    float currentTime; 
-    std::string background_path = "hdr/studio_small_08_4k.hdr";
-    
-    std::vector<ObjModel> objModels;
-    Cylinder cylinder;
-    Sphere sphere;
+    // Класс Game содержит все связанные с игрой параметры состояния и различный функционал. 
+    // Он объединяет все игровые данные в один класс, обеспечивая тем самым простой доступ к каждому из компонентов класса и возможность управления ими
+    class Scene {
+    public:
 
-    std::vector<SceneObject> sceneObjects;
-    std::vector<SceneObject> cylinders;
-    std::vector<SceneObject> spheres;
-    std::vector<Dashboard> dashboards;
+        unsigned int& width;
+        unsigned int& height;
 
-    Shader pbrShader;
-    Shader pbrSphereTangentShader;
-    Shader pbrCylinderTangentShader;
-    Shader pbrCylinderTangentShader1;
+        Camera& camera;
+        float currentTime;
+        std::string background_path = "hdr/studio_small_08_4k.hdr";
 
-    Shader dashboardShader;
-    Shader backgroundShader;
-    Background background;
-   
-    // Освещение
-    std::vector<glm::vec3> lightPositions = {
-        glm::vec3(3.0f, 2.0f, 0.0f),
-        glm::vec3(-2.0f, 3.0f, 2.0f),
-        glm::vec3(-2.0f, -3.0f, 2.0f),
-        glm::vec3(2.0f, -3.0f, 2.0f)
+        std::vector<ObjModel> objModels;
+        Cylinder cylinder;
+        Sphere sphere;
+
+        std::vector<SceneObject> sceneObjects;
+        std::vector<SceneObject> cylinders;
+        std::vector<SceneObject> spheres;
+        std::vector<Dashboard> dashboards;
+
+        Shader pbrShader;
+        Shader pbrSphereTangentShader;
+        Shader pbrCylinderTangentShader;
+        Shader pbrCylinderTangentShader1;
+
+        Shader dashboardShader;
+        Shader backgroundShader;
+        Background background;
+
+        // Освещение
+        std::vector<glm::vec3> lightPositions = {
+            glm::vec3(3.0f, 2.0f, 0.0f),
+            glm::vec3(-2.0f, 3.0f, 2.0f),
+            glm::vec3(-2.0f, -3.0f, 2.0f),
+            glm::vec3(2.0f, -3.0f, 2.0f)
+        };
+        std::vector<glm::vec3> lightColors = {
+            glm::vec3(300.0f, 300.0f, 300.0f),
+            glm::vec3(300.0f, 300.0f, 300.0f),
+            glm::vec3(300.0f, 300.0f, 300.0f),
+            glm::vec3(300.0f, 300.0f, 300.0f)
+        };
+
+
+        // Конструктор
+        Scene(unsigned int& width, unsigned int& height, Camera& camera);
+
+        // Деструктор
+        ~Scene();
+
+        // Инициализация начального состояния игры (загрузка всех шейдеров, текстур, уровней)
+        void Init(GLFWwindow* window);
+        void LoadSceneFromFile(std::string const& path);
+
+        // Игровой цикл
+        void ProcessInput(GLFWwindow* window, float deltaTime);
+        void Update(float dt);
+        void DrawScene(Shader& shader);
+        void DrawDashboards(Shader& shader);
+        void Render();
+
     };
-    std::vector<glm::vec3> lightColors = {
-        glm::vec3(300.0f, 300.0f, 300.0f),
-        glm::vec3(300.0f, 300.0f, 300.0f),
-        glm::vec3(300.0f, 300.0f, 300.0f),
-        glm::vec3(300.0f, 300.0f, 300.0f)
-    };
+} // namspace Chotra
 
- 
-    // Конструктор
-    Scene(unsigned int& width, unsigned int& height, Camera& camera);
- 
-    // Деструктор
-    ~Scene();
- 
-    // Инициализация начального состояния игры (загрузка всех шейдеров, текстур, уровней)
-    void Init(GLFWwindow* window);
-    void LoadSceneFromFile(std::string const &path);
-
-    // Игровой цикл
-    void ProcessInput(GLFWwindow* window, float deltaTime);
-    void Update(float dt);
-    void DrawScene(Shader& shader);
-    void DrawDashboards(Shader& shader);
-    void Render();
-
-};
- 
 #endif

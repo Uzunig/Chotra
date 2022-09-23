@@ -53,4 +53,4 @@ namespace Chotra {
     void Application::OnUpdate() {
     
     }
-}
+} // namspace Chotra

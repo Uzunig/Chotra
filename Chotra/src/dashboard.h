@@ -7,15 +7,18 @@
 
 #include "mesh.h"
 
-class Dashboard {
-public:
-    Mesh& mesh;
+namespace Chotra {
 
-    bool visible;
-    int row;
+    class Dashboard {
+    public:
+        Mesh& mesh;
 
-    Dashboard(Mesh& mesh, bool visible, int row = 0);
-    void Draw(Shader& shader);
-};
+        bool visible;
+        int row;
+
+        Dashboard(Mesh& mesh, bool visible, int row = 0);
+        void Draw(Shader& shader);
+    };
+} // namspace Chotra
 
 #endif

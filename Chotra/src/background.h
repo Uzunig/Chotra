@@ -11,36 +11,38 @@
 #include"stb_image.h"
 
 #include "shader.h"
+namespace Chotra {
 
-class Background {
-public:
-    unsigned int hdrTexture;
-    
-    unsigned int captureFBO;
-    unsigned int captureRBO;
-   
-    unsigned int cubeVAO;
-    unsigned int cubeVBO;
-    unsigned int quadVAO;
-    unsigned int quadVBO;
+    class Background {
+    public:
+        unsigned int hdrTexture;
 
-    unsigned int envCubemap;
-    unsigned int irradianceMap;
-    unsigned int prefilterMap;
-    unsigned int brdfLUTTexture;
-    
-    Background(std::string const &path);
-    void LoadHDRi(std::string const &path);
-    void SetFrameBuffer();
+        unsigned int captureFBO;
+        unsigned int captureRBO;
 
-    void SetCubeMap();
-    void SetIrradianceMap();
-    void SetPrefilterMap();
-    void SetBrdfLUTTexture();
+        unsigned int cubeVAO;
+        unsigned int cubeVBO;
+        unsigned int quadVAO;
+        unsigned int quadVBO;
 
-    void Draw();
-    void RenderCube();
-    void RenderQuad();
-};
+        unsigned int envCubemap;
+        unsigned int irradianceMap;
+        unsigned int prefilterMap;
+        unsigned int brdfLUTTexture;
+
+        Background(std::string const& path);
+        void LoadHDRi(std::string const& path);
+        void SetFrameBuffer();
+
+        void SetCubeMap();
+        void SetIrradianceMap();
+        void SetPrefilterMap();
+        void SetBrdfLUTTexture();
+
+        void Draw();
+        void RenderCube();
+        void RenderQuad();
+    };
+} // namspace Chotra
 
 #endif

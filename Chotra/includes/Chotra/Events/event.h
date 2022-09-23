@@ -99,4 +99,4 @@ namespace Chotra {
             return eventType;
         }
     };
-}
+} // namspace Chotra

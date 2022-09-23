@@ -7,27 +7,30 @@
 
 #include "mesh.h"
 
-class SceneObject {
-public:
-    Mesh& mesh;
+namespace Chotra {
 
-    glm::vec3 position;
-    glm::vec3 angle;
-    glm::vec3 pivot;
-    glm::vec3 scale;
-    glm::mat4 modelMatrix;
-    glm::vec3 velocity;
-    glm::vec3 rVelocity;
-    bool visible;
-    float deformation;
-    int deformationVector;
+    class SceneObject {
+    public:
+        Mesh& mesh;
 
-    SceneObject(Mesh& mesh, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
+        glm::vec3 position;
+        glm::vec3 angle;
+        glm::vec3 pivot;
+        glm::vec3 scale;
+        glm::mat4 modelMatrix;
+        glm::vec3 velocity;
+        glm::vec3 rVelocity;
+        bool visible;
+        float deformation;
+        int deformationVector;
+
+        SceneObject(Mesh& mesh, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
             bool visible, float deformation = 0.0f, int deformatioVector = 0);
-    void Draw(Shader& shader);
-    void Draw(Shader& shader1, Shader& shader2, Shader& shader3);
-    void Deformation(float dt);
-    void UpdateModelMatrix();
-};
+        void Draw(Shader& shader);
+        void Draw(Shader& shader1, Shader& shader2, Shader& shader3);
+        void Deformation(float dt);
+        void UpdateModelMatrix();
+    };
+} // namspace Chotra
 
 #endif

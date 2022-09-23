@@ -137,4 +137,4 @@ namespace Chotra {
 
         windowData.eventCallbackFn = callback;
     }
-}
+} // namspace Chotra
