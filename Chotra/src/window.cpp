@@ -79,6 +79,22 @@ namespace Chotra {
             }
         );
 
+        glfwSetKeyCallback(glfwWindow,
+            [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+                if (action == GLFW_PRESS) {
+                    KeyPressedEvent event(key, scancode, action, mods);
+                    data.eventCallbackFn(event);
+
+                } else if ((action == GLFW_RELEASE)) {
+                    KeyReleasedEvent event(key, scancode, action, mods);
+                    data.eventCallbackFn(event);
+                }
+                
+            }
+        );
+
         glfwSetCursorPosCallback(glfwWindow,
             [](GLFWwindow* window, double newX, double newY) {
 

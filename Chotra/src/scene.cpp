@@ -292,8 +292,6 @@ namespace Chotra {
 
     void Scene::Render() {
 
-        std::cout << "Common scene rndering" << std::endl;
-
         // 2. Рендерим сцену как обычно, но используем при этом сгенерированную карту глубины/тени
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
