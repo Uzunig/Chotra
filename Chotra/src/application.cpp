@@ -19,6 +19,8 @@ namespace Chotra {
 
     int Application::Start() {
         
+
+        float deltaTime = 0.5f;
         mainWindow = std::make_unique<Window>("Chotra Engine", 1280, 720);
 
         eventDispatcher.addEventListener<WindowResizeEvent>(
@@ -29,22 +31,65 @@ namespace Chotra {
         eventDispatcher.addEventListener<WindowCloseEvent>(
             [&](WindowCloseEvent& event) {
                 std::cout << "Window close " << std::endl;
-                closeWindow = true;
+                closeMainWindow = true;
             });
 
         eventDispatcher.addEventListener<KeyPressedEvent>(
-            [](KeyPressedEvent& event) {
-                std::cout << "Key pressed:  " << event.key << std::endl;
+            [&](KeyPressedEvent& event) {
+                std::cout << "Key pressed:  " << (char)event.key << std::endl;
+
+                if (event.key == GLFW_KEY_ESCAPE) {
+                    closeMainWindow = true;
+
+                } else if (event.key == GLFW_KEY_W) {
+                    mainWindow->camera->movementDirection.z = 1.0f;
+                }
+                else if (event.key == GLFW_KEY_S) {
+                    mainWindow->camera->movementDirection.z = -1.0f;
+                }
+                else if (event.key == GLFW_KEY_A) {
+                    mainWindow->camera->movementDirection.x = -1.0f;
+                }
+                else if (event.key == GLFW_KEY_D)
+                    mainWindow->camera->movementDirection.x = 1.0f;
             });
 
         eventDispatcher.addEventListener<KeyReleasedEvent>(
-            [](KeyReleasedEvent& event) {
-                std::cout << "Key released:  " << event.key << std::endl;
+            [&](KeyReleasedEvent& event) {
+                std::cout << "Key released:  " << (char)event.key << std::endl;
+
+                if (event.key == GLFW_KEY_W) {
+                    mainWindow->camera->movementDirection.z = 0.0f;
+
+                } else if (event.key == GLFW_KEY_S) {
+                    mainWindow->camera->movementDirection.z = 0.0f;
+
+                } else if (event.key == GLFW_KEY_A) {
+                    mainWindow->camera->movementDirection.x = 0.0f;
+
+                } else if (event.key == GLFW_KEY_D)
+                    mainWindow->camera->movementDirection.x = 0.0f;
             });
 
         eventDispatcher.addEventListener<MouseMovedEvent>(
-            [](MouseMovedEvent& event) {
+            [&](MouseMovedEvent& event) {
                 std::cout << "Mouse moved to  " << event.x << " " << event.y << std::endl;
+
+                if (mainWindow->firstMouse)
+                {
+                    mainWindow->lastMousePosition.x = event.x;
+                    mainWindow->lastMousePosition.y = event.y;
+                    mainWindow->firstMouse = false;
+                }
+
+                float xoffset = event.x - mainWindow->lastMousePosition.x;  
+                float yoffset = mainWindow->lastMousePosition.y - event.y;
+
+                mainWindow->lastMousePosition.x = event.x;     
+                mainWindow->lastMousePosition.y = event.y;
+
+                mainWindow->camera->ProcessMouseMovement(xoffset, yoffset);
+
             });
 
         mainWindow->SetEventCallbackFn(
@@ -52,7 +97,7 @@ namespace Chotra {
                 eventDispatcher.Dispatch(event);
             });
 
-        while (!closeWindow) {
+        while (!closeMainWindow) {
             mainWindow->OnUpdate();
             OnUpdate();
         }

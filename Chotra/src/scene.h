@@ -82,7 +82,7 @@ namespace Chotra {
         void LoadSceneFromFile(std::string const& path);
 
         // Игровой цикл
-        void ProcessInput(GLFWwindow* window, float deltaTime);
+        //void ProcessInput(GLFWwindow* window, float deltaTime);
         void Update(float dt);
         void DrawScene(Shader& shader);
         void DrawDashboards(Shader& shader);

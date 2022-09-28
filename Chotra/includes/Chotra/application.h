@@ -24,7 +24,7 @@ namespace Chotra {
         std::unique_ptr<class Window> mainWindow;
 
         EventDispatcher eventDispatcher;
-        bool closeWindow = false;
+        bool closeMainWindow = false;
     };
 
 

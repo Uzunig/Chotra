@@ -37,6 +37,14 @@ namespace Chotra {
 
         void SetEventCallbackFn(const EventCallbackFn& callback);
 
+
+        float backgroundColor[4] = { 0.2f, 0.2f, 0.3f, 1.0f };
+        std::unique_ptr<Camera> camera;
+        std::unique_ptr<Scene> scene;
+
+        glm::vec2 lastMousePosition;
+        bool firstMouse = true;
+
     private:
 
         struct WindowData {
@@ -52,10 +60,6 @@ namespace Chotra {
         GLFWwindow* glfwWindow = nullptr;
         WindowData windowData;
 
-        float backgroundColor[4] = { 0.2f, 0.2f, 0.3f, 1.0f };
-        Camera camera;
-        std::unique_ptr<Scene> scene;
-
-                         
+                                 
     };
 } // namspace Chotra
