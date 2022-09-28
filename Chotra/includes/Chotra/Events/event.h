@@ -15,8 +15,8 @@ namespace Chotra {
         KeyPressed,
         KeyReleased,
 
-        MouseButtonPrssed,
-        MouseButtonReleased,
+        MouseRightButtonPressed,
+        MouseRightButtonReleased,
         MouseMoved,
 
 
@@ -114,6 +114,44 @@ namespace Chotra {
 
         KeyReleasedEvent(int key, int scancode, int action, int mods)
             : key(key), scancode(scancode), action(action), mods(mods) {
+
+        }
+
+        virtual EventType GetEventType() const override {
+
+            return eventType;
+        }
+    };
+
+    struct MouseRightButtonPressedEvent : public Event { //TO DO: optimizatize
+
+        int button;
+        int action;
+        int mods;
+
+        static const EventType eventType = EventType::MouseRightButtonPressed;
+
+        MouseRightButtonPressedEvent(int button, int action, int mods)
+            : button(button), action(action), mods(mods) {
+
+        }
+
+        virtual EventType GetEventType() const override {
+
+            return eventType;
+        }
+    };
+
+    struct MouseRightButtonReleasedEvent : public Event { //TO DO: optimizatize
+
+        int button;
+        int action;
+        int mods;
+
+        static const EventType eventType = EventType::MouseRightButtonReleased;
+
+        MouseRightButtonReleasedEvent(int button, int action, int mods)
+            : button(button), action(action), mods(mods) {
 
         }
 
