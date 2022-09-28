@@ -6,8 +6,7 @@ namespace Chotra {
     static bool GLFW_initialized = false;
 
     Window::Window(std::string title, unsigned int width, unsigned int height) 
-              : windowData({title, width, height}), 
-                camera(glm::vec3(0.0f, 5.0f, 25.0f)){
+              : windowData({title, width, height}) {
     
         int resultCode = Init();
 
@@ -79,6 +78,39 @@ namespace Chotra {
             }
         );
 
+        glfwSetKeyCallback(glfwWindow,
+            [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+                if (action == GLFW_PRESS) {
+                    KeyPressedEvent event(key, scancode, action, mods);
+                    data.eventCallbackFn(event);
+
+                } else if ((action == GLFW_RELEASE)) {
+                    KeyReleasedEvent event(key, scancode, action, mods);
+                    data.eventCallbackFn(event);
+                }
+                
+            }
+        );
+
+        glfwSetMouseButtonCallback(glfwWindow,
+            [](GLFWwindow* window, int button, int action, int mods) {
+
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+                if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+                    MouseRightButtonPressedEvent event(button, action, mods);
+                    data.eventCallbackFn(event);
+
+                }
+                else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+                    MouseRightButtonReleasedEvent event(button, action, mods);
+                    data.eventCallbackFn(event);
+                }
+
+            }
+        );
+
         glfwSetCursorPosCallback(glfwWindow,
             [](GLFWwindow* window, double newX, double newY) {
 
@@ -89,8 +121,15 @@ namespace Chotra {
             }
         );
 
-        scene = std::make_unique<Scene>(windowData.width, windowData.height, camera);
+        // tell GLFW to captur our mouse
+        //glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+        camera = std::make_unique<Camera>(glm::vec3(0.0f, 5.0f, 25.0f));
+
+        scene = std::make_unique<Scene>(windowData.width, windowData.height, *camera);
         scene->Init(glfwWindow);
+
+        lastMousePosition = glm::vec2(GetWidth() / 2, GetHeight() / 2);
 
         return 0;
     }
@@ -106,10 +145,10 @@ namespace Chotra {
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        scene->ProcessInput(glfwWindow, 0.05);
+        camera->ProcessKeyboard(0.05);
         scene->Update(0.05);
         scene->Render();
-
+        
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize.x = static_cast<float>(GetWidth());
         io.DisplaySize.y = static_cast<float>(GetHeight());
@@ -118,15 +157,21 @@ namespace Chotra {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::ShowDemoWindow();
+        //ImGui::ShowDemoWindow();
+
+        ImGui::SetNextWindowPos(ImVec2(GetWidth() - 200, 0));
+        ImGui::SetNextWindowSize(ImVec2(200, GetHeight()));
 
         ImGui::Begin("Background color");
-        ImGui::ColorEdit4("Color", backgroundColor);
-        ImGui::End();
 
+        ImGui::ColorEdit4("Color", backgroundColor);
+        ImGui::SliderFloat("Speed", &camera->MovementSpeed, 3.0f, 10.0f);
+        
+        ImGui::End();
+        
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+        
 
  
         glfwSwapBuffers(glfwWindow);
@@ -136,5 +181,36 @@ namespace Chotra {
     void Window::SetEventCallbackFn(const EventCallbackFn& callback) {
 
         windowData.eventCallbackFn = callback;
+    }
+
+    void Window::SetPlayerMode(bool playerMode) {
+        if (this->playerMode = playerMode) {
+            glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        } else {
+            glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+    }
+
+    bool Window::GetPlayerMode() {
+        if (playerMode) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    void Window::SetFirstMouse(bool firstMouse) {
+        this->firstMouse = firstMouse;
+    }
+
+    bool Window::GetFirstMouse() {
+        if (firstMouse) {
+            return true;
+        }
+        else {
+            return false;
+        }
+
     }
 } // namspace Chotra

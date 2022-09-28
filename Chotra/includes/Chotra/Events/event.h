@@ -13,10 +13,10 @@ namespace Chotra {
         WindowClose,
 
         KeyPressed,
-        KeyReleasd,
+        KeyReleased,
 
-        MouseButtonPrssed,
-        MouseButtonReleased,
+        MouseRightButtonPressed,
+        MouseRightButtonReleased,
         MouseMoved,
 
 
@@ -77,6 +77,84 @@ namespace Chotra {
 
         static const EventType eventType = EventType::WindowClose;
                 
+        virtual EventType GetEventType() const override {
+
+            return eventType;
+        }
+    };
+
+    struct KeyPressedEvent : public Event { //TO DO: optimizatize
+
+        int key; 
+        int scancode; 
+        int action; 
+        int mods;
+
+        static const EventType eventType = EventType::KeyPressed;
+
+        KeyPressedEvent(int key, int scancode, int action, int mods)
+            : key(key), scancode(scancode), action(action), mods(mods) {
+
+        }
+
+        virtual EventType GetEventType() const override {
+
+            return eventType;
+        }
+    };
+
+    struct KeyReleasedEvent : public Event { //TO DO: optimizatize
+
+        int key;
+        int scancode;
+        int action;
+        int mods;
+
+        static const EventType eventType = EventType::KeyReleased;
+
+        KeyReleasedEvent(int key, int scancode, int action, int mods)
+            : key(key), scancode(scancode), action(action), mods(mods) {
+
+        }
+
+        virtual EventType GetEventType() const override {
+
+            return eventType;
+        }
+    };
+
+    struct MouseRightButtonPressedEvent : public Event { //TO DO: optimizatize
+
+        int button;
+        int action;
+        int mods;
+
+        static const EventType eventType = EventType::MouseRightButtonPressed;
+
+        MouseRightButtonPressedEvent(int button, int action, int mods)
+            : button(button), action(action), mods(mods) {
+
+        }
+
+        virtual EventType GetEventType() const override {
+
+            return eventType;
+        }
+    };
+
+    struct MouseRightButtonReleasedEvent : public Event { //TO DO: optimizatize
+
+        int button;
+        int action;
+        int mods;
+
+        static const EventType eventType = EventType::MouseRightButtonReleased;
+
+        MouseRightButtonReleasedEvent(int button, int action, int mods)
+            : button(button), action(action), mods(mods) {
+
+        }
+
         virtual EventType GetEventType() const override {
 
             return eventType;

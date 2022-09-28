@@ -19,12 +19,13 @@ namespace Chotra {
 
         virtual int Start();
         virtual void OnUpdate();
-
+ 
     private:
         std::unique_ptr<class Window> mainWindow;
 
         EventDispatcher eventDispatcher;
-        bool closeWindow = false;
+        bool closeMainWindow = false;
+                
     };
 
 

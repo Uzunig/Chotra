@@ -9,14 +9,7 @@
 
 namespace Chotra {
 
-    // Определяет несколько возможных вариантов движения камеры. Используется в качестве абстракции, чтобы держаться подальше от специфичных для оконной системы методов ввода
-    enum Camera_Movement {
-        FORWARD,
-        BACKWARD,
-        LEFT,
-        RIGHT
-    };
-
+    
     // Абстрактный класс камеры, который обрабатывает входные данные и вычисляет соответствующие Эйлеровы углы, векторы и матрицы для использования в OpenGL
     class Camera {
     public:
@@ -29,6 +22,9 @@ namespace Chotra {
         // углы Эйлера
         float Yaw;
         float Pitch;
+
+        glm::vec3 movementDirection; 
+
         // Настройки камеры
         float MovementSpeed; //Скорость движения за единицу времени
         float MouseSensitivity; //Коэффициент преобразования смещения мыши по экрану в углы Эйлера
@@ -39,7 +35,7 @@ namespace Chotra {
 
         glm::mat4 GetViewMatrix();
         void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-        void ProcessKeyboard(Camera_Movement direction, float deltaTime);
+        void ProcessKeyboard(float deltaTime);
         void ProcessMouseScroll(float yoffset);
 
     private:

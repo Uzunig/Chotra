@@ -19,18 +19,11 @@ namespace Chotra {
 
 
     //Обрабатываем входные данные, полученные от любой клавиатуроподобной системы ввода. Принимаем входной параметр в виде определенного камерой перечисления (для абстрагирования его от оконных систем)
-    void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime) {
+    void Camera::ProcessKeyboard(float deltaTime) {
 
-        float velocity = MovementSpeed * deltaTime;  //Количество смещения за время deltaTime
-
-        if (direction == FORWARD)
-            Position += Front * velocity;    //Единичный вектор направления умножаем на количество смещения и получаем смезение в заданном направлении
-        if (direction == BACKWARD)
-            Position -= Front * velocity;
-        if (direction == LEFT)
-            Position -= Right * velocity;
-        if (direction == RIGHT)
-            Position += Right * velocity;
+        glm::vec3 movement = movementDirection * MovementSpeed * deltaTime;  
+        Position += Front * movement.z;
+        Position += Right * movement.x;
     }
 
 
