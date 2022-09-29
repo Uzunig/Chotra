@@ -76,8 +76,8 @@ namespace Chotra {
         glViewport(0, 0, scrWidth, scrHeight);
     }
 
-    void Scene::Update(float dt) {
-        dt *= 50.0f;
+    void Scene::Update(float deltaTime) {
+        float dt = deltaTime * 50.0f;
         //straight screw
         for (unsigned int i = 0; i <= 8; ++i) {
             if (sceneObjects[i].visible) {

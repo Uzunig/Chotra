@@ -141,13 +141,13 @@ namespace Chotra {
         glfwTerminate();
     }
 
-    void Window::OnUpdate() {
+    void Window::OnUpdate(float deltaTime) {
         
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        camera->ProcessKeyboard(0.05);
-        scene->Update(0.05);
+        camera->ProcessKeyboard(deltaTime);
+        scene->Update(deltaTime);
         scene->Render();
         
         ImGuiIO& io = ImGui::GetIO();
