@@ -127,8 +127,9 @@ namespace Chotra {
 
         camera = std::make_unique<Camera>(glm::vec3(0.0f, 5.0f, 25.0f));
 
-        scene = std::make_unique<Scene>(windowData.width, windowData.height, *camera);
-        scene->Init(glfwWindow);
+        scene = std::make_unique<Scene>();
+        renderer = std::make_unique<Renderer>(windowData.width, windowData.height, *camera, *scene);
+        renderer->Init(glfwWindow);
 
         lastMousePosition = glm::vec2(GetWidth() / 2, GetHeight() / 2);
 
@@ -148,7 +149,7 @@ namespace Chotra {
 
         camera->ProcessKeyboard(deltaTime);
         scene->Update(deltaTime);
-        scene->Render();
+        renderer->Render();
         
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize.x = static_cast<float>(GetWidth());
