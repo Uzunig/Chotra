@@ -17,7 +17,7 @@ namespace Chotra {
 		unsigned int ID;
 
 		// Конструктор геренирует шейдер
-		Shader() {};
+		//Shader() {};
 		Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
 
 		// Активация шейдера

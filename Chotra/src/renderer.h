@@ -32,11 +32,50 @@ namespace Chotra {
         Shader pbrCylinderTangentShader;
         Shader pbrCylinderTangentShader1;
 
+        Shader screenShader;
+        Shader downSamplingShader;
+        Shader combineShader;
+
+        Shader shaderBlur;
+        Shader shaderBloomFinal;
+
         Shader dashboardShader;
         Shader backgroundShader;
 
+
+
+        unsigned int framebuffer;
+        unsigned int textureColorBufferMultiSampled;
+        unsigned int rbo;
+
+        unsigned int intermediateFBO;
+        unsigned int screenTexture;
+
+        bool bloom = true;
+        bool bloomKeyPressed = false;
+        float exposure = 1.0f;
+
+        unsigned int hdrFBO;
+        unsigned int colorBuffers[2];
+        unsigned int rboDepth;
+        unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+
+        unsigned int downPingpongFBO[16][2];
+        unsigned int downPingpongColorbuffers[16][2];
+
+        unsigned int upFBO[16];
+        unsigned int upColorbuffers[16];
+
+        unsigned int quadVAO = 0;
+        unsigned int quadVBO;
+
         void Init(GLFWwindow* window);
         void Render();
+
+        void SetupQuad();
+        void RenderQuad();
+        void ConfigureMSAA();
+        void ConfigureBloom();
     };
 
 } // namespace Chotra

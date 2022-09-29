@@ -168,6 +168,7 @@ namespace Chotra {
 
         ImGui::ColorEdit4("Background color", backgroundColor);
         ImGui::SliderFloat("Speed", &camera->MovementSpeed, 3.0f, 10.0f);
+        ImGui::SliderFloat("Exposure", &renderer->exposure, 0.0f, 10.0f);
         
         ImGui::End();
         
