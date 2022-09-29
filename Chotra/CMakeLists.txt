@@ -26,6 +26,9 @@ add_library(Chotra STATIC
 	src/obj_model.cpp
 	src/obj_model.h
 
+	src/renderer.cpp
+	src/renderer.h
+
 	src/scene.cpp
 	src/scene.h
 

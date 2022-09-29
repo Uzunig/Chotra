@@ -15,8 +15,7 @@
 
 #include "stb_image.h"
 
-#include "shader.h"
-#include "camera.h"
+
 #include "background.h"
 #include "sphere.h"
 #include "cylinder.h"
@@ -31,11 +30,7 @@ namespace Chotra {
     class Scene {
     public:
 
-        unsigned int& width;
-        unsigned int& height;
-
-        Camera& camera;
-        float currentTime;
+               
         std::string background_path = "hdr/studio_small_08_4k.hdr";
 
         std::vector<ObjModel> objModels;
@@ -47,15 +42,7 @@ namespace Chotra {
         std::vector<SceneObject> spheres;
         std::vector<Dashboard> dashboards;
 
-        Shader pbrShader;
-        Shader pbrSphereTangentShader;
-        Shader pbrCylinderTangentShader;
-        Shader pbrCylinderTangentShader1;
-
-        Shader dashboardShader;
-        Shader backgroundShader;
-
-        
+                
         Background background;
 
         // Освещение
@@ -74,20 +61,20 @@ namespace Chotra {
 
 
         // Конструктор
-        Scene(unsigned int& width, unsigned int& height, Camera& camera);
+        Scene();
 
         // Деструктор
         ~Scene();
 
         // Инициализация начального состояния игры (загрузка всех шейдеров, текстур, уровней)
-        void Init(GLFWwindow* window);
+        
         void LoadSceneFromFile(std::string const& path);
 
         // Игровой цикл
         void Update(float dt);
         void DrawScene(Shader& shader);
-        void DrawDashboards(Shader& shader);
-        void Render();
+        //void DrawDashboards(Shader& shader);
+        
 
     };
 } // namspace Chotra

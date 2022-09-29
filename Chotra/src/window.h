@@ -15,6 +15,7 @@
 
 #include "camera.h"
 #include "scene.h"
+#include "renderer.h"
  
 namespace Chotra {
     
@@ -47,6 +48,8 @@ namespace Chotra {
 
         std::unique_ptr<Camera> camera;
         std::unique_ptr<Scene> scene;
+        std::unique_ptr<Renderer> renderer;
+        
 
         glm::vec2 lastMousePosition;
         
