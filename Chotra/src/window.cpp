@@ -62,7 +62,8 @@ namespace Chotra {
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
                 data.width = width;
                 data.height = height;
- 
+                  
+                
                 WindowResizeEvent event(width, height);
                 data.eventCallbackFn(event);
             }
@@ -159,12 +160,12 @@ namespace Chotra {
 
         //ImGui::ShowDemoWindow();
 
-        ImGui::SetNextWindowPos(ImVec2(GetWidth() - 200, 0));
-        ImGui::SetNextWindowSize(ImVec2(200, GetHeight()));
+        ImGui::SetNextWindowPos(ImVec2(GetWidth() - 300, 0));
+        ImGui::SetNextWindowSize(ImVec2(300, GetHeight()));
 
         ImGui::Begin("Background color");
 
-        ImGui::ColorEdit4("Color", backgroundColor);
+        ImGui::ColorEdit4("Background color", backgroundColor);
         ImGui::SliderFloat("Speed", &camera->MovementSpeed, 3.0f, 10.0f);
         
         ImGui::End();

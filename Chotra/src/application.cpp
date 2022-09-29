@@ -21,11 +21,12 @@ namespace Chotra {
 
 
         float deltaTime = 0.5f;
-        mainWindow = std::make_unique<Window>("Chotra Engine", 1280, 720);
+        mainWindow = std::make_unique<Window>("Chotra Engine", 1600, 1024);
 
         eventDispatcher.addEventListener<WindowResizeEvent>(
             [&](WindowResizeEvent& event) {
                 std::cout << "Window resized to  " << event.width << " " << event.height << std::endl;
+                
             });
 
         eventDispatcher.addEventListener<WindowCloseEvent>(

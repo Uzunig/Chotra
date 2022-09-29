@@ -36,38 +36,38 @@ namespace Chotra {
     }
 
     void Scene::Init(GLFWwindow* window) {
-
+        /*
         glm::mat4 projection;
         projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
-
+        */
         // Активируем шейдер и передаем матрицы
         pbrShader.Use();
-        pbrShader.SetMat4("projection", projection);
+        //pbrShader.SetMat4("projection", projection);
         pbrShader.SetInt("irradianceMap", 5);
         pbrShader.SetInt("prefilterMap", 6);
         pbrShader.SetInt("brdfLUT", 7);
 
         pbrSphereTangentShader.Use();
-        pbrSphereTangentShader.SetMat4("projection", projection);
+        //pbrSphereTangentShader.SetMat4("projection", projection);
         pbrSphereTangentShader.SetInt("irradianceMap", 5);
         pbrSphereTangentShader.SetInt("prefilterMap", 6);
         pbrSphereTangentShader.SetInt("brdfLUT", 7);
 
         pbrCylinderTangentShader.Use();
-        pbrCylinderTangentShader.SetMat4("projection", projection);
+        //pbrCylinderTangentShader.SetMat4("projection", projection);
         pbrCylinderTangentShader.SetInt("irradianceMap", 5);
         pbrCylinderTangentShader.SetInt("prefilterMap", 6);
         pbrCylinderTangentShader.SetInt("brdfLUT", 7);
 
         pbrCylinderTangentShader1.Use();
-        pbrCylinderTangentShader1.SetMat4("projection", projection);
+        //pbrCylinderTangentShader1.SetMat4("projection", projection);
         pbrCylinderTangentShader1.SetInt("irradianceMap", 5);
         pbrCylinderTangentShader1.SetInt("prefilterMap", 6);
         pbrCylinderTangentShader1.SetInt("brdfLUT", 7);
 
 
         backgroundShader.Use();
-        backgroundShader.SetMat4("projection", projection);
+        //backgroundShader.SetMat4("projection", projection);
         backgroundShader.SetInt("environmentMap", 0);
 
         // Далее, перед рендерингом, конфигурируем видовой экран в соответствии с исходными размерами экрана фреймбуфера
@@ -280,23 +280,30 @@ namespace Chotra {
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glm::mat4 projection;
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
+
         pbrShader.Use();
         glm::mat4 view = camera.GetViewMatrix();
+        pbrShader.SetMat4("projection", projection);
         pbrShader.SetMat4("view", view);
         pbrShader.SetVec3("camPos", camera.Position);
         //pbrShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
 
         pbrSphereTangentShader.Use();
+        pbrSphereTangentShader.SetMat4("projection", projection);
         pbrSphereTangentShader.SetMat4("view", view);
         pbrSphereTangentShader.SetVec3("camPos", camera.Position);
         // pbrSphereTangentShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
 
         pbrCylinderTangentShader.Use();
+        pbrCylinderTangentShader.SetMat4("projection", projection);
         pbrCylinderTangentShader.SetMat4("view", view);
         pbrCylinderTangentShader.SetVec3("camPos", camera.Position);
         // pbrCylinderTangentShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
 
         pbrCylinderTangentShader1.Use();
+        pbrCylinderTangentShader1.SetMat4("projection", projection);
         pbrCylinderTangentShader1.SetMat4("view", view);
         pbrCylinderTangentShader1.SetVec3("camPos", camera.Position);
         // pbrCylinderTangentShader1.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
@@ -331,14 +338,14 @@ namespace Chotra {
         }
 
         DrawScene(pbrShader);
-
+/*
         // Рендеринг скайбокса
         backgroundShader.Use();
         backgroundShader.SetMat4("view", view);
         background.Draw();
         // Рисуем панель инструментов в самом конце
         DrawDashboards(dashboardShader);
-
+        */
 
     }
 
