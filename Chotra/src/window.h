@@ -31,7 +31,7 @@ namespace Chotra {
         Window& operator=(const Window&) = delete;
         Window& operator=(Window&&) = delete;
 
-        void OnUpdate();
+        void OnUpdate(float deltaTime);
         unsigned int GetWidth() { return windowData.width; }
         unsigned int GetHeight() { return windowData.height; }
 

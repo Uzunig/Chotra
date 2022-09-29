@@ -7,7 +7,7 @@ class Sandbox : public Chotra::Application {
     
     int frame = 0;
 
-    virtual void OnUpdate() override {
+    virtual void OnUpdate(float deltaTime) override {
        
 
     }

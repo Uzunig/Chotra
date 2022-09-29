@@ -18,14 +18,19 @@ namespace Chotra {
         Application& operator=(Application&&) = delete;
 
         virtual int Start();
-        virtual void OnUpdate();
- 
+        virtual void OnUpdate(float deltaTime);
+
     private:
         std::unique_ptr<class Window> mainWindow;
 
         EventDispatcher eventDispatcher;
         bool closeMainWindow = false;
-                
+
+        float currentTime = 0.0f;
+        float deltaTime = 0.0f;
+        float lastFrame = 0.0f;
+          
+
     };
 
 

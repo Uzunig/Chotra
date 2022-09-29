@@ -19,14 +19,12 @@ namespace Chotra {
 
     int Application::Start() {
 
-
-        float deltaTime = 0.5f;
         mainWindow = std::make_unique<Window>("Chotra Engine", 1600, 1024);
 
         eventDispatcher.addEventListener<WindowResizeEvent>(
             [&](WindowResizeEvent& event) {
                 std::cout << "Window resized to  " << event.width << " " << event.height << std::endl;
-                
+
             });
 
         eventDispatcher.addEventListener<WindowCloseEvent>(
@@ -46,19 +44,17 @@ namespace Chotra {
                 if (mainWindow->GetPlayerMode()) {
                     if (event.key == GLFW_KEY_W) {
                         mainWindow->camera->movementDirection.z += 1.0f;
-                    }
-                    else if (event.key == GLFW_KEY_S) {
+                    } else if (event.key == GLFW_KEY_S) {
                         mainWindow->camera->movementDirection.z -= 1.0f;
-                    }
-                    else if (event.key == GLFW_KEY_A) {
+                    } else if (event.key == GLFW_KEY_A) {
                         mainWindow->camera->movementDirection.x -= 1.0f;
-                    }
-                    else if (event.key == GLFW_KEY_D) {
+                    } else if (event.key == GLFW_KEY_D) {
                         mainWindow->camera->movementDirection.x += 1.0f;
                     }
                 }
             });
 
+        // TODO: Register of pressed keys
         eventDispatcher.addEventListener<KeyReleasedEvent>(
             [&](KeyReleasedEvent& event) {
                 std::cout << "Key released:  " << (char)event.key << std::endl;
@@ -94,7 +90,7 @@ namespace Chotra {
                 mainWindow->camera->movementDirection.z = 0.0f;
                 mainWindow->camera->movementDirection.x = 0.0f;
                 mainWindow->camera->movementDirection.x = 0.0f;
-               
+
             });
 
         eventDispatcher.addEventListener<MouseMovedEvent>(
@@ -126,14 +122,19 @@ namespace Chotra {
             });
 
         while (!closeMainWindow) {
-            mainWindow->OnUpdate();
-            OnUpdate();
+
+            currentTime = glfwGetTime();
+            deltaTime = currentTime - lastFrame;
+            lastFrame = currentTime;
+
+            mainWindow->OnUpdate(deltaTime);
+            OnUpdate(deltaTime);
         }
         mainWindow = nullptr;
         return 0;
     }
 
-    void Application::OnUpdate() {
+    void Application::OnUpdate(float deltaTime) {
 
     }
 } // namspace Chotra

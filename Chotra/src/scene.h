@@ -54,6 +54,8 @@ namespace Chotra {
 
         Shader dashboardShader;
         Shader backgroundShader;
+
+        
         Background background;
 
         // Освещение
