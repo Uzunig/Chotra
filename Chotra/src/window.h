@@ -44,8 +44,6 @@ namespace Chotra {
         void SetFirstMouse(bool firstMouse);
         bool GetFirstMouse();
 
-        float backgroundColor[4] = { 0.2f, 0.2f, 0.3f, 1.0f };
-
         std::unique_ptr<Camera> camera;
         std::unique_ptr<Scene> scene;
         std::unique_ptr<Renderer> renderer;

@@ -40,7 +40,6 @@ namespace Chotra {
         std::vector<SceneObject> sceneObjects;
         std::vector<SceneObject> cylinders;
         std::vector<SceneObject> spheres;
-        std::vector<Dashboard> dashboards;
 
                 
         Background background;
@@ -73,7 +72,10 @@ namespace Chotra {
         // Игровой цикл
         void Update(float dt);
         void DrawScene(Shader& shader);
-        //void DrawDashboards(Shader& shader);
+
+        void DemoInit();
+        void DemoUpdate(float deltaTime);
+       
         
 
     };
