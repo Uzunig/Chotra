@@ -123,14 +123,14 @@ namespace Chotra {
         pbrCylinderTangentShader1.Use();
         pbrCylinderTangentShader1.SetMat4("model", model);
 
-/* Demo scne
+
         if (scene.spheres[0].visible) {
             scene.spheres[0].Draw(pbrSphereTangentShader, pbrShader, pbrSphereTangentShader);
         }
         if (scene.cylinders[0].visible) {
             scene.cylinders[0].Draw(pbrCylinderTangentShader, pbrShader, pbrCylinderTangentShader1);
         }
-        */
+        
 
         scene.DrawScene(pbrShader);
         

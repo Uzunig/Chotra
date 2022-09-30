@@ -143,7 +143,8 @@ namespace Chotra {
     void Window::OnUpdate(float deltaTime) {
 
         camera->ProcessKeyboard(deltaTime);
-        scene->Update(deltaTime);
+        scene->DemoUpdate(deltaTime);
+        //scene->Update(deltaTime);
         renderer->Render();
 
         ImGuiIO& io = ImGui::GetIO();

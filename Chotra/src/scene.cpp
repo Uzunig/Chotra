@@ -6,8 +6,8 @@ namespace Chotra {
         : cylinder(), sphere(),
         background(background_path) {
 
-        LoadSceneFromFile("level1.lv");
-        //DemoInit();
+        LoadSceneFromFile("level_demo.lv");
+        DemoInit();
     }
 
     Scene::~Scene() {
