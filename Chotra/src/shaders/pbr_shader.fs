@@ -130,7 +130,7 @@ void main()
     vec3 color = ambient + Lo;
 
     // Тональная компрессия HDR
-    color = color / (color + vec3(1.0));
+    //color = color / (color + vec3(1.0));
     
 	// Гамма-коррекция
     //color = pow(color, vec3(1.0/2.2)); 

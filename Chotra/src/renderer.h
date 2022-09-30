@@ -41,6 +41,7 @@ namespace Chotra {
 
         Shader backgroundShader;
 
+        bool perspectiveProjection;    
         float backgroundColor[4] = { 0.2f, 0.2f, 0.3f, 1.0f };
         bool drawSkybox = true;
         bool bloom = true;

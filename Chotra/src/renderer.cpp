@@ -6,17 +6,17 @@ namespace Chotra {
 
     Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene)
         : width(width), height(height),
-          camera(camera), scene(scene),
-          pbrShader("shaders/pbr_shader.vs", "shaders/pbr_shader.fs"),
-          screenShader("shaders/screen_shader.vs", "shaders/screen_shader.fs"),
-          downSamplingShader("shaders/downsampling.vs", "shaders/downsampling.fs"),
-          combineShader("shaders/downsampling.vs", "shaders/combine.fs"),
-          shaderBlur("shaders/blur.vs", "shaders/blur.fs"),
-          shaderBloomFinal("shaders/bloom_final.vs", "shaders/bloom_final.fs"),
-          pbrSphereTangentShader("shaders/pbr_sphere_tangent.vs", "shaders/pbr_shader.fs"),
-          pbrCylinderTangentShader("shaders/pbr_cylinder_tangent.vs", "shaders/pbr_shader.fs"),
-          pbrCylinderTangentShader1("shaders/pbr_cylinder_tangent1.vs", "shaders/pbr_shader.fs"),
-          backgroundShader("shaders/background.vs", "shaders/background.fs") {
+        camera(camera), scene(scene),
+        pbrShader("shaders/pbr_shader.vs", "shaders/pbr_shader.fs"),
+        screenShader("shaders/screen_shader.vs", "shaders/screen_shader.fs"),
+        downSamplingShader("shaders/downsampling.vs", "shaders/downsampling.fs"),
+        combineShader("shaders/downsampling.vs", "shaders/combine.fs"),
+        shaderBlur("shaders/blur.vs", "shaders/blur.fs"),
+        shaderBloomFinal("shaders/bloom_final.vs", "shaders/bloom_final.fs"),
+        pbrSphereTangentShader("shaders/pbr_sphere_tangent.vs", "shaders/pbr_shader.fs"),
+        pbrCylinderTangentShader("shaders/pbr_cylinder_tangent.vs", "shaders/pbr_shader.fs"),
+        pbrCylinderTangentShader1("shaders/pbr_cylinder_tangent1.vs", "shaders/pbr_shader.fs"),
+        backgroundShader("shaders/background.vs", "shaders/background.fs") {
 
         SetupQuad(); //Создаем экранный прямоуголник
         ConfigureMSAA();
@@ -26,8 +26,8 @@ namespace Chotra {
 
     void Renderer::Init(GLFWwindow* window) {
 
-        
-       
+
+
         // Активируем шейдер и передаем матрицы
         pbrShader.Use();
         pbrShader.SetInt("irradianceMap", 5);
@@ -66,7 +66,7 @@ namespace Chotra {
 
         // 1. Отрисовываем обычную сцену в мультисэмплированные буферы
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        
+
         // 2. Рендерим сцену как обычно, но используем при этом сгенерированную карту глубины/тени
         glViewport(0, 0, width, height);
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
@@ -74,8 +74,11 @@ namespace Chotra {
         glEnable(GL_DEPTH_TEST);
 
         glm::mat4 projection;
-        projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
-
+        if (perspectiveProjection) {
+            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
+        } else {
+            projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+        }
         pbrShader.Use();
         glm::mat4 view = camera.GetViewMatrix();
         pbrShader.SetMat4("projection", projection);
@@ -130,10 +133,10 @@ namespace Chotra {
         if (scene.cylinders[0].visible) {
             scene.cylinders[0].Draw(pbrCylinderTangentShader, pbrShader, pbrCylinderTangentShader1);
         }
-        
+
 
         scene.DrawScene(pbrShader);
-        
+
         if (drawSkybox) {
             // Skybox drawing
             backgroundShader.Use();
@@ -141,7 +144,7 @@ namespace Chotra {
             backgroundShader.SetMat4("view", view);
             scene.background.Draw();
         }
-                
+
         // 2. Теперь блитируем мультисэмплированный буфер(ы) в нормальный цветовой буфер промежуточного FBO. Изображение сохранено в screenTexture
         glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
@@ -177,7 +180,8 @@ namespace Chotra {
                 shaderBlur.SetInt("horizontal", horizontal);
                 if (first_iteration && (j == 0)) {
                     glBindTexture(GL_TEXTURE_2D, first_iteration ? colorBuffers[1] : downPingpongColorbuffers[j][!horizontal]);
-                } else {
+                }
+                else {
                     glBindTexture(GL_TEXTURE_2D, first_iteration ? downPingpongColorbuffers[j - 1][!horizontal] : downPingpongColorbuffers[j][!horizontal]);
                 }
                 RenderQuad();

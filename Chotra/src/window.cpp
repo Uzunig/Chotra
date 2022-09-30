@@ -167,11 +167,14 @@ namespace Chotra {
             ImGui::Checkbox("Draw skybox", &renderer->drawSkybox);
         }
 
-        if (ImGui::CollapsingHeader("Camera configuration")) {
+        if (ImGui::CollapsingHeader("Camera settings")) {
             ImGui::SliderFloat("Speed", &camera->MovementSpeed, 3.0f, 10.0f);
+            ImGui::SliderFloat("Zoom", &camera->Zoom, 15.0f, 90.0f);
+            //ImGui::Checkbox("Perspective projection", &renderer->perspectiveProjection);
+
         }
 
-        if (ImGui::CollapsingHeader("LIghting options")) {
+        if (ImGui::CollapsingHeader("Post effects")) {
             ImGui::SliderFloat("Exposure", &renderer->exposure, 0.0f, 10.0f);
             ImGui::Checkbox("Bloom", &renderer->bloom);
             ImGui::Checkbox("Gamma correction", &renderer->gammaCorrection);
