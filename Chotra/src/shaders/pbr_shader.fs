@@ -5,6 +5,7 @@ in vec3 WorldPos;
 in vec3 Normal;
 //in vec4 FragPosLightSpace;
 
+
 // Параметры материала
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
@@ -132,7 +133,7 @@ void main()
     color = color / (color + vec3(1.0));
     
 	// Гамма-коррекция
-    color = pow(color, vec3(1.0/2.2)); 
+    //color = pow(color, vec3(1.0/2.2)); 
 
     FragColor = vec4(color , 1.0);
 }

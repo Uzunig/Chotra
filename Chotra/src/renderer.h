@@ -39,22 +39,21 @@ namespace Chotra {
         Shader shaderBlur;
         Shader shaderBloomFinal;
 
-        Shader dashboardShader;
         Shader backgroundShader;
 
-
-
+        float backgroundColor[4] = { 0.2f, 0.2f, 0.3f, 1.0f };
+        bool drawSkybox = true;
+        bool bloom = true;
+        float exposure = 1.0f;
+        bool gammaCorrection = true;
+        
         unsigned int framebuffer;
         unsigned int textureColorBufferMultiSampled;
         unsigned int rbo;
 
         unsigned int intermediateFBO;
         unsigned int screenTexture;
-
-        bool bloom = true;
-        bool bloomKeyPressed = false;
-        float exposure = 1.0f;
-
+                
         unsigned int hdrFBO;
         unsigned int colorBuffers[2];
         unsigned int rboDepth;
@@ -68,6 +67,8 @@ namespace Chotra {
 
         unsigned int quadVAO = 0;
         unsigned int quadVBO;
+
+        
 
         void Init(GLFWwindow* window);
         void Render();

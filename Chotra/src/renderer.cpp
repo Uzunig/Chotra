@@ -16,16 +16,17 @@ namespace Chotra {
           pbrSphereTangentShader("shaders/pbr_sphere_tangent.vs", "shaders/pbr_shader.fs"),
           pbrCylinderTangentShader("shaders/pbr_cylinder_tangent.vs", "shaders/pbr_shader.fs"),
           pbrCylinderTangentShader1("shaders/pbr_cylinder_tangent1.vs", "shaders/pbr_shader.fs"),
-          dashboardShader("shaders/dashboard_shader.vs", "shaders/dashboard_shader.fs"),
           backgroundShader("shaders/background.vs", "shaders/background.fs") {
+
+        SetupQuad(); //Создаем экранный прямоуголник
+        ConfigureMSAA();
+        ConfigureBloom();
 
     }
 
     void Renderer::Init(GLFWwindow* window) {
 
-        SetupQuad(); //Создаем экранный прямоуголник
-        ConfigureMSAA();
-        ConfigureBloom();
+        
        
         // Активируем шейдер и передаем матрицы
         pbrShader.Use();
@@ -52,23 +53,25 @@ namespace Chotra {
         backgroundShader.Use();
         backgroundShader.SetInt("environmentMap", 0);
 
+        screenShader.Use();
+        screenShader.SetInt("screenTexture", 0);
+
         // Далее, перед рендерингом, конфигурируем видовой экран в соответствии с исходными размерами экрана фреймбуфера
-        int scrWidth, scrHeight;
-        glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
-        glViewport(0, 0, scrWidth, scrHeight);
+       // int scrWidth, scrHeight;
+       // glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
+       // glViewport(0, 0, scrWidth, scrHeight);
     }
 
     void Renderer::Render() {
 
         // 1. Отрисовываем обычную сцену в мультисэмплированные буферы
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
-
+        
         // 2. Рендерим сцену как обычно, но используем при этом сгенерированную карту глубины/тени
         glViewport(0, 0, width, height);
+        glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
 
         glm::mat4 projection;
         projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
@@ -120,21 +123,24 @@ namespace Chotra {
         pbrCylinderTangentShader1.Use();
         pbrCylinderTangentShader1.SetMat4("model", model);
 
+/* Demo scne
         if (scene.spheres[0].visible) {
             scene.spheres[0].Draw(pbrSphereTangentShader, pbrShader, pbrSphereTangentShader);
         }
         if (scene.cylinders[0].visible) {
             scene.cylinders[0].Draw(pbrCylinderTangentShader, pbrShader, pbrCylinderTangentShader1);
         }
+        */
 
         scene.DrawScene(pbrShader);
         
-        // Рендеринг скайбокса
-        backgroundShader.Use();
-        backgroundShader.SetMat4("view", view);
-        scene.background.Draw();
-        // Рисуем панель инструментов в самом конце
-        //DrawDashboards(dashboardShader);
+        if (drawSkybox) {
+            // Skybox drawing
+            backgroundShader.Use();
+            backgroundShader.SetMat4("projection", projection);
+            backgroundShader.SetMat4("view", view);
+            scene.background.Draw();
+        }
                 
         // 2. Теперь блитируем мультисэмплированный буфер(ы) в нормальный цветовой буфер промежуточного FBO. Изображение сохранено в screenTexture
         glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
@@ -215,6 +221,7 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, upColorbuffers[15]);
         shaderBloomFinal.SetInt("bloom", bloom);
         shaderBloomFinal.SetFloat("exposure", exposure);
+        shaderBloomFinal.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
         RenderQuad();
     }
 

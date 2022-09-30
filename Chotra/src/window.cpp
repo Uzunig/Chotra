@@ -2,12 +2,12 @@
 #include "window.h"
 
 namespace Chotra {
-    
+
     static bool GLFW_initialized = false;
 
-    Window::Window(std::string title, unsigned int width, unsigned int height) 
-              : windowData({title, width, height}) {
-    
+    Window::Window(std::string title, unsigned int width, unsigned int height)
+        : windowData({ title, width, height }) {
+
         int resultCode = Init();
 
         IMGUI_CHECKVERSION();
@@ -31,19 +31,19 @@ namespace Chotra {
             glfwWindowHint(GLFW_SAMPLES, 4);
             GLFW_initialized = true;
         }
-    
+
         /* Create a windowed mode window and its OpenGL context */
         glfwWindow = glfwCreateWindow(windowData.width, windowData.height, windowData.title.c_str(), NULL, NULL);
-
+        
         if (!glfwWindow) {
             glfwTerminate();
             std::cout << "Failed to create the window" << std::endl;
             return -2;
         }
- 
+
         /* Make the window's context current */
         glfwMakeContextCurrent(glfwWindow);
- 
+
         // glad: load all OpenGL function pointers
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
             std::cout << "Failed to initialize GLAD" << std::endl;
@@ -58,12 +58,11 @@ namespace Chotra {
 
         glfwSetWindowSizeCallback(glfwWindow,
             [](GLFWwindow* window, int width, int height) {
-               
+
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
                 data.width = width;
                 data.height = height;
-                  
-                
+               
                 WindowResizeEvent event(width, height);
                 data.eventCallbackFn(event);
             }
@@ -73,7 +72,7 @@ namespace Chotra {
             [](GLFWwindow* window) {
 
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-                
+
                 WindowCloseEvent event;
                 data.eventCallbackFn(event);
             }
@@ -91,7 +90,7 @@ namespace Chotra {
                     KeyReleasedEvent event(key, scancode, action, mods);
                     data.eventCallbackFn(event);
                 }
-                
+
             }
         );
 
@@ -103,8 +102,7 @@ namespace Chotra {
                     MouseRightButtonPressedEvent event(button, action, mods);
                     data.eventCallbackFn(event);
 
-                }
-                else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+                } else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
                     MouseRightButtonReleasedEvent event(button, action, mods);
                     data.eventCallbackFn(event);
                 }
@@ -116,7 +114,7 @@ namespace Chotra {
             [](GLFWwindow* window, double newX, double newY) {
 
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-                
+
                 MouseMovedEvent event(newX, newY);
                 data.eventCallbackFn(event);
             }
@@ -143,14 +141,11 @@ namespace Chotra {
     }
 
     void Window::OnUpdate(float deltaTime) {
-        
-        glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
-        glClear(GL_COLOR_BUFFER_BIT);
 
         camera->ProcessKeyboard(deltaTime);
         scene->Update(deltaTime);
         renderer->Render();
-        
+
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize.x = static_cast<float>(GetWidth());
         io.DisplaySize.y = static_cast<float>(GetHeight());
@@ -161,26 +156,35 @@ namespace Chotra {
 
         //ImGui::ShowDemoWindow();
 
-        ImGui::SetNextWindowPos(ImVec2(GetWidth() - 300, 0));
-        ImGui::SetNextWindowSize(ImVec2(300, GetHeight()));
+        ImGui::SetNextWindowPos(ImVec2(GetWidth() - 350, 0));
+        ImGui::SetNextWindowSize(ImVec2(350, GetHeight()));
 
-        ImGui::Begin("Background color");
+        ImGui::Begin("Rendering configuration");
 
-        ImGui::ColorEdit4("Background color", backgroundColor);
-        ImGui::SliderFloat("Speed", &camera->MovementSpeed, 3.0f, 10.0f);
-        ImGui::SliderFloat("Exposure", &renderer->exposure, 0.0f, 10.0f);
-        
+        if (ImGui::CollapsingHeader("Background")) {
+            ImGui::ColorPicker4("Color", renderer->backgroundColor);
+            ImGui::Checkbox("Draw skybox", &renderer->drawSkybox);
+        }
+
+        if (ImGui::CollapsingHeader("Camera configuration")) {
+            ImGui::SliderFloat("Speed", &camera->MovementSpeed, 3.0f, 10.0f);
+        }
+
+        if (ImGui::CollapsingHeader("LIghting options")) {
+            ImGui::SliderFloat("Exposure", &renderer->exposure, 0.0f, 10.0f);
+            ImGui::Checkbox("Bloom", &renderer->bloom);
+            ImGui::Checkbox("Gamma correction", &renderer->gammaCorrection);
+        }
+
         ImGui::End();
-        
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        
 
- 
         glfwSwapBuffers(glfwWindow);
         glfwPollEvents();
     }
-    
+
     void Window::SetEventCallbackFn(const EventCallbackFn& callback) {
 
         windowData.eventCallbackFn = callback;
@@ -210,8 +214,7 @@ namespace Chotra {
     bool Window::GetFirstMouse() {
         if (firstMouse) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
 

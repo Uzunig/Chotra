@@ -4,9 +4,17 @@ namespace Chotra {
 
     Scene::Scene()
         : cylinder(), sphere(),
-          background(background_path) {
+        background(background_path) {
 
         LoadSceneFromFile("level1.lv");
+        //DemoInit();
+    }
+
+    Scene::~Scene() {
+
+    }
+
+    void Scene::DemoInit() {
         for (unsigned int i = 0; i <= 35; ++i) {
             sceneObjects.push_back(SceneObject(objModels[0],
                 glm::vec3(7.0f * cos(10.0f * i / 180.0f * 3.14159f), 0.0f, 7.0f * sin(10.0f * i / 180.0f * 3.14159f)),
@@ -21,15 +29,20 @@ namespace Chotra {
                 glm::vec3(6.0f - 0.8f * i, 6.0f - 0.8f * i, 10.0f),
                 glm::vec3(0.0f), glm::vec3(1.0f + 0.1f * i, 1.0f, 1.0f - 0.1f * i), 0));
         }
-
     }
-
-    Scene::~Scene() {
-
-    }
-
 
     void Scene::Update(float deltaTime) {
+        float dt = deltaTime * 50.0f;
+        for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
+            if (sceneObjects[i].visible) {
+                sceneObjects[i].position += sceneObjects[i].velocity * dt;
+                sceneObjects[i].angle += sceneObjects[i].rVelocity * dt;
+                sceneObjects[i].UpdateModelMatrix();
+            }
+        }
+    }
+
+    void Scene::DemoUpdate(float deltaTime) {
         float dt = deltaTime * 50.0f;
         //straight screw
         for (unsigned int i = 0; i <= 8; ++i) {
@@ -53,18 +66,15 @@ namespace Chotra {
             if (sceneObjects[i].visible) {
                 if (sceneObjects[i].angle.y == 0.0f && sceneObjects[i].rVelocity.y == 0.0f) {
                     sceneObjects[i].rVelocity.y = -1.0f;
-                }
-                else if (sceneObjects[i].angle.y <= -180.0f && sceneObjects[i].rVelocity.y == -1.0f) {
+                } else if (sceneObjects[i].angle.y <= -180.0f && sceneObjects[i].rVelocity.y == -1.0f) {
                     sceneObjects[i].angle.y = -180.0f;
                     sceneObjects[i].rVelocity.y = 1.0f;
-                }
-                else if (sceneObjects[i].angle.y >= 0.0f && sceneObjects[i].angle.y < 360.0f && sceneObjects[i].rVelocity.y == 1.0f) {
+                } else if (sceneObjects[i].angle.y >= 0.0f && sceneObjects[i].angle.y < 360.0f && sceneObjects[i].rVelocity.y == 1.0f) {
                     sceneObjects[i].velocity = sceneObjects[i].position * 0.01f;
                     if (glm::length(sceneObjects[i].position) >= 7.0f) {
                         sceneObjects[i].velocity = glm::vec3(0.0f);
                     }
-                }
-                else if (sceneObjects[i].angle.y >= 360.0f && sceneObjects[i].rVelocity.y == 1.0f) {
+                } else if (sceneObjects[i].angle.y >= 360.0f && sceneObjects[i].rVelocity.y == 1.0f) {
                     sceneObjects[i].velocity = sceneObjects[i].position * -0.01f;
                     if (glm::length(sceneObjects[i].position) <= 2.0f) {
                         for (unsigned int j = 9; j <= 34; ++j) {
@@ -99,8 +109,7 @@ namespace Chotra {
                     sceneObjects[i].visible = false;
                     if (i < 38) {
                         sceneObjects[i + 1].visible = true;
-                    }
-                    else {
+                    } else {
                         for (unsigned int i = 39; i <= 74; ++i) {
                             sceneObjects[i].visible = true;
                         }
@@ -210,30 +219,13 @@ namespace Chotra {
             }
         }
     }
-/*
-    void Scene::DrawDashboards(Shader& shader) {
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        for (unsigned int i = 0; i < dashboards.size(); ++i) {
-            if (dashboards[i].visible) {
-                dashboards[i].Draw(shader);
-            }
-        }
-        glEnable(GL_DEPTH_TEST);
-        glDisable(GL_BLEND);
-
-    }*/
-
-
 
     void Scene::LoadSceneFromFile(std::string const& path) {
 
         std::ifstream level_file(path);
         if (!level_file) {
             std::cout << "The level file could not open for writing!" << std::endl;
-        }
-        else {
+        } else {
             while (level_file) {
                 std::string s;
                 level_file >> s;
@@ -243,8 +235,7 @@ namespace Chotra {
                     level_file >> model_path;
                     objModels.push_back(ObjModel(model_path));
 
-                }
-                else if (s == "SceneObject") {
+                } else if (s == "SceneObject") {
                     std::string meshType;
                     level_file >> meshType;
 
@@ -272,30 +263,15 @@ namespace Chotra {
                     if (meshType == "OBJModel") {
                         sceneObjects.push_back(SceneObject(objModels[i], position, angle,
                             scale, velocity, rVelocity, visible));
-                    }
-                    else if (meshType == "Sphere") {
+                    } else if (meshType == "Sphere") {
                         spheres.push_back(SceneObject(sphere, position, angle,
                             scale, velocity, rVelocity, visible, 0.0f));
-                    }
-                    else if (meshType == "Cylinder") {
+                    } else if (meshType == "Cylinder") {
                         cylinders.push_back(SceneObject(cylinder, position, angle,
                             scale, velocity, rVelocity, visible, 0.0f));
                     }
                 }
-                else if (s == "Dashboard") {
-                    std::string meshType;
-                    level_file >> meshType;
 
-                    unsigned int i;
-                    level_file >> i;
-
-                    int visible;
-                    level_file >> visible;
-
-                    if (meshType == "OBJModel") {
-                        dashboards.push_back(Dashboard(objModels[i], visible));
-                    }
-                }
             }
         }
     }
