@@ -150,8 +150,9 @@ namespace Chotra {
         
 */
         for (unsigned int i = 0; i < scene.sceneLights.size(); ++i) {
+            pbrShader.Use();
             pbrShader.SetVec3("lightPositions[" + std::to_string(i) + "]", scene.sceneLights[i].position);
-            pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", glm::vec3(1000.0f, 1000.0f, 1000.0f));
+            pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", glm::vec3(0.0f, 100.0f, 0.0f));
         }
         
         scene.DrawSceneObjects(pbrShader);

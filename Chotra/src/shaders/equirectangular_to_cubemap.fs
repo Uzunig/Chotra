@@ -17,6 +17,7 @@ void main()
 {		
     vec2 uv = SampleSphericalMap(normalize(WorldPos));
     vec3 color = texture(equirectangularMap, uv).rgb;
+	//vec3 color = vec3(1.0, 3.0, 0.0); //monochrome skybox
     
     FragColor = vec4(color, 1.0);
 }

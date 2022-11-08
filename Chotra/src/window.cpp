@@ -169,7 +169,7 @@ namespace Chotra {
         }
 
         if (ImGui::CollapsingHeader("Camera settings")) {
-            ImGui::SliderFloat("Speed", &camera->MovementSpeed, 3.0f, 10.0f);
+            ImGui::SliderFloat("Speed", &camera->MovementSpeed, 3.0f, 30.0f);
             ImGui::SliderFloat("Zoom", &camera->Zoom, 15.0f, 90.0f);
             //ImGui::Checkbox("Perspective projection", &renderer->perspectiveProjection);
 

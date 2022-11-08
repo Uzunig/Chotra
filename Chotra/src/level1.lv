@@ -1,5 +1,5 @@
 Type          Path  
-ObjModel     models/spiral.obj
+ObjModel     models/sphere.obj
  
 
                          Number        Position          Angle          Scale        Velocity         rVelocity       Visible
@@ -9,5 +9,7 @@ SceneObject   OBJModel     0         0.0  0.0  0.0     0.0 0.0 0.0    3.0 3.0 3.
 
                          Number        Position          Angle          Scale        Velocity         rVelocity       Intensity
 
-SceneLight    OBJModel     0         10.0 10.0 -10.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0      2      
-SceneLight    OBJModel     0        -10.0 10.0 -10.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0      1000      
+SceneLight    OBJModel     0        0.0 10.0 -5.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0      0.0 0.0 0.0      1  
+SceneLight    OBJModel     0       10.0 10.0 0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0      0.0 0.0 0.0      1  
+SceneLight    OBJModel     0      -10.0 10.0 -5.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0      0.0 0.0 0.0      1      
+SceneLight    OBJModel     0        5.0 10.0 5.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0      0.0 0.0 0.0      1      

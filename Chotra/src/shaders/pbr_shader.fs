@@ -92,7 +92,7 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 void main()
 {		
     // Свойства материала
-    vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(1.0)); //pow 2.2, inverse gamma, if it needs
+    vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(2.2)); //pow 2.2, inverse gamma, if it needs
     float metallic = texture(metallicMap, TexCoords).r;
     float roughness = texture(roughnessMap, TexCoords).r;
     float ao = texture(aoMap, TexCoords).r;
