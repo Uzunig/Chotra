@@ -31,7 +31,7 @@ namespace Chotra {
     public:
 
                
-        std::string background_path = "hdr/studio_small_08_4k.hdr";
+        std::string background_path = "hdr/industrial_sunset_02_8k.hdr";
 
         std::vector<ObjModel> objModels;
         Cylinder cylinder;
@@ -41,8 +41,10 @@ namespace Chotra {
         std::vector<SceneObject> cylinders;
         std::vector<SceneObject> spheres;
 
+        std::vector<SceneObject> sceneLights;
+
                 
-        Background background;
+        //Background background;
 
         // Освещение
         std::vector<glm::vec3> lightPositions = {

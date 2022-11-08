@@ -3,11 +3,11 @@
 namespace Chotra {
 
     Scene::Scene()
-        : cylinder(), sphere(),
-        background(background_path) {
+        : cylinder(), sphere()/*,
+        background(background_path)*/ {
 
-        LoadSceneFromFile("level_demo.lv");
-        DemoInit();
+        LoadSceneFromFile("level1.lv");
+        //DemoInit();
     }
 
     Scene::~Scene() {
@@ -15,6 +15,7 @@ namespace Chotra {
     }
 
     void Scene::DemoInit() {
+        
         for (unsigned int i = 0; i <= 35; ++i) {
             sceneObjects.push_back(SceneObject(objModels[0],
                 glm::vec3(7.0f * cos(10.0f * i / 180.0f * 3.14159f), 0.0f, 7.0f * sin(10.0f * i / 180.0f * 3.14159f)),
@@ -29,6 +30,7 @@ namespace Chotra {
                 glm::vec3(6.0f - 0.8f * i, 6.0f - 0.8f * i, 10.0f),
                 glm::vec3(0.0f), glm::vec3(1.0f + 0.1f * i, 1.0f, 1.0f - 0.1f * i), 0));
         }
+        
     }
 
     void Scene::Update(float deltaTime) {
@@ -238,7 +240,7 @@ namespace Chotra {
                 } else if (s == "SceneObject") {
                     std::string meshType;
                     level_file >> meshType;
-
+                    
                     unsigned int i;
                     level_file >> i;
 
@@ -270,8 +272,37 @@ namespace Chotra {
                         cylinders.push_back(SceneObject(cylinder, position, angle,
                             scale, velocity, rVelocity, visible, 0.0f));
                     }
-                }
 
+                } else if (s == "SceneLight") {
+                    std::string meshType;
+                    level_file >> meshType;
+
+                    unsigned int i;
+                    level_file >> i;
+
+                    glm::vec3 position;
+                    level_file >> position.x >> position.y >> position.z;
+
+                    glm::vec3 angle;
+                    level_file >> angle.x >> angle.y >> angle.z;
+
+                    glm::vec3 scale;
+                    level_file >> scale.x >> scale.y >> scale.z;
+
+                    glm::vec3 velocity;
+                    level_file >> velocity.x >> velocity.y >> velocity.z;
+
+                    glm::vec3 rVelocity;
+                    level_file >> rVelocity.x >> rVelocity.y >> rVelocity.z;
+
+                    int visible;
+                    level_file >> visible;
+
+                    if (meshType == "OBJModel") {
+                        sceneLights.push_back(SceneObject(objModels[i], position, angle,
+                            scale, velocity, rVelocity, visible));
+                    } 
+                }
             }
         }
     }

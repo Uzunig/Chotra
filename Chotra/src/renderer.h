@@ -18,14 +18,13 @@ namespace Chotra {
     class Renderer {
     public:
         
+        Camera& camera;
         Scene& scene;
-
-        Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene);
-
+                
         unsigned int& width;
         unsigned int& height;
 
-        Camera& camera;
+        Background background;
 
         Shader pbrShader;
         Shader pbrSphereTangentShader;
@@ -46,6 +45,7 @@ namespace Chotra {
         bool drawSkybox = true;
         bool bloom = true;
         float exposure = 1.0f;
+        float backgroundExposure = 1.0f;
         bool gammaCorrection = true;
         
         unsigned int framebuffer;
@@ -70,6 +70,7 @@ namespace Chotra {
         unsigned int quadVBO;
 
         
+        Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene, std::string& background_path);
 
         void Init(GLFWwindow* window);
         void Render();

@@ -30,8 +30,8 @@ namespace Chotra {
         unsigned int prefilterMap;
         unsigned int brdfLUTTexture;
 
-        Background(std::string const& path);
-        void LoadHDRi(std::string const& path);
+        Background(std::string& path);
+        void LoadHDRi(std::string& path);
         void SetFrameBuffer();
 
         void SetCubeMap();

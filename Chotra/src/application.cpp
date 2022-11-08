@@ -127,8 +127,8 @@ namespace Chotra {
             deltaTime = currentTime - lastFrame;
             lastFrame = currentTime;
 
-            mainWindow->OnUpdate(deltaTime);
             OnUpdate(deltaTime);
+            mainWindow->OnUpdate(deltaTime);
         }
         mainWindow = nullptr;
         return 0;

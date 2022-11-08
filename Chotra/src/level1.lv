@@ -1,8 +1,11 @@
 Type          Path  
-ObjModel     models/armor/armor.obj
+ObjModel     models/spiral.obj
  
 
                          Number        Position          Angle          Scale        Velocity         rVelocity       Visible
                          
-SceneObject   OBJModel     0         0.0  0.0  0.0     0.0 0.0 0.0    5.0 5.0 5.0    0.0 0.0 0.0     0.0 1.0 0.0          1
+SceneObject   OBJModel     0         0.0  0.0  0.0     0.0 0.0 0.0    3.0 3.0 3.0    0.0 0.0 0.0     0.0 0.0 0.0          1
 
+
+
+SceneLight    OBJModel     0         0.0  0.0  0.0     0.0 0.0 0.0    3.0 3.0 3.0    0.0 0.0 0.0     0.0 0.0 0.0          1

@@ -124,9 +124,8 @@ namespace Chotra {
         //glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         camera = std::make_unique<Camera>(glm::vec3(0.0f, 5.0f, 25.0f));
-
         scene = std::make_unique<Scene>();
-        renderer = std::make_unique<Renderer>(windowData.width, windowData.height, *camera, *scene);
+        renderer = std::make_unique<Renderer>(windowData.width, windowData.height, *camera, *scene, scene->background_path);
         renderer->Init(glfwWindow);
 
         lastMousePosition = glm::vec2(GetWidth() / 2, GetHeight() / 2);
@@ -143,8 +142,8 @@ namespace Chotra {
     void Window::OnUpdate(float deltaTime) {
 
         camera->ProcessKeyboard(deltaTime);
-        scene->DemoUpdate(deltaTime);
-        //scene->Update(deltaTime);
+        //scene->DemoUpdate(deltaTime);
+        scene->Update(deltaTime);
         renderer->Render();
 
         ImGuiIO& io = ImGui::GetIO();
@@ -165,6 +164,7 @@ namespace Chotra {
         if (ImGui::CollapsingHeader("Background")) {
             ImGui::ColorPicker4("Color", renderer->backgroundColor);
             ImGui::Checkbox("Draw skybox", &renderer->drawSkybox);
+            ImGui::SliderFloat("Background exposure", &renderer->backgroundExposure, 0.0f, 10.0f);
         }
 
         if (ImGui::CollapsingHeader("Camera settings")) {

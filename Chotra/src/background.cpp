@@ -14,7 +14,7 @@ namespace Chotra {
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    Background::Background(std::string const& path) {
+    Background::Background(std::string& path) {
 
         SetFrameBuffer();
         LoadHDRi(path);
@@ -31,11 +31,11 @@ namespace Chotra {
 
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 8192, 8192);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
     }
 
-    void Background::LoadHDRi(std::string const& path) {
+    void Background::LoadHDRi(std::string& path) {
 
         stbi_set_flip_vertically_on_load(true);
         int width, height, nrComponents;
@@ -66,7 +66,7 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
         for (unsigned int i = 0; i < 6; ++i) {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 8192, 8192, 0, GL_RGB, GL_FLOAT, nullptr);
         }
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -81,7 +81,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, hdrTexture);
 
-        glViewport(0, 0, 512, 512); // не забудьте настроить видовой экран в соответствии с размерами захвата
+        glViewport(0, 0, 8192, 8192); // не забудьте настроить видовой экран в соответствии с размерами захвата
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         for (unsigned int i = 0; i < 6; ++i) {
             equirectangularToCubemapShader.SetMat4("view", captureViews[i]);
@@ -194,7 +194,7 @@ namespace Chotra {
 
         // Выделяем необходимое количество памяти для LUT-текстуры
         glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0, GL_RG, GL_FLOAT, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 8192, 8192, 0, GL_RG, GL_FLOAT, 0);
 
         // Убеждаемся, что режим наложения задан как GL_CLAMP_TO_EDGE
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -205,10 +205,10 @@ namespace Chotra {
         // Затем переконфигурируем захват объекта фреймбуфера и рендерим экранный прямоугольник с использованием BRDF-шейдера
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 8192, 8192);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture, 0);
 
-        glViewport(0, 0, 512, 512);
+        glViewport(0, 0, 8192, 8192);
         brdfShader.Use();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         RenderQuad();

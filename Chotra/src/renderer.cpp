@@ -4,7 +4,7 @@
 
 namespace Chotra {
 
-    Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene)
+    Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene, std::string& background_path)
         : width(width), height(height),
         camera(camera), scene(scene),
         pbrShader("shaders/pbr_shader.vs", "shaders/pbr_shader.fs"),
@@ -16,9 +16,10 @@ namespace Chotra {
         pbrSphereTangentShader("shaders/pbr_sphere_tangent.vs", "shaders/pbr_shader.fs"),
         pbrCylinderTangentShader("shaders/pbr_cylinder_tangent.vs", "shaders/pbr_shader.fs"),
         pbrCylinderTangentShader1("shaders/pbr_cylinder_tangent1.vs", "shaders/pbr_shader.fs"),
-        backgroundShader("shaders/background.vs", "shaders/background.fs") {
+        backgroundShader("shaders/background.vs", "shaders/background.fs"),
+        background(background_path) {
 
-        SetupQuad(); //Создаем экранный прямоуголник
+        SetupQuad();
         ConfigureMSAA();
         ConfigureBloom();
 
@@ -106,11 +107,11 @@ namespace Chotra {
 
          // Связываем предварительно вычисленные IBL-данные
         glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.background.irradianceMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, background.irradianceMap);
         glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.background.prefilterMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, background.prefilterMap);
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, scene.background.brdfLUTTexture);
+        glBindTexture(GL_TEXTURE_2D, background.brdfLUTTexture);
         glActiveTexture(GL_TEXTURE0);
 
         glm::mat4 model = glm::mat4(1.0f);
@@ -126,7 +127,7 @@ namespace Chotra {
         pbrCylinderTangentShader1.Use();
         pbrCylinderTangentShader1.SetMat4("model", model);
 
-
+/*
         if (scene.spheres[0].visible) {
             scene.spheres[0].Draw(pbrSphereTangentShader, pbrShader, pbrSphereTangentShader);
         }
@@ -134,7 +135,7 @@ namespace Chotra {
             scene.cylinders[0].Draw(pbrCylinderTangentShader, pbrShader, pbrCylinderTangentShader1);
         }
 
-
+*/
         scene.DrawScene(pbrShader);
 
         if (drawSkybox) {
@@ -142,7 +143,8 @@ namespace Chotra {
             backgroundShader.Use();
             backgroundShader.SetMat4("projection", projection);
             backgroundShader.SetMat4("view", view);
-            scene.background.Draw();
+            backgroundShader.SetFloat("exposure", backgroundExposure);
+            background.Draw();
         }
 
         // 2. Теперь блитируем мультисэмплированный буфер(ы) в нормальный цветовой буфер промежуточного FBO. Изображение сохранено в screenTexture
