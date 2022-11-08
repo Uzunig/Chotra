@@ -16,7 +16,7 @@
 #include "stb_image.h"
 
 
-#include "background.h"
+
 #include "sphere.h"
 #include "cylinder.h"
 #include "scene_object.h"
@@ -31,7 +31,7 @@ namespace Chotra {
     public:
 
                
-        std::string background_path = "hdr/industrial_sunset_02_8k.hdr";
+        std::string background_path = "hdr/industrial_sunset_02_4k.hdr";
 
         std::vector<ObjModel> objModels;
         Cylinder cylinder;
@@ -46,21 +46,6 @@ namespace Chotra {
                 
         //Background background;
 
-        // Освещение
-        std::vector<glm::vec3> lightPositions = {
-            glm::vec3(3.0f, 2.0f, 0.0f),
-            glm::vec3(-2.0f, 3.0f, 2.0f),
-            glm::vec3(-2.0f, -3.0f, 2.0f),
-            glm::vec3(2.0f, -3.0f, 2.0f)
-        };
-        std::vector<glm::vec3> lightColors = {
-            glm::vec3(300.0f, 300.0f, 300.0f),
-            glm::vec3(300.0f, 300.0f, 300.0f),
-            glm::vec3(300.0f, 300.0f, 300.0f),
-            glm::vec3(300.0f, 300.0f, 300.0f)
-        };
-
-
         // Конструктор
         Scene();
 
@@ -73,7 +58,8 @@ namespace Chotra {
 
         // Игровой цикл
         void Update(float dt);
-        void DrawScene(Shader& shader);
+        void DrawSceneObjects(Shader& shader);
+        void DrawSceneLights(Shader& shader);
 
         void DemoInit();
         void DemoUpdate(float deltaTime);

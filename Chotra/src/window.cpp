@@ -125,7 +125,8 @@ namespace Chotra {
 
         camera = std::make_unique<Camera>(glm::vec3(0.0f, 5.0f, 25.0f));
         scene = std::make_unique<Scene>();
-        renderer = std::make_unique<Renderer>(windowData.width, windowData.height, *camera, *scene, scene->background_path);
+        background = std::make_unique<Background>(*scene);
+        renderer = std::make_unique<Renderer>(windowData.width, windowData.height, *camera, *scene, *background);
         renderer->Init(glfwWindow);
 
         lastMousePosition = glm::vec2(GetWidth() / 2, GetHeight() / 2);

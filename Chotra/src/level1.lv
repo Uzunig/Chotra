@@ -7,5 +7,7 @@ ObjModel     models/spiral.obj
 SceneObject   OBJModel     0         0.0  0.0  0.0     0.0 0.0 0.0    3.0 3.0 3.0    0.0 0.0 0.0     0.0 0.0 0.0          1
 
 
+                         Number        Position          Angle          Scale        Velocity         rVelocity       Intensity
 
-SceneLight    OBJModel     0         0.0  0.0  0.0     0.0 0.0 0.0    3.0 3.0 3.0    0.0 0.0 0.0     0.0 0.0 0.0          1
+SceneLight    OBJModel     0         10.0 10.0 -10.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0      2      
+SceneLight    OBJModel     0        -10.0 10.0 -10.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0      1000      

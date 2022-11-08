@@ -5,6 +5,7 @@ in vec3 WorldPos;
 in vec3 Normal;
 //in vec4 FragPosLightSpace;
 
+uniform int intensity;
 
 // Параметры материала
 uniform sampler2D albedoMap;
@@ -88,7 +89,9 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 void main()
 {		
     // Свойства материала
-    vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(1.0)); //pow 2.2, inverse gamma, if it needs
+    vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(1.0));
+    albedo = albedo * intensity;	
+	
     float metallic = texture(metallicMap, TexCoords).r;
     float roughness = texture(roughnessMap, TexCoords).r;
     float ao = texture(aoMap, TexCoords).r;

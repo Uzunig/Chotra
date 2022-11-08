@@ -214,10 +214,20 @@ namespace Chotra {
         }
     }
 
-    void Scene::DrawScene(Shader& shader) {
+    void Scene::DrawSceneObjects(Shader& shader) {
         for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
             if (sceneObjects[i].visible) {
                 sceneObjects[i].Draw(shader);
+            }
+        }
+    }
+
+    void Scene::DrawSceneLights(Shader& shader) {
+        for (unsigned int i = 0; i < sceneLights.size(); ++i) {
+            if (sceneLights[i].visible) {
+                shader.Use();
+                shader.SetInt("intensity", sceneLights[i].visible);
+                sceneLights[i].Draw(shader);
             }
         }
     }

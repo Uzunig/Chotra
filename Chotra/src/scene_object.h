@@ -20,12 +20,12 @@ namespace Chotra {
         glm::mat4 modelMatrix;
         glm::vec3 velocity;
         glm::vec3 rVelocity;
-        bool visible;
+        int visible;
         float deformation;
         int deformationVector;
 
         SceneObject(Mesh& mesh, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
-            bool visible, float deformation = 0.0f, int deformatioVector = 0);
+            int visible, float deformation = 0.0f, int deformatioVector = 0);
         void Draw(Shader& shader);
         void Draw(Shader& shader1, Shader& shader2, Shader& shader3);
         void Deformation(float dt);
