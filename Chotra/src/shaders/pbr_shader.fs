@@ -18,6 +18,10 @@ uniform samplerCube irradianceMap;
 uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
 
+// Освещение
+uniform vec3 lightPositions[4];
+uniform vec3 lightColors[4];
+
 uniform vec3 camPos;
 
 const float PI = 3.14159265359;
@@ -88,7 +92,7 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 void main()
 {		
     // Свойства материала
-    vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(2.2));
+    vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(2.2)); //pow 2.2, inverse gamma, if it needs
     float metallic = texture(metallicMap, TexCoords).r;
     float roughness = texture(roughnessMap, TexCoords).r;
     float ao = texture(aoMap, TexCoords).r;
@@ -105,6 +109,41 @@ void main()
 
     // Уравнение отражения
     vec3 Lo = vec3(0.0);
+
+	for(int i = 0; i < 4; ++i) 
+    {
+        // Вычисляем энергетическую яркость каждого источника света
+        vec3 L = normalize(lightPositions[i] - WorldPos);
+        vec3 H = normalize(V + L);
+        float distance = length(lightPositions[i] - WorldPos);
+        float attenuation = 1.0 / (distance * distance);
+        vec3 radiance = lightColors[i] * attenuation;
+
+        // BRDF Кука-Торренса
+        float NDF = DistributionGGX(N, H, roughness);   
+        float G = GeometrySmith(N, V, L, roughness);    
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);        
+        
+        vec3 nominator = NDF * G * F;
+        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // 0.001 to prevent divide by zero.
+        vec3 specular = nominator / denominator;
+        
+         // kS эквивалентно коэффициенту Френеля
+        vec3 kS = F;
+		
+        // Чтобы выполнялся закон сохранения энергии, сумма энергий диффузной и отраженной составляющих света не может быть больше 1.0 
+		// (кроме тех случаев, когда сама поверхность имеет возможность излучать свет); 
+		// для выполнения данного соотношения диффузная составляющая (kD) должна равняться значению 1.0 - kS
+        vec3 kD = vec3(1.0) - kS;
+		
+        kD *= 1.0 - metallic;	                
+            
+        // Масштабируем освещенность при помощи NdotL
+        float NdotL = max(dot(N, L), 0.0);        
+
+        // Добавляем к исходящей энергитической яркости Lo
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL; // обратите внимание, что мы уже умножали BRDF на коэффициент Френеля(kS), поэтому нам не нужно снова умножать на kS
+    }   
    
     // Фоновая составляющая освещения (теперь мы используем IBL)
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);

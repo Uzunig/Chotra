@@ -10,6 +10,7 @@
 #include <string>
 #include"stb_image.h"
 
+#include "scene.h"
 #include "shader.h"
 namespace Chotra {
 
@@ -30,8 +31,8 @@ namespace Chotra {
         unsigned int prefilterMap;
         unsigned int brdfLUTTexture;
 
-        Background(std::string const& path);
-        void LoadHDRi(std::string const& path);
+        Background(Scene& scene);
+        void LoadHDRi(std::string& path);
         void SetFrameBuffer();
 
         void SetCubeMap();

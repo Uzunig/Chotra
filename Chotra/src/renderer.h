@@ -8,7 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
+#include "background.h"
 #include "camera.h"
 #include "shader.h"
 #include "scene.h"
@@ -18,16 +18,15 @@ namespace Chotra {
     class Renderer {
     public:
         
+        Camera& camera;
         Scene& scene;
-
-        Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene);
-
+        Background& background;
+                
         unsigned int& width;
         unsigned int& height;
 
-        Camera& camera;
-
         Shader pbrShader;
+        Shader lightsShader;
         Shader pbrSphereTangentShader;
         Shader pbrCylinderTangentShader;
         Shader pbrCylinderTangentShader1;
@@ -46,6 +45,7 @@ namespace Chotra {
         bool drawSkybox = true;
         bool bloom = true;
         float exposure = 1.0f;
+        float backgroundExposure = 2.0f;
         bool gammaCorrection = true;
         
         unsigned int framebuffer;
@@ -70,6 +70,7 @@ namespace Chotra {
         unsigned int quadVBO;
 
         
+        Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene, Background& background);
 
         void Init(GLFWwindow* window);
         void Render();
