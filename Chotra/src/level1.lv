@@ -7,9 +7,9 @@ ObjModel     models/sphere.obj
 SceneObject   OBJModel     0         0.0  0.0  0.0     0.0 0.0 0.0    3.0 3.0 3.0    0.0 0.0 0.0     0.0 0.0 0.0          1
 
 
-                         Number        Position          Angle          Scale        Velocity         rVelocity       Intensity
+                         Number        Position          Angle          Scale        Velocity         rVelocity       Visible       Color        Brightness
 
-SceneLight    OBJModel     0        0.0 10.0 -5.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0      0.0 0.0 0.0      1  
-SceneLight    OBJModel     0       10.0 10.0 0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0      0.0 0.0 0.0      1  
-SceneLight    OBJModel     0      -10.0 10.0 -5.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0      0.0 0.0 0.0      1      
-SceneLight    OBJModel     0        5.0 10.0 5.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0      0.0 0.0 0.0      1      
+SceneLight    OBJModel     0      -30.0 10.0 -50.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1     1.0 1.0 0.2        1000
+SceneLight    OBJModel     0      -10.0 10.0 -50.0    0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0         1     0.5 0.5 0.1       1000
+SceneLight    OBJModel     0       10.0 10.0 -50.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1     1.0 0.1 0.1       1000 
+SceneLight    OBJModel     0       30.0 10.0 -50.0   0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0          1     0.1 0.5 0.1        1000 

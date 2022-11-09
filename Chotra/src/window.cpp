@@ -160,7 +160,7 @@ namespace Chotra {
         ImGui::SetNextWindowPos(ImVec2(GetWidth() - 350, 0));
         ImGui::SetNextWindowSize(ImVec2(350, GetHeight()));
 
-        ImGui::Begin("Rendering configuration");
+         ImGui::Begin("Rendering configuration");
 
         if (ImGui::CollapsingHeader("Background")) {
             ImGui::ColorPicker4("Color", renderer->backgroundColor);
@@ -173,6 +173,34 @@ namespace Chotra {
             ImGui::SliderFloat("Zoom", &camera->Zoom, 15.0f, 90.0f);
             //ImGui::Checkbox("Perspective projection", &renderer->perspectiveProjection);
 
+        }
+
+        if (ImGui::CollapsingHeader("Point lights")) {
+            
+            if (ImGui::Button("Light 0", ImVec2(0.f, 20.0f))) {
+                tab = 0;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Light 1", ImVec2(0.f, 20.0f))) {
+                tab = 1;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Light 2", ImVec2(0.f, 20.0f))) {
+                tab = 2;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Light 3", ImVec2(0.f, 20.0f))) {
+                tab = 3;
+            }
+            
+            ImGui::Text(("Light " + std::to_string(tab)).c_str());
+            ImGui::InputFloat("x", &scene->sceneLights[tab].position.x, 0.1f, 1.0f, "%.1f");
+            ImGui::InputFloat("y", &scene->sceneLights[tab].position.y, 0.1f, 1.0f, "%.1f");
+            ImGui::InputFloat("z", &scene->sceneLights[tab].position.z, 0.1f, 1.0f, "%.1f");
+            ImGui::SliderFloat("r", &scene->sceneLights[tab].color.r, 0.005f, 1.0f);
+            ImGui::SliderFloat("g", &scene->sceneLights[tab].color.g, 0.005f, 1.0f);
+            ImGui::SliderFloat("b", &scene->sceneLights[tab].color.b, 0.005f, 1.0f);
+            ImGui::SliderInt("Brightness", &scene->sceneLights[tab].brightness, 0, 100000);
         }
 
         if (ImGui::CollapsingHeader("Post effects")) {

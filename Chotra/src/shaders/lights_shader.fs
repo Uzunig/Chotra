@@ -5,7 +5,6 @@ in vec3 WorldPos;
 in vec3 Normal;
 //in vec4 FragPosLightSpace;
 
-uniform int intensity;
 
 // Параметры материала
 uniform sampler2D albedoMap;
@@ -20,6 +19,8 @@ uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
 
 uniform vec3 camPos;
+
+uniform vec3 lightsColor;
 
 const float PI = 3.14159265359;
 
@@ -90,7 +91,8 @@ void main()
 {		
     // Свойства материала
     vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(1.0));
-    albedo = albedo * intensity;	
+	//vec3 albedo = pow(vec3(10.0, 100.0, 100.0), vec3(1.0));
+    	
 	
     float metallic = texture(metallicMap, TexCoords).r;
     float roughness = texture(roughnessMap, TexCoords).r;
@@ -138,5 +140,6 @@ void main()
 	// Гамма-коррекция
     //color = pow(color, vec3(1.0/2.2)); 
 
-    FragColor = vec4(color , 1.0);
+    //FragColor = vec4(color , 1.0);
+	FragColor = vec4(lightsColor, 1.0);
 }

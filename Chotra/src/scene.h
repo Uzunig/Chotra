@@ -20,8 +20,10 @@
 #include "sphere.h"
 #include "cylinder.h"
 #include "scene_object.h"
+#include "scene_light.h"
 #include "dashboard.h"
 #include "obj_model.h"
+
 
 namespace Chotra {
 
@@ -41,7 +43,7 @@ namespace Chotra {
         std::vector<SceneObject> cylinders;
         std::vector<SceneObject> spheres;
 
-        std::vector<SceneObject> sceneLights;
+        std::vector<SceneLight> sceneLights;
 
                 
         //Background background;

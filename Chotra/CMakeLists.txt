@@ -35,6 +35,9 @@ add_library(Chotra STATIC
 	src/scene_object.cpp
 	src/scene_object.h
 
+	src/scene_light.cpp
+	src/scene_light.h
+
 	src/shader.cpp
 	src/shader.h
 

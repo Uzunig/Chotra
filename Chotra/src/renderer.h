@@ -45,7 +45,7 @@ namespace Chotra {
         bool drawSkybox = true;
         bool bloom = true;
         float exposure = 1.0f;
-        float backgroundExposure = 1.0f;
+        float backgroundExposure = 2.0f;
         bool gammaCorrection = true;
         
         unsigned int framebuffer;

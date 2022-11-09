@@ -42,6 +42,13 @@ namespace Chotra {
                 sceneObjects[i].UpdateModelMatrix();
             }
         }
+        for (unsigned int i = 0; i < sceneLights.size(); ++i) {
+            if (sceneLights[i].visible) {
+                sceneLights[i].position += sceneLights[i].velocity * dt;
+                sceneLights[i].angle += sceneLights[i].rVelocity * dt;
+                sceneLights[i].UpdateModelMatrix();
+            }
+        }
     }
 
     void Scene::DemoUpdate(float deltaTime) {
@@ -226,7 +233,7 @@ namespace Chotra {
         for (unsigned int i = 0; i < sceneLights.size(); ++i) {
             if (sceneLights[i].visible) {
                 shader.Use();
-                shader.SetInt("intensity", sceneLights[i].visible);
+                shader.SetVec3("lightsColor", sceneLights[i].color * (float)sceneLights[i].brightness);
                 sceneLights[i].Draw(shader);
             }
         }
@@ -307,10 +314,16 @@ namespace Chotra {
 
                     int visible;
                     level_file >> visible;
+                    
+                    glm::vec3 color;
+                    level_file >> color.x >> color.y >> color.z;
+
+                    int intensity;
+                    level_file >> intensity;
 
                     if (meshType == "OBJModel") {
-                        sceneLights.push_back(SceneObject(objModels[i], position, angle,
-                            scale, velocity, rVelocity, visible));
+                        sceneLights.push_back(SceneLight(objModels[i], position, angle,
+                            scale, velocity, rVelocity, visible, color, intensity));
                     } 
                 }
             }
