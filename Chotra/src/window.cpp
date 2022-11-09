@@ -192,6 +192,18 @@ namespace Chotra {
             if (ImGui::Button("Light 3", ImVec2(0.f, 20.0f))) {
                 tab = 3;
             }
+            if (ImGui::Button("Light 4", ImVec2(0.f, 20.0f))) {
+                tab = 4;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Light 5", ImVec2(0.f, 20.0f))) {
+                tab = 5;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Light 6", ImVec2(0.f, 20.0f))) {
+                tab = 6;
+            }
+            ImGui::SameLine();
             
             ImGui::Text(("Light " + std::to_string(tab)).c_str());
             ImGui::InputFloat("x", &scene->sceneLights[tab].position.x, 0.1f, 1.0f, "%.1f");
@@ -200,7 +212,7 @@ namespace Chotra {
             ImGui::SliderFloat("r", &scene->sceneLights[tab].color.r, 0.005f, 1.0f);
             ImGui::SliderFloat("g", &scene->sceneLights[tab].color.g, 0.005f, 1.0f);
             ImGui::SliderFloat("b", &scene->sceneLights[tab].color.b, 0.005f, 1.0f);
-            ImGui::SliderInt("Brightness", &scene->sceneLights[tab].brightness, 0, 100000);
+            ImGui::SliderInt("Brightness", &scene->sceneLights[tab].brightness, 0, 10000);
         }
 
         if (ImGui::CollapsingHeader("Post effects")) {
