@@ -19,8 +19,8 @@ uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
 
 // Освещение
-uniform vec3 lightPositions[4];
-uniform vec3 lightColors[4];
+uniform vec3 lightPositions[7];
+uniform vec3 lightColors[7];
 
 uniform vec3 camPos;
 
@@ -110,7 +110,7 @@ void main()
     // Уравнение отражения
     vec3 Lo = vec3(0.0);
 
-	for(int i = 0; i < 4; ++i) 
+	for(int i = 0; i < 7; ++i) 
     {
         // Вычисляем энергетическую яркость каждого источника света
         vec3 L = normalize(lightPositions[i] - WorldPos);
