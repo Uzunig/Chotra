@@ -7,7 +7,7 @@ namespace Chotra {
         background(background_path)*/ {
 
         LoadSceneFromFile("level1.lv");
-        //DemoInit();
+        //DemoInit(); 
     }
 
     Scene::~Scene() {
