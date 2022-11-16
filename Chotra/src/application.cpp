@@ -19,7 +19,7 @@ namespace Chotra {
 
     int Application::Start() {
 
-        mainWindow = std::make_unique<Window>("Chotra Engine", 1600, 1024);
+        mainWindow = std::make_unique<Window>("Chotra Engine", 1920, 1080);
 
         eventDispatcher.addEventListener<WindowResizeEvent>(
             [&](WindowResizeEvent& event) {

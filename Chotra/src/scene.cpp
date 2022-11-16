@@ -219,6 +219,14 @@ namespace Chotra {
             cylinders[0].angle += cylinders[0].rVelocity * dt;
             cylinders[0].UpdateModelMatrix();
         }
+
+        for (unsigned int i = 0; i < sceneLights.size(); ++i) {
+            if (sceneLights[i].visible) {
+                sceneLights[i].position += sceneLights[i].velocity * dt;
+                sceneLights[i].angle += sceneLights[i].rVelocity * dt;
+                sceneLights[i].UpdateModelMatrix();
+            }
+        }
     }
 
     void Scene::DrawSceneObjects(Shader& shader) {

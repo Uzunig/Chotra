@@ -138,8 +138,8 @@ namespace Chotra {
 
         pbrCylinderTangentShader1.Use();
         pbrCylinderTangentShader1.SetMat4("model", model);
-
 /*
+
         if (scene.spheres[0].visible) {
             scene.spheres[0].Draw(pbrSphereTangentShader, pbrShader, pbrSphereTangentShader);
         }
@@ -147,8 +147,8 @@ namespace Chotra {
             scene.cylinders[0].Draw(pbrCylinderTangentShader, pbrShader, pbrCylinderTangentShader1);
         }
 
-        
-*/
+    */    
+
         for (unsigned int i = 0; i < scene.sceneLights.size(); ++i) {
             pbrShader.Use();
             pbrShader.SetVec3("lightPositions[" + std::to_string(i) + "]", scene.sceneLights[i].position);
