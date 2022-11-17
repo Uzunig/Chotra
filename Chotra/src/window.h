@@ -72,7 +72,6 @@ namespace Chotra {
         bool playerMode = false;
         bool firstMouse = true;
 
-        int tab = 0;
-                                 
+                                         
     };
 } // namspace Chotra
