@@ -206,9 +206,9 @@ namespace Chotra {
             ImGui::SameLine();
             
             ImGui::Text(("Light " + std::to_string(tab)).c_str());
-            ImGui::InputFloat("x", &scene->sceneLights[tab].position.x, 0.5f, 1.0f, "%.1f");
-            ImGui::InputFloat("y", &scene->sceneLights[tab].position.y, 0.5f, 1.0f, "%.1f");
-            ImGui::InputFloat("z", &scene->sceneLights[tab].position.z, 0.5f, 1.0f, "%.1f");
+            ImGui::InputFloat("x", &scene->sceneLights[tab].position.x, 1.5f, 1.0f, "%.1f");
+            ImGui::InputFloat("y", &scene->sceneLights[tab].position.y, 1.5f, 1.0f, "%.1f");
+            ImGui::InputFloat("z", &scene->sceneLights[tab].position.z, 1.5f, 1.0f, "%.1f");
             ImGui::SliderFloat("r", &scene->sceneLights[tab].color.r, 0.005f, 1.0f);
             ImGui::SliderFloat("g", &scene->sceneLights[tab].color.g, 0.005f, 1.0f);
             ImGui::SliderFloat("b", &scene->sceneLights[tab].color.b, 0.005f, 1.0f);

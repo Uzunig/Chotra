@@ -33,7 +33,7 @@ namespace Chotra {
     public:
 
                
-        std::string background_path = "hdr/studio_small_08_4k.hdr";
+        std::string background_path = "hdr/industrial_sunset_02_4k.hdr";
 
         std::vector<ObjModel> objModels;
         Cylinder cylinder;
