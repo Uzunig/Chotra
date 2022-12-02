@@ -8,7 +8,7 @@ Gamma correction, Post-processing, Multisampling, Bloom ... </strong></h3>
 <a href="https://youtu.be/Fin5xd_LX2M" target="_blank">
    <img src="icon_engine.png" alt="Chotra Engine">
 </a>
-
+<hr>
 <br>
 <p>Hi. I'm Igor.</p>
 
