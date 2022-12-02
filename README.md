@@ -5,7 +5,7 @@ OBJ-model loading, PBR (Metallic workflow), Lighting, Image Based Lighting,
 Gamma correction, Post-processing, Multisampling, Bloom ... </strong></h3>
 <hr>
 
-<a href="https://youtu.be/Fin5xd_LX2M" target="_blank">
+<a href="https://youtu.be/Fin5xd_LX2M" target="_blank" rel="noopener noreferrer">
    <img src="icon_engine.png" alt="Chotra Engine">
 </a>
 <hr>
