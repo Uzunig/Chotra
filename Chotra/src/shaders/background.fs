@@ -9,6 +9,7 @@ void main()
 {	
 
 	vec3 envColor = texture(environmentMap, WorldPos).rgb;
+	
       //envColor = pow(envColor, vec3(2.2)); //inverse gamma, if it needs	
 	
       envColor = vec3(1.0) - exp(-envColor * exposure); //tone mapping 

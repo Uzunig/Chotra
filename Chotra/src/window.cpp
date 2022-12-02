@@ -158,7 +158,7 @@ namespace Chotra {
         //ImGui::ShowDemoWindow();
 
         ImGui::SetNextWindowPos(ImVec2(GetWidth() - 350, 0));
-        ImGui::SetNextWindowSize(ImVec2(350, GetHeight()));
+        ImGui::SetNextWindowSize(ImVec2(350,0));
 
          ImGui::Begin("Rendering configuration");
 
@@ -175,44 +175,28 @@ namespace Chotra {
 
         }
 
-        if (ImGui::CollapsingHeader("Point lights")) {
-            
-            if (ImGui::Button("Light 0", ImVec2(0.f, 20.0f))) {
-                tab = 0;
+        
+        if (!scene->sceneLights.empty()) {
+            ImGui::SetNextWindowPos(ImVec2(GetWidth()-600, 0));
+            ImGui::SetNextWindowSize(ImVec2(250, 0));
+            ImGui::Begin("Point lights");
+            //ImGui::BeginGroup();
+            for (int i = 0; i < scene->sceneLights.size(); ++i) {
+                //ImGui::BeginChild(std::to_string(i).c_str());
+                if (ImGui::CollapsingHeader(("Light " + std::to_string(i)).c_str())) {
+                    ImGui::Text(("Light " + std::to_string(i)).c_str());
+                    ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
+                    ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
+                    ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
+                    ImGui::SliderFloat(("r " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.r, 0.005f, 1.0f);
+                    ImGui::SliderFloat(("g " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.g, 0.005f, 1.0f);
+                    ImGui::SliderFloat(("b " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.b, 0.005f, 1.0f);
+                    ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &scene->sceneLights[i].brightness, 0, 10000);
+                }
+               // ImGui::EndChild();
             }
-            ImGui::SameLine();
-            if (ImGui::Button("Light 1", ImVec2(0.f, 20.0f))) {
-                tab = 1;
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Light 2", ImVec2(0.f, 20.0f))) {
-                tab = 2;
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Light 3", ImVec2(0.f, 20.0f))) {
-                tab = 3;
-            }
-            if (ImGui::Button("Light 4", ImVec2(0.f, 20.0f))) {
-                tab = 4;
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Light 5", ImVec2(0.f, 20.0f))) {
-                tab = 5;
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Light 6", ImVec2(0.f, 20.0f))) {
-                tab = 6;
-            }
-            ImGui::SameLine();
-            
-            ImGui::Text(("Light " + std::to_string(tab)).c_str());
-            ImGui::InputFloat("x", &scene->sceneLights[tab].position.x, 0.5f, 1.0f, "%.1f");
-            ImGui::InputFloat("y", &scene->sceneLights[tab].position.y, 0.5f, 1.0f, "%.1f");
-            ImGui::InputFloat("z", &scene->sceneLights[tab].position.z, 0.5f, 1.0f, "%.1f");
-            ImGui::SliderFloat("r", &scene->sceneLights[tab].color.r, 0.005f, 1.0f);
-            ImGui::SliderFloat("g", &scene->sceneLights[tab].color.g, 0.005f, 1.0f);
-            ImGui::SliderFloat("b", &scene->sceneLights[tab].color.b, 0.005f, 1.0f);
-            ImGui::SliderInt("Brightness", &scene->sceneLights[tab].brightness, 0, 10000);
+            //ImGui::EndGroup();
+            ImGui::End();     
         }
 
         if (ImGui::CollapsingHeader("Post effects")) {

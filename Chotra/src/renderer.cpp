@@ -146,8 +146,8 @@ namespace Chotra {
         if (scene.cylinders[0].visible) {
             scene.cylinders[0].Draw(pbrCylinderTangentShader, pbrShader, pbrCylinderTangentShader1);
         }
-
-    */    
+        */
+        
 
         for (unsigned int i = 0; i < scene.sceneLights.size(); ++i) {
             pbrShader.Use();
