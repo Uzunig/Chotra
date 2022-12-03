@@ -162,7 +162,7 @@ namespace Chotra {
 
          ImGui::Begin("Rendering configuration");
 
-        if (ImGui::CollapsingHeader("Background")) {
+        if (ImGui::CollapsingHeader("Environment")) {
             ImGui::ColorPicker4("Color", renderer->backgroundColor);
             ImGui::Checkbox("Draw skybox", &renderer->drawSkybox);
             ImGui::SliderFloat("Background exposure", &renderer->backgroundExposure, 0.0f, 10.0f);
