@@ -188,7 +188,7 @@ namespace Chotra {
 
         bool horizontal = true;
         bool first_iteration = true;
-        unsigned int amount = 10;
+        unsigned int amount = 20;
         shaderBlur.Use();
 
         // Downsampling

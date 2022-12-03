@@ -12,7 +12,7 @@ void main()
 	
       //envColor = pow(envColor, vec3(2.2)); //inverse gamma, if it needs	
 	
-      envColor = vec3(1.0) - exp(-envColor * exposure); //tone mapping 
+      //envColor = vec3(1.0) - exp(-envColor * exposure); //tone mapping 
 
 	   
 	//envColor = envColor / (envColor + vec3(1.0));
