@@ -78,7 +78,7 @@ namespace Chotra {
 
         float near_plane = 1.0f, far_plane = 100.0f;
         // lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane); // обратите внимание, что если вы используете матрицу перспективной проекции, то вам придется изменить положение света, так как текущего положения света недостаточно для отображения всей сцены
-        lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        lightProjection = glm::ortho(-30.0f, 30.0f, -30.0f, 30.0f, near_plane, far_plane);
         lightView = glm::lookAt(scene.sceneLights[0].position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
         lightSpaceMatrix = lightProjection * lightView;
 
@@ -89,7 +89,8 @@ namespace Chotra {
         glViewport(0, 0, shadowWidth, shadowHeight);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
-         
+        glEnable(GL_DEPTH_TEST);
+        
         scene.DrawSceneObjects(simpleDepthShader);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -242,7 +243,7 @@ namespace Chotra {
             glBindTexture(GL_TEXTURE_2D, first_iteration ? downPingpongColorbuffers[15 - j][!horizontal] : upColorbuffers[j - 1]);
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, downPingpongColorbuffers[15 - j][!horizontal]);
-
+            
             RenderQuad();
 
             horizontal = !horizontal;
@@ -258,14 +259,14 @@ namespace Chotra {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shaderBloomFinal.Use();
         glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);  
+        //glBindTexture(GL_TEXTURE_2D, depthMap);
         glActiveTexture(GL_TEXTURE1);
-        //glBindTexture(GL_TEXTURE_2D, upColorbuffers[15]);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glBindTexture(GL_TEXTURE_2D, upColorbuffers[15]);
         shaderBloomFinal.SetInt("bloom", bloom);
         shaderBloomFinal.SetFloat("exposure", exposure);
         shaderBloomFinal.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
+       
         RenderQuad();
         
     }
@@ -440,7 +441,7 @@ namespace Chotra {
     }
 
     void Renderer::ConfigureShadowMap() {
-
+       
         glGenFramebuffers(1, &depthMapFBO);
 
         glGenTextures(1, &depthMap);
@@ -457,8 +458,8 @@ namespace Chotra {
         //Make shaddow map
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-        //glDrawBuffer(GL_NONE);
-        //glReadBuffer(GL_NONE);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
