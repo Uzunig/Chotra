@@ -31,6 +31,8 @@ namespace Chotra {
         Shader pbrCylinderTangentShader;
         Shader pbrCylinderTangentShader1;
 
+        Shader simpleDepthShader;
+
         Shader screenShader;
         Shader downSamplingShader;
         Shader combineShader;
@@ -66,6 +68,11 @@ namespace Chotra {
         unsigned int upFBO[16];
         unsigned int upColorbuffers[16];
 
+        unsigned int depthMapFBO;
+        unsigned int shadowWidth = 1024;
+        unsigned int shadowHeight = 1024;
+        unsigned int depthMap;
+
         unsigned int quadVAO = 0;
         unsigned int quadVBO;
 
@@ -79,6 +86,7 @@ namespace Chotra {
         void RenderQuad();
         void ConfigureMSAA();
         void ConfigureBloom();
+        void ConfigureShadowMap();
     };
 
 } // namespace Chotra

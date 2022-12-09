@@ -8,6 +8,7 @@ namespace Chotra {
         : width(width), height(height),
         camera(camera), scene(scene), background(background), 
         pbrShader("shaders/pbr_shader.vs", "shaders/pbr_shader.fs"),
+        simpleDepthShader("shaders/shadow_depth.vs", "shaders/shadow_depth.fs"),
         lightsShader("shaders/pbr_shader.vs", "shaders/lights_shader.fs"),
         screenShader("shaders/screen_shader.vs", "shaders/screen_shader.fs"),
         downSamplingShader("shaders/downsampling.vs", "shaders/downsampling.fs"),
@@ -20,6 +21,7 @@ namespace Chotra {
         backgroundShader("shaders/background.vs", "shaders/background.fs") {
 
         SetupQuad();
+        ConfigureShadowMap();
         ConfigureMSAA();
         ConfigureBloom();
 
@@ -33,6 +35,7 @@ namespace Chotra {
         pbrShader.SetInt("irradianceMap", 5);
         pbrShader.SetInt("prefilterMap", 6);
         pbrShader.SetInt("brdfLUT", 7);
+        pbrShader.SetInt("shadowMap", 8);
 
         lightsShader.Use();
         lightsShader.SetInt("irradianceMap", 5);
@@ -69,6 +72,30 @@ namespace Chotra {
 
     void Renderer::Render() {
 
+        
+        glm::mat4 lightProjection, lightView;
+        glm::mat4 lightSpaceMatrix;
+
+        float near_plane = 1.0f, far_plane = 100.0f;
+        // lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane); // обратите внимание, что если вы используете матрицу перспективной проекции, то вам придется изменить положение света, так как текущего положения света недостаточно для отображения всей сцены
+        lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        lightView = glm::lookAt(scene.sceneLights[0].position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+        lightSpaceMatrix = lightProjection * lightView;
+
+        // Рендеринг сцены глазами источника света
+        simpleDepthShader.Use();
+        simpleDepthShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+        glViewport(0, 0, shadowWidth, shadowHeight);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+         
+        scene.DrawSceneObjects(simpleDepthShader);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+                       
+
+
         // 1. Отрисовываем обычную сцену в мультисэмплированные буферы
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
@@ -89,7 +116,7 @@ namespace Chotra {
         pbrShader.SetMat4("projection", projection);
         pbrShader.SetMat4("view", view);
         pbrShader.SetVec3("camPos", camera.Position);
-        //pbrShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+        pbrShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
 
         lightsShader.Use();
         lightsShader.SetMat4("projection", projection);
@@ -121,24 +148,11 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_CUBE_MAP, background.prefilterMap);
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, background.brdfLUTTexture);
+        glActiveTexture(GL_TEXTURE8);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
         glActiveTexture(GL_TEXTURE0);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        pbrShader.Use();
-        pbrShader.SetMat4("model", model);
-
-        lightsShader.Use();
-        lightsShader.SetMat4("model", model);
-
-        pbrSphereTangentShader.Use();
-        pbrSphereTangentShader.SetMat4("model", model);
-
-        pbrCylinderTangentShader.Use();
-        pbrCylinderTangentShader.SetMat4("model", model);
-
-        pbrCylinderTangentShader1.Use();
-        pbrCylinderTangentShader1.SetMat4("model", model);
-/*
+       /*
 
         if (scene.spheres[0].visible) {
             scene.spheres[0].Draw(pbrSphereTangentShader, pbrShader, pbrSphereTangentShader);
@@ -188,7 +202,7 @@ namespace Chotra {
 
         bool horizontal = true;
         bool first_iteration = true;
-        unsigned int amount = 20;
+        unsigned int amount = 10;
         shaderBlur.Use();
 
         // Downsampling
@@ -237,20 +251,23 @@ namespace Chotra {
 
         }
 
-
+        
         // 3. Теперь рендерим цветовой буфер (типа с плавающей точкой) на 2D-прямоугольник и сужаем диапазон значений HDR-цветов к цветовому диапазону значений заданного по умолчанию фреймбуфера
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shaderBloomFinal.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
+        //glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, upColorbuffers[15]);
+        //glBindTexture(GL_TEXTURE_2D, upColorbuffers[15]);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
         shaderBloomFinal.SetInt("bloom", bloom);
         shaderBloomFinal.SetFloat("exposure", exposure);
         shaderBloomFinal.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
         RenderQuad();
+        
     }
 
 
@@ -420,6 +437,29 @@ namespace Chotra {
         combineShader.SetInt("texture1", 0);
         combineShader.SetInt("texture2", 1);
 
+    }
+
+    void Renderer::ConfigureShadowMap() {
+
+        glGenFramebuffers(1, &depthMapFBO);
+
+        glGenTextures(1, &depthMap);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadowWidth, shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+
+        //Make shaddow map
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+        //glDrawBuffer(GL_NONE);
+        //glReadBuffer(GL_NONE);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
 } // namespace Chotra
