@@ -62,7 +62,7 @@ namespace Chotra {
 
     void Mesh::Draw(Shader& shader) {
 
-        for (unsigned int i = 0; i < textures.size(); i++) {
+        for (int i = 0; i < textures.size(); ++i) {
             glActiveTexture(GL_TEXTURE0 + i); // перед связыванием активируем нужный текстурный юнит
 
             // Теперь устанавливаем сэмплер на нужный текстурный юнит
@@ -71,7 +71,6 @@ namespace Chotra {
             // и связываем текстуру
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
-        glActiveTexture(GL_TEXTURE0);
 
         // Отрисовываем меш
         glBindVertexArray(VAO);
@@ -81,7 +80,7 @@ namespace Chotra {
         glBindVertexArray(0);
 
         // Считается хорошей практикой возвращать значения переменных к их первоначальным значениям
-       // glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE0);
     }
 
     void Mesh::Draw(Shader& shader1, unsigned int top_section, Shader& shader2, unsigned int bottom_section, Shader& shader3) {

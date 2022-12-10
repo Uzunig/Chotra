@@ -17,12 +17,10 @@ namespace Chotra {
     class Background {
     public:
         
-        unsigned int width  = 1024;
-        unsigned int height = 1024;
-
-        unsigned int irradianceSizeCoefficient = 0.0625; // 0.0625 == 1/16
-        unsigned int prefilterSizeCoefficient = 1;
-
+        unsigned int envMapSize  = 1024;
+        unsigned int irradianceMapSize = 64; 
+        unsigned int prefilterMapSize = 1024;
+        
         unsigned int hdrTexture;
 
         unsigned int captureFBO;

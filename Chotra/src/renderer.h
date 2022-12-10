@@ -69,8 +69,7 @@ namespace Chotra {
         unsigned int upColorbuffers[16];
 
         unsigned int depthMapFBO;
-        unsigned int shadowWidth = 1024;
-        unsigned int shadowHeight = 1024;
+        unsigned int shadowMapSize = 4096;
         unsigned int depthMap;
 
         unsigned int quadVAO = 0;
