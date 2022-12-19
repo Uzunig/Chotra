@@ -47,6 +47,9 @@ add_library(Chotra STATIC
 	src/stb_image.cpp
 	src/stb_image.h
 
+	src/quad.cpp
+	src/quad.h
+
       src/window.h
       src/window.cpp
 )

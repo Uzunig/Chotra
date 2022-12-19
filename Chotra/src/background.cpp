@@ -326,8 +326,11 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
         //  glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
         //glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
+               
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
         RenderCube();
-
+        glCullFace(GL_BACK);     
     }
 
 } // namspace Chotra

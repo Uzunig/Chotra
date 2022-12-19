@@ -2,6 +2,7 @@
 
 
 
+
 namespace Chotra {
 
     Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene, Background& background)
@@ -29,14 +30,17 @@ namespace Chotra {
 
     void Renderer::Init(GLFWwindow* window) {
 
-                
+        //Quad quad;
+        //quad.SetupQuad();
+        //quads.push_back(quad);
+
         // Активируем шейдер и передаем матрицы
         pbrShader.Use();
         pbrShader.SetInt("irradianceMap", 5);
         pbrShader.SetInt("prefilterMap", 6);
         pbrShader.SetInt("brdfLUT", 7);
         pbrShader.SetInt("shadowMap", 8);
-
+        
         lightsShader.Use();
         lightsShader.SetInt("irradianceMap", 5);
         lightsShader.SetInt("prefilterMap", 6);
@@ -72,13 +76,12 @@ namespace Chotra {
 
     void Renderer::Render() {
 
-        
         glm::mat4 lightProjection, lightView;
         glm::mat4 lightSpaceMatrix;
 
         float near_plane = 1.0f, far_plane = 100.0f;
-        // lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane); // обратите внимание, что если вы используете матрицу перспективной проекции, то вам придется изменить положение света, так как текущего положения света недостаточно для отображения всей сцены
-        lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, near_plane, far_plane);
+         //lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)shadowMapSize / (GLfloat)shadowMapSize, near_plane, far_plane); // обратите внимание, что если вы используете матрицу перспективной проекции, то вам придется изменить положение света, так как текущего положения света недостаточно для отображения всей сцены
+        lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
         lightView = glm::lookAt(scene.sceneLights[0].position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
         lightSpaceMatrix = lightProjection * lightView;
 
@@ -90,8 +93,14 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
         
-        scene.DrawSceneObjects(simpleDepthShader);
+        if (showShadows) {  // if false, getting the empty depthmap withaut rendering      TODO::otimizing 
+            scene.DrawSceneObjects(simpleDepthShader);
+        }
+        glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
                        
@@ -118,6 +127,8 @@ namespace Chotra {
         pbrShader.SetMat4("view", view);
         pbrShader.SetVec3("camPos", camera.Position);
         pbrShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+        pbrShader.SetFloat("shadowBiasMin", shadowBiasMin);
+        pbrShader.SetFloat("shadowBiasMax", shadowBiasMax);
 
         lightsShader.Use();
         lightsShader.SetMat4("projection", projection);
@@ -151,6 +162,7 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, background.brdfLUTTexture);
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, depthMap);
+      
         glActiveTexture(GL_TEXTURE0);
 
        /*
@@ -268,7 +280,13 @@ namespace Chotra {
         shaderBloomFinal.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
        
         RenderQuad();
-        
+/*
+        screenShader.Use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+
+        quads[0].RenderQuad();
+  */      
     }
 
 
@@ -276,6 +294,7 @@ namespace Chotra {
     void Renderer::SetupQuad() {
         if (quadVAO == 0)
         {
+
             float quadVertices[] = {
                 // координаты      // текстурные коодинаты
                -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
@@ -296,12 +315,10 @@ namespace Chotra {
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
         }
     }
+ 
     void Renderer::RenderQuad() {
-        // Отрисовываем прямоугольник сцены
-        //screenShader.Use();
+ 
         glBindVertexArray(quadVAO);
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, screenTexture); // теперь в качестве текстуры прямоугольника используем преобразованный прикрепленный цветовой объект 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindVertexArray(0);
 

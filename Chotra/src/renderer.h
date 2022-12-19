@@ -8,20 +8,25 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <vector>
+
 #include "background.h"
 #include "camera.h"
 #include "shader.h"
 #include "scene.h"
+#include "quad.h"
 
 namespace Chotra {
 
     class Renderer {
     public:
-        
+
+        std::vector<Quad> quads;
+
         Camera& camera;
         Scene& scene;
         Background& background;
-                
+                                
         unsigned int& width;
         unsigned int& height;
 
@@ -49,6 +54,9 @@ namespace Chotra {
         float exposure = 1.0f;
         float backgroundExposure = 2.0f;
         bool gammaCorrection = true;
+        bool showShadows = true;
+        float shadowBiasMin = 0.005f;
+        float shadowBiasMax = 0.05f;
         
         unsigned int framebuffer;
         unsigned int textureColorBufferMultiSampled;
@@ -69,11 +77,13 @@ namespace Chotra {
         unsigned int upColorbuffers[16];
 
         unsigned int depthMapFBO;
-        unsigned int shadowMapSize = 4096;
+        unsigned int shadowMapSize = 2048;
         unsigned int depthMap;
-
+         
         unsigned int quadVAO = 0;
         unsigned int quadVBO;
+
+       
 
         
         Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene, Background& background);

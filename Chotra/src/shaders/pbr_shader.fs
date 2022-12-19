@@ -18,8 +18,11 @@ uniform samplerCube irradianceMap;
 uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
 
-// Shadow maps
+// Shadows
 uniform sampler2D shadowMap;
+uniform float shadowBiasMin;
+uniform float shadowBiasMax; 
+
 
 // Освещение
 uniform vec3 lightPositions[7];
@@ -109,7 +112,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     // Вычисляем смещение (на основе разрешения карты глубины и наклона)
     vec3 normal = normalize(Normal);
     vec3 lightDir = normalize(lightPositions[0] - WorldPos);
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float bias = max(shadowBiasMax * (1.0 - dot(normal, lightDir)), shadowBiasMin);
 	
     // Проверка нахождения текущего фрагмента в тени
     // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
@@ -212,7 +215,7 @@ void main()
     // Вычисляем тень
     float shadow = ShadowCalculation(FragPosLightSpace);   
  
-    vec3 color = (ambient + Lo) * (1.0 - shadow * 0.3);
+    vec3 color = (ambient + Lo) * (1.0 - shadow * 1.0);
 
     // Тональная компрессия HDR
     //color = color / (color + vec3(1.0));
