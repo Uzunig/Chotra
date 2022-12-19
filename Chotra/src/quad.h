@@ -8,12 +8,13 @@ namespace Chotra {
 
     class Quad {
     public:
-        unsigned int quadVAO = 0;
-        unsigned int quadVBO;
-
         Quad();
         void SetupQuad();
         void RenderQuad();
+
+    private:
+        unsigned int quadVAO = 0;
+        unsigned int quadVBO;
     };
 }
 

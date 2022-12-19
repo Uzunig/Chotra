@@ -55,8 +55,8 @@ namespace Chotra {
         float backgroundExposure = 2.0f;
         bool gammaCorrection = true;
         bool showShadows = true;
-        float shadowBiasMin = 0.005f;
-        float shadowBiasMax = 0.05f;
+        float shadowBiasMin = 0.00f;
+        float shadowBiasMax = 0.0f;
         
         unsigned int framebuffer;
         unsigned int textureColorBufferMultiSampled;
@@ -77,7 +77,7 @@ namespace Chotra {
         unsigned int upColorbuffers[16];
 
         unsigned int depthMapFBO;
-        unsigned int shadowMapSize = 2048;
+        unsigned int shadowMapSize = 512;
         unsigned int depthMap;
          
         unsigned int quadVAO = 0;

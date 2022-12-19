@@ -209,7 +209,7 @@ namespace Chotra {
             ImGui::Checkbox("Show shadows", &renderer->showShadows);
             if (renderer->showShadows) {
                 
-                ImGui::SliderFloat("Bias min", &renderer->shadowBiasMin, 0.0f, 0.01f);
+                ImGui::SliderFloat("Bias min", &renderer->shadowBiasMin, 0.0f, 0.1f);
                 ImGui::SliderFloat("Bias max", &renderer->shadowBiasMax, 0.0f, 0.1f);
                
             }

@@ -2,16 +2,20 @@
 
 namespace Chotra {
 
-     void Quad::SetupQuad() {
+    Quad::Quad() {
+
+    }
+
+    void Quad::SetupQuad() {
         if (quadVAO == 0)
         {
 
             float quadVertices[] = {
                 // координаты      // текстурные коодинаты
                -1.0f,  1.0f, 0.0f,     0.0f, 1.0f,
-               -1.0f,  0.6f, 0.0f,     0.0f, 0.0f,
-               -0.6f,  1.0f, 0.0f, 1.0f, 1.0f,
-               -0.6f,  0.6f, 0.0f, 1.0f, 0.0f,
+               -1.0f,  0.4f, 0.0f,     0.0f, 0.0f,
+               -0.4f,  1.0f, 0.0f,     1.0f, 1.0f,
+               -0.4f,  0.4f, 0.0f,     1.0f, 0.0f,
             };
 
             // Установка VAO плоскости
@@ -29,6 +33,9 @@ namespace Chotra {
 
     void Quad::RenderQuad() {
 
+        glBindVertexArray(quadVAO);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindVertexArray(0);
     }
   
 }

@@ -30,9 +30,9 @@ namespace Chotra {
 
     void Renderer::Init(GLFWwindow* window) {
 
-        //Quad quad;
-        //quad.SetupQuad();
-        //quads.push_back(quad);
+        Quad quad;
+        quad.SetupQuad();
+        quads.push_back(quad);
 
         // Активируем шейдер и передаем матрицы
         pbrShader.Use();
@@ -280,13 +280,13 @@ namespace Chotra {
         shaderBloomFinal.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
        
         RenderQuad();
-/*
+
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, depthMap);
 
         quads[0].RenderQuad();
-  */      
+       
     }
 
 

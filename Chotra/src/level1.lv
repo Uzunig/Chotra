@@ -6,6 +6,7 @@ ObjModel     models/radio/radio.obj
                          Number        Position          Angle          Scale        Velocity         rVelocity       Visible
                          
 SceneObject   OBJModel     0         0.0  -1.0  0.0     0.0 0.0 0.0    10.0 1.0 10.0    0.0 0.0 0.0     0.0 0.0 0.0          1
+SceneObject   OBJModel     0         0.0   2.0  0.0     0.0 0.0 0.0    3.0 0.5 3.0    0.0 0.0 0.0     0.0 0.0 0.0          1
 SceneObject   OBJModel     1         0.0  3.0  0.0     0.0 0.0 0.0    2.0 2.0 2.0    0.0 0.0 0.0     0.0 0.0 0.0          1
 
 

@@ -215,7 +215,7 @@ void main()
     // Вычисляем тень
     float shadow = ShadowCalculation(FragPosLightSpace);   
  
-    vec3 color = (ambient + Lo) * (1.0 - shadow * 1.0);
+    vec3 color = ambient + Lo * (1.0 - shadow);
 
     // Тональная компрессия HDR
     //color = color / (color + vec3(1.0));
