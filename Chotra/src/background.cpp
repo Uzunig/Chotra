@@ -323,8 +323,8 @@ namespace Chotra {
     void Background::Draw() {
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-        //  glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
+        //glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+          glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
         //glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
                
         glEnable(GL_CULL_FACE);

@@ -190,8 +190,11 @@ void main()
         // Масштабируем освещенность при помощи NdotL
         float NdotL = max(dot(N, L), 0.0);        
 
+	  // Вычисляем тень
+        float shadow = ShadowCalculation(FragPosLightSpace);  
+
         // Добавляем к исходящей энергитической яркости Lo
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL; // обратите внимание, что мы уже умножали BRDF на коэффициент Френеля(kS), поэтому нам не нужно снова умножать на kS
+        Lo += ((kD * albedo / PI + specular) * radiance * NdotL) * (1.0 - shadow); // обратите внимание, что мы уже умножали BRDF на коэффициент Френеля(kS), поэтому нам не нужно снова умножать на kS
     }   
    
     // Фоновая составляющая освещения (теперь мы используем IBL)
@@ -213,9 +216,9 @@ void main()
     vec3 ambient = (kD * diffuse + specular) * ao;
     
     // Вычисляем тень
-    float shadow = ShadowCalculation(FragPosLightSpace);   
+    //float shadow = ShadowCalculation(FragPosLightSpace);   
  
-    vec3 color = ambient + Lo * (1.0 - shadow);
+    vec3 color = ambient + Lo;
 
     // Тональная компрессия HDR
     //color = color / (color + vec3(1.0));
