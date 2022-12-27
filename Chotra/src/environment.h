@@ -10,13 +10,15 @@
 #include <string>
 #include"stb_image.h"
 
-#include "scene.h"
+
 #include "shader.h"
+
 namespace Chotra {
 
     class Environment {
     public:
-        
+
+         
         unsigned int envMapSize  = 1024;
         unsigned int irradianceMapSize = 64; 
         unsigned int prefilterMapSize = 1024;
@@ -37,7 +39,7 @@ namespace Chotra {
         unsigned int brdfLUTTexture;
 
         Environment();
-        void LoadHDRi(std::string& path);
+       // void LoadHDRi(std::string& path);
         void SetFrameBuffer();
 
         void SetCubeMap();

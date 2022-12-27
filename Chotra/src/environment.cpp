@@ -2,21 +2,15 @@
 
 namespace Chotra {
 
+
     // PBR: установка матриц проекции и вида для захвата данных по всем 6 направлениям граней кубической карты
-    glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+    extern glm::mat4 captureProjection;
 
-    glm::mat4 captureViews[] = {
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
-    };
-
+    extern glm::mat4 captureViews[];
+    
     Environment::Environment() {
+
         SetFrameBuffer();
-        
         SetCubeMap();
         SetIrradianceMap();
         SetPrefilterMap();
@@ -35,7 +29,7 @@ namespace Chotra {
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, envMapSize, envMapSize);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
     }
-
+/*
     void Environment::LoadHDRi(std::string& path) {
 
         stbi_set_flip_vertically_on_load(true);
@@ -58,7 +52,7 @@ namespace Chotra {
             std::cout << "Failed to load HDR image." << std::endl;
         }
     }
-
+    */
     void Environment::SetCubeMap() {
 
         Shader equirectangularToCubemapShader("shaders/cubemap.vs", "shaders/equirectangular_to_cubemap.fs");

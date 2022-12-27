@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "mesh.h"
+#include "environment.h"
 
 
 namespace Chotra {
@@ -13,6 +14,7 @@ namespace Chotra {
     class SceneObject {
     public:
         Mesh& mesh;
+        Environment environment;
 
         glm::vec3 position;
         glm::vec3 angle;
