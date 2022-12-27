@@ -20,6 +20,9 @@ add_library(Chotra STATIC
 	src/dashboard.cpp
 	src/dashboard.h
 
+	src/environment.cpp
+	src/environment.h
+
 	src/mesh.cpp
 	src/mesh.h
 

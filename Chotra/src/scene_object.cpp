@@ -14,6 +14,7 @@ namespace Chotra {
     }
 
     void SceneObject::Draw(Shader& shader) {
+
         shader.Use();
         shader.SetMat4("model", modelMatrix);
         mesh.Draw(shader);

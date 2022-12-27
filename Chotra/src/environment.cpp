@@ -1,4 +1,4 @@
-#include "background.h"
+#include "environment.h"
 
 namespace Chotra {
 
@@ -14,9 +14,9 @@ namespace Chotra {
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    Background::Background(Scene& scene) {
+    Environment::Environment() {
         SetFrameBuffer();
-        LoadHDRi(scene.background_path);
+        
         SetCubeMap();
         SetIrradianceMap();
         SetPrefilterMap();
@@ -25,7 +25,7 @@ namespace Chotra {
     }
 
     
-    void Background::SetFrameBuffer() {
+    void Environment::SetFrameBuffer() {
 
         glGenFramebuffers(1, &captureFBO);
         glGenRenderbuffers(1, &captureRBO);
@@ -36,7 +36,7 @@ namespace Chotra {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
     }
 
-    void Background::LoadHDRi(std::string& path) {
+    void Environment::LoadHDRi(std::string& path) {
 
         stbi_set_flip_vertically_on_load(true);
         int width, height, nrComponents;
@@ -59,7 +59,7 @@ namespace Chotra {
         }
     }
 
-    void Background::SetCubeMap() {
+    void Environment::SetCubeMap() {
 
         Shader equirectangularToCubemapShader("shaders/cubemap.vs", "shaders/equirectangular_to_cubemap.fs");
 
@@ -94,7 +94,7 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void Background::SetIrradianceMap() {
+    void Environment::SetIrradianceMap() {
 
         // PBR: создаем кубическую карту облученности
         Shader irradianceShader("shaders/cubemap.vs", "shaders/irradiance_convolution.fs");
@@ -136,7 +136,7 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void Background::SetPrefilterMap() {
+    void Environment::SetPrefilterMap() {
 
         // PBR: создаем префильтрованную кубическую карту, и приводим размеры захвата FBO к размерам префильтрованной карты
         Shader prefilterShader("shaders/cubemap.vs", "shaders/prefilter.fs");
@@ -189,7 +189,7 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void Background::SetBrdfLUTTexture() {
+    void Environment::SetBrdfLUTTexture() {
 
         // PBR: генерируем 2D LUT-текстуру при помощи используемых уравнений BRDF
         Shader brdfShader("shaders/brdf.vs", "shaders/brdf.fs");
@@ -221,7 +221,7 @@ namespace Chotra {
     }
 
 
-    void Background::RenderCube() {
+    void Environment::RenderCube() {
         float vertices[] = {
             // задняя грань
             -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // нижняя-левая
@@ -295,7 +295,7 @@ namespace Chotra {
         glBindVertexArray(0);
     }
 
-    void Background::RenderQuad() {
+    void Environment::RenderQuad() {
         float quadVertices[] = {
             // координаты      // текстурные координаты
            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
@@ -320,7 +320,7 @@ namespace Chotra {
         glBindVertexArray(0);
     }
 
-    void Background::Draw() {
+    void Environment::Draw() {
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
