@@ -14,9 +14,9 @@ namespace Chotra {
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    Background::Background(Scene& scene) {
+    Background::Background() {
         SetFrameBuffer();
-        LoadHDRi(scene.background_path);
+        LoadHDRi(background_path);
         SetCubeMap();
         SetIrradianceMap();
         SetPrefilterMap();

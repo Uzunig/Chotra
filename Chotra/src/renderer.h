@@ -25,8 +25,7 @@ namespace Chotra {
 
         Camera& camera;
         Scene& scene;
-        Background& background;
-                                
+                                       
         unsigned int& width;
         unsigned int& height;
 
@@ -86,7 +85,7 @@ namespace Chotra {
        
 
         
-        Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene, Background& background);
+        Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene);
 
         void Init(GLFWwindow* window);
         void Render();

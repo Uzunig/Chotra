@@ -10,13 +10,15 @@
 #include <string>
 #include"stb_image.h"
 
-#include "scene.h"
+
 #include "shader.h"
 namespace Chotra {
 
     class Background {
     public:
         
+        std::string background_path = "hdr/industrial_sunset_02_4k.hdr";
+
         unsigned int envMapSize  = 1024;
         unsigned int irradianceMapSize = 64; 
         unsigned int prefilterMapSize = 1024;
@@ -36,7 +38,7 @@ namespace Chotra {
         unsigned int prefilterMap;
         unsigned int brdfLUTTexture;
 
-        Background(Scene& scene);
+        Background();
         void LoadHDRi(std::string& path);
         void SetFrameBuffer();
 

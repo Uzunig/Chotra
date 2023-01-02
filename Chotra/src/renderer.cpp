@@ -5,9 +5,9 @@
 
 namespace Chotra {
 
-    Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene, Background& background)
+    Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene)
         : width(width), height(height),
-        camera(camera), scene(scene), background(background), 
+        camera(camera), scene(scene), 
         pbrShader("shaders/pbr_shader.vs", "shaders/pbr_shader.fs"),
         simpleDepthShader("shaders/shadow_depth.vs", "shaders/shadow_depth.fs"),
         lightsShader("shaders/pbr_shader.vs", "shaders/lights_shader.fs"),
@@ -97,7 +97,7 @@ namespace Chotra {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         
-        if (showShadows) {  // if false, getting the empty depthmap withaut rendering      TODO::otimizing 
+        if (showShadows) {  // if false, getting the empty depthmap withaut rendering      TODO::optimize 
             scene.DrawSceneObjects(simpleDepthShader);
         }
         glCullFace(GL_BACK);
@@ -155,11 +155,11 @@ namespace Chotra {
 
          // Связываем предварительно вычисленные IBL-данные
         glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, background.irradianceMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.background.irradianceMap);
         glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, background.prefilterMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.background.prefilterMap);
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, background.brdfLUTTexture);
+        glBindTexture(GL_TEXTURE_2D, scene.background.brdfLUTTexture);
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, depthMap);
       
@@ -193,7 +193,7 @@ namespace Chotra {
             backgroundShader.SetMat4("projection", projection);
             backgroundShader.SetMat4("view", view);
             backgroundShader.SetFloat("exposure", backgroundExposure);
-            background.Draw();
+            scene.background.Draw();
         }
 
         // 2. Теперь блитируем мультисэмплированный буфер(ы) в нормальный цветовой буфер промежуточного FBO. Изображение сохранено в screenTexture
