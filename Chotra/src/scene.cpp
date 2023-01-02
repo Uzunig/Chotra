@@ -3,8 +3,7 @@
 namespace Chotra {
 
     Scene::Scene()
-        : cylinder(), sphere()/*,
-        background(background_path)*/ {
+        : cylinder(), sphere(), environment("hdr/industrial_sunset_02_4k.hdr") {
 
         LoadSceneFromFile("level1.lv");
         //DemoInit(); 

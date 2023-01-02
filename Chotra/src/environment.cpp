@@ -3,22 +3,28 @@
 namespace Chotra {
 
 
-    // PBR: установка матриц проекции и вида для захвата данных по всем 6 направлениям граней кубической карты
-    extern glm::mat4 captureProjection;
+    Environment::Environment(std::string hdri_path) {
 
-    extern glm::mat4 captureViews[];
-    
-    Environment::Environment() {
+        if (LoadHDRi(hdri_path)) {
+            
+            SetFrameBuffer();
+            GenTextures();
+            SetCubeMap();
+            
+            UpdateMaps();
+            
+        }
 
-        SetFrameBuffer();
-        SetCubeMap();
+    }
+
+    void Environment::UpdateMaps() {
+                
         SetIrradianceMap();
         SetPrefilterMap();
         SetBrdfLUTTexture();
-        
     }
 
-    
+
     void Environment::SetFrameBuffer() {
 
         glGenFramebuffers(1, &captureFBO);
@@ -29,8 +35,16 @@ namespace Chotra {
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, envMapSize, envMapSize);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
     }
-/*
-    void Environment::LoadHDRi(std::string& path) {
+
+    void Environment::GenTextures() {
+        
+        glGenTextures(1, &envCubemap);
+        glGenTextures(1, &irradianceMap);
+        glGenTextures(1, &prefilterMap);
+        glGenTextures(1, &brdfLUTTexture);
+    }
+
+    int Environment::LoadHDRi(std::string path) {
 
         stbi_set_flip_vertically_on_load(true);
         int width, height, nrComponents;
@@ -39,7 +53,7 @@ namespace Chotra {
         if (data) {
             glGenTextures(1, &hdrTexture);
             glBindTexture(GL_TEXTURE_2D, hdrTexture);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data); 
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -47,17 +61,18 @@ namespace Chotra {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
             stbi_image_free(data);
+            return hdrTexture;
         }
         else {
             std::cout << "Failed to load HDR image." << std::endl;
+            return -1;
         }
     }
-    */
+
     void Environment::SetCubeMap() {
 
         Shader equirectangularToCubemapShader("shaders/cubemap.vs", "shaders/equirectangular_to_cubemap.fs");
 
-        glGenTextures(1, &envCubemap);
         glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
         for (unsigned int i = 0; i < 6; ++i) {
@@ -72,17 +87,17 @@ namespace Chotra {
         // PBR: конвертирование равнопромежуточной HDR-карты окружения в кубическую
         equirectangularToCubemapShader.Use();
         equirectangularToCubemapShader.SetInt("equirectangularMap", 0);
-        equirectangularToCubemapShader.SetMat4("projection", captureProjection);
+        equirectangularToCubemapShader.SetMat4("projection", captureSettings.captureProjection);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, hdrTexture);
 
         glViewport(0, 0, envMapSize, envMapSize);
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         for (unsigned int i = 0; i < 6; ++i) {
-            equirectangularToCubemapShader.SetMat4("view", captureViews[i]);
+            equirectangularToCubemapShader.SetMat4("view", captureSettings.captureViews[i]);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            
+
             RenderCube();
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -92,8 +107,7 @@ namespace Chotra {
 
         // PBR: создаем кубическую карту облученности
         Shader irradianceShader("shaders/cubemap.vs", "shaders/irradiance_convolution.fs");
-        
-        glGenTextures(1, &irradianceMap);
+                
         glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
 
         for (unsigned int i = 0; i < 6; ++i) {
@@ -112,7 +126,7 @@ namespace Chotra {
         // PBR: решаем диффузный интеграл, применяя операцию свертки для создания кубической карты облученности
         irradianceShader.Use();
         irradianceShader.SetInt("environmentMap", 0);
-        irradianceShader.SetMat4("projection", captureProjection);
+        irradianceShader.SetMat4("projection", captureSettings.captureProjection);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
@@ -121,7 +135,7 @@ namespace Chotra {
 
         for (unsigned int i = 0; i < 6; ++i) {
 
-            irradianceShader.SetMat4("view", captureViews[i]);
+            irradianceShader.SetMat4("view", captureSettings.captureViews[i]);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -135,7 +149,6 @@ namespace Chotra {
         // PBR: создаем префильтрованную кубическую карту, и приводим размеры захвата FBO к размерам префильтрованной карты
         Shader prefilterShader("shaders/cubemap.vs", "shaders/prefilter.fs");
 
-        glGenTextures(1, &prefilterMap);
         glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
         for (unsigned int i = 0; i < 6; ++i)
         {
@@ -153,17 +166,17 @@ namespace Chotra {
         // PBR: применяем симуляцию квази Монте-Карло для освещения окружающей среды, чтобы создать префильтрованную (кубическую)карту
         prefilterShader.Use();
         prefilterShader.SetInt("environmentMap", 0);
-        prefilterShader.SetMat4("projection", captureProjection);
+        prefilterShader.SetMat4("projection", captureSettings.captureProjection);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-        
+
 
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         unsigned int maxMipLevels = 5;
 
         for (unsigned int mip = 0; mip < maxMipLevels; ++mip) {
             // Изменяем размеры фреймбуфера в соответствии с размерами мипмап-карты
-            unsigned int mipWidth  = prefilterMapSize * std::pow(0.5, mip);
+            unsigned int mipWidth = prefilterMapSize * std::pow(0.5, mip);
             unsigned int mipHeight = prefilterMapSize * std::pow(0.5, mip);
             glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
@@ -173,7 +186,7 @@ namespace Chotra {
             prefilterShader.SetFloat("roughness", roughness);
 
             for (unsigned int i = 0; i < 6; ++i) {
-                prefilterShader.SetMat4("view", captureViews[i]);
+                prefilterShader.SetMat4("view", captureSettings.captureViews[i]);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mip);
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -187,9 +200,7 @@ namespace Chotra {
 
         // PBR: генерируем 2D LUT-текстуру при помощи используемых уравнений BRDF
         Shader brdfShader("shaders/brdf.vs", "shaders/brdf.fs");
-
-        glGenTextures(1, &brdfLUTTexture);
-
+                
         // Выделяем необходимое количество памяти для LUT-текстуры
         glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, envMapSize, envMapSize, 0, GL_RG, GL_FLOAT, 0);
@@ -249,21 +260,21 @@ namespace Chotra {
              1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // верхняя-левая
              1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // нижняя-левая     
 
-            // нижняя грань
-            -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // верхняя-правая
-             1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // верхняя-левая
-             1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // нижняя-левая
-             1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // нижняя-левая
-            -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // нижняя-правая
-            -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // верхняя-правая
+             // нижняя грань
+             -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // верхняя-правая
+              1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // верхняя-левая
+              1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // нижняя-левая
+              1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // нижняя-левая
+             -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // нижняя-правая
+             -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // верхняя-правая
 
-            // верхняя грань
-            -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // верхняя-левая
-             1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // нижняя-правая
-             1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // верхняя-правая     
-             1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // нижняя-правая
-            -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // верхняя-левая
-            -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // нижняя-левая        
+             // верхняя грань
+             -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // верхняя-левая
+              1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // нижняя-правая
+              1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // верхняя-правая     
+              1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // нижняя-правая
+             -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // верхняя-левая
+             -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // нижняя-левая        
         };
         glGenVertexArrays(1, &cubeVAO);
         glGenBuffers(1, &cubeVBO);
@@ -320,11 +331,11 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
         //glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
         //glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
-               
+
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         RenderCube();
-        glCullFace(GL_BACK);     
+        glCullFace(GL_BACK);
     }
 
 } // namspace Chotra

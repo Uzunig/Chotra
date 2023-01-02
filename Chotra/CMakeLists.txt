@@ -7,10 +7,7 @@ add_library(Chotra STATIC
 	includes/Chotra/Events/event.h      
 	
 	src/application.cpp
-
-	src/background.cpp
-	src/background.h
-
+	
 	src/camera.cpp
 	src/camera.h
 

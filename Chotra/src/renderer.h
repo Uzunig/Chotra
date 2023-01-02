@@ -10,7 +10,7 @@
 
 #include <vector>
 
-#include "background.h"
+#include "environment.h"
 #include "camera.h"
 #include "shader.h"
 #include "scene.h"

@@ -12,17 +12,34 @@
 
 
 #include "shader.h"
-
 namespace Chotra {
 
+    class CaptureSettings {
+    public:
+
+        glm::vec3 eye = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+
+        glm::mat4 captureViews[6] = {
+            glm::lookAt(eye, glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+            glm::lookAt(eye, glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+            glm::lookAt(eye, glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+            glm::lookAt(eye, glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+            glm::lookAt(eye, glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+            glm::lookAt(eye, glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+        };
+    };
+
+ 
     class Environment {
     public:
 
-         
-        unsigned int envMapSize  = 1024;
-        unsigned int irradianceMapSize = 64; 
+        CaptureSettings captureSettings;
+
+        unsigned int envMapSize = 1024;
+        unsigned int irradianceMapSize = 64;
         unsigned int prefilterMapSize = 1024;
-        
+
         unsigned int hdrTexture;
 
         unsigned int captureFBO;
@@ -38,9 +55,11 @@ namespace Chotra {
         unsigned int prefilterMap;
         unsigned int brdfLUTTexture;
 
-        Environment();
-       // void LoadHDRi(std::string& path);
+        Environment(std::string hdri_path);
+        int LoadHDRi(std::string hdri_path);
         void SetFrameBuffer();
+        void GenTextures();
+        void UpdateMaps();
 
         void SetCubeMap();
         void SetIrradianceMap();
@@ -51,6 +70,7 @@ namespace Chotra {
         void RenderCube();
         void RenderQuad();
     };
+
 } // namspace Chotra
 
 #endif

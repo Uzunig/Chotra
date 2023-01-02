@@ -14,8 +14,7 @@ namespace Chotra {
     class SceneObject {
     public:
         Mesh& mesh;
-        Environment environment;
-
+       
         glm::vec3 position;
         glm::vec3 angle;
         glm::vec3 pivot;

@@ -9,7 +9,7 @@ namespace Chotra {
         float deformation, int deformationVector)
         : mesh(mesh), position(position), angle(angle),
         scale(scale), velocity(velocity), rVelocity(rVelocity), visible(visible),
-        deformation(deformation), deformationVector(deformationVector), environment() {
+        deformation(deformation), deformationVector(deformationVector) {
 
         UpdateModelMatrix();
     }

@@ -29,7 +29,7 @@ namespace Chotra {
     }
 
     void Renderer::Init(GLFWwindow* window) {
-
+        
         Quad quad;
         quad.SetupQuad();
         quads.push_back(quad);
@@ -75,7 +75,7 @@ namespace Chotra {
     }
 
     void Renderer::Render() {
-
+        
         glm::mat4 lightProjection, lightView;
         glm::mat4 lightSpaceMatrix;
 
@@ -152,14 +152,14 @@ namespace Chotra {
         pbrCylinderTangentShader1.SetMat4("view", view);
         pbrCylinderTangentShader1.SetVec3("camPos", camera.Position);
         // pbrCylinderTangentShader1.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
-
+               
          // Связываем предварительно вычисленные IBL-данные
         glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.background.irradianceMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.irradianceMap);
         glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.background.prefilterMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.prefilterMap);
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, scene.background.brdfLUTTexture);
+        glBindTexture(GL_TEXTURE_2D, scene.environment.brdfLUTTexture);
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, depthMap);
       
@@ -193,7 +193,7 @@ namespace Chotra {
             backgroundShader.SetMat4("projection", projection);
             backgroundShader.SetMat4("view", view);
             backgroundShader.SetFloat("exposure", backgroundExposure);
-            scene.background.Draw();
+            scene.environment.Draw();
         }
 
         // 2. Теперь блитируем мультисэмплированный буфер(ы) в нормальный цветовой буфер промежуточного FBO. Изображение сохранено в screenTexture
