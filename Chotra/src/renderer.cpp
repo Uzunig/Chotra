@@ -15,7 +15,10 @@ namespace Chotra {
         combineShader("shaders/downsampling.vs", "shaders/combine.fs"),
         shaderBlur("shaders/blur.vs", "shaders/blur.fs"),
         shaderBloomFinal("shaders/bloom_final.vs", "shaders/bloom_final.fs"),
-        backgroundShader("shaders/background.vs", "shaders/background.fs") {
+        backgroundShader("shaders/background.vs", "shaders/background.fs"),
+        shaderGeometryPass("shaders/g_buffer.vs", "shaders/g_buffer.fs") {
+
+        ConfigureGBuffer();
 
         GenerateScreenTexture();
         SetupQuad();
@@ -23,7 +26,7 @@ namespace Chotra {
         ConfigureFramebufferMSAA();
         ConfigureFramebuffer();
         ConfigureBloom();
-
+        
     }
 
     void Renderer::GenerateScreenTexture() {
@@ -64,6 +67,8 @@ namespace Chotra {
     }
 
     void Renderer::Render() {
+        
+        RenderGBuffer();
 
         RenderShadowMap();
 
@@ -77,14 +82,9 @@ namespace Chotra {
 
         RenderBloom();
 
-
-
-
-
-
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glBindTexture(GL_TEXTURE_2D, gPosition);
 
         quads[0].RenderQuad();
 
@@ -133,14 +133,14 @@ namespace Chotra {
         // Создаем мультисэмплированную цветовую прикрепляемую текстуру
         glGenTextures(1, &textureColorBufferMultiSampled);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled);
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 16, GL_RGBA16F, width, height, GL_TRUE);
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samplesNumber, GL_RGBA16F, width, height, GL_TRUE);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled, 0);
 
         // Создаем (также мультисэмплированный) рендербуфер для прикрепляемых объектов глубины трафарета
         glGenRenderbuffers(1, &rboMSAA);
         glBindRenderbuffer(GL_RENDERBUFFER, rboMSAA);
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, 16, GL_DEPTH24_STENCIL8, width, height);
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samplesNumber, GL_DEPTH24_STENCIL8, width, height);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboMSAA);
 
@@ -171,7 +171,7 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, screenTexture);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	
 
-        // Создаем (также мультисэмплированный) рендербуфер для прикрепляемых объектов глубины трафарета
+        // Создаем рендербуфер для прикрепляемых объектов глубины трафарета
         glGenRenderbuffers(1, &rbo);
         glBindRenderbuffer(GL_RENDERBUFFER, rbo);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
@@ -546,6 +546,71 @@ namespace Chotra {
             scene.DrawSceneObjects(simpleDepthShader);
         }
         glCullFace(GL_BACK);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void Renderer::ConfigureGBuffer() {
+        // Конфигурирование g-буфера фреймбуфера
+        glGenFramebuffers(1, &gBuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+        
+
+        // Цветовой буфер позиций
+        glGenTextures(1, &gPosition);
+        glBindTexture(GL_TEXTURE_2D, gPosition);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
+
+        // Цветовой буфер нормалей
+        glGenTextures(1, &gNormal);
+        glBindTexture(GL_TEXTURE_2D, gNormal);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
+
+        // Цветовой буфер значений цвета + отраженной составляющей
+        glGenTextures(1, &gAlbedoSpec);
+        glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec, 0);
+
+        // Создаем и прикрепляем буфер глубины (рендербуфер)
+        glGenRenderbuffers(1, &rboG);
+        glBindRenderbuffer(GL_RENDERBUFFER, rboG);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboG);
+
+        // Проверяем готовность фреймбуфера
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "Framebuffer not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    }
+
+    void Renderer::RenderGBuffer() {
+        // Рендер
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+
+        // 1. Геометрический проход: выполняем рендеринг геометрических/цветовых данных сцены в g-буфер
+        glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
+        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 model = glm::mat4(1.0f);
+        shaderGeometryPass.Use();
+        shaderGeometryPass.SetMat4("projection", projection);
+        shaderGeometryPass.SetMat4("view", view);
+        
+        scene.DrawSceneObjects(shaderGeometryPass);
+
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 

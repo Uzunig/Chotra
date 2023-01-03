@@ -163,7 +163,7 @@ namespace Chotra {
         ImGui::Begin("Rendering configuration");
 
         if (ImGui::Checkbox("MSAA", &renderer->enableMSAA)) {
-            //TO DO: add samples amounts input
+            //add input samplesNumber
         }
 
         if (ImGui::CollapsingHeader("Environment")) {
