@@ -5,11 +5,9 @@
 namespace Chotra {
 
     SceneObject::SceneObject(Mesh& mesh, glm::vec3 position, glm::vec3 angle,
-        glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, int visible,
-        float deformation, int deformationVector)
+        glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, int visible)
         : mesh(mesh), position(position), angle(angle),
-        scale(scale), velocity(velocity), rVelocity(rVelocity), visible(visible),
-        deformation(deformation), deformationVector(deformationVector) {
+        scale(scale), velocity(velocity), rVelocity(rVelocity), visible(visible) {
 
         UpdateModelMatrix();
     }
@@ -33,31 +31,4 @@ namespace Chotra {
 
     }
 
-    void SceneObject::Draw(Shader& shader1, Shader& shader2, Shader& shader3) {
-        shader1.Use();
-        shader1.SetMat4("model", modelMatrix);
-        shader2.Use();
-        shader2.SetMat4("model", modelMatrix);
-        shader3.Use();
-        shader3.SetMat4("model", modelMatrix);
-
-        unsigned int firstSection = 32 * deformation;
-        unsigned int secondSection = 64 - 32 * deformation;
-        mesh.Draw(shader1, firstSection, shader2, secondSection, shader3);
-    }
-
-    void SceneObject::Deformation(float dt) {
-        dt *= 0.02f;
-        if (deformationVector != 0) {
-            deformation += deformationVector * dt;
-            if (deformation < 0.0f) {
-                deformation = 0.0f;
-                deformationVector = 0;
-            }
-            else if (deformation > 1.0f) {
-                deformation = 1.0f;
-                deformationVector = 0;
-            }
-        }
-    }
 } // namspace Chotra

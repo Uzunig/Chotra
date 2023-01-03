@@ -34,9 +34,7 @@ namespace Chotra {
               
 
         std::vector<ObjModel> objModels;
-        Cylinder cylinder;
-        Sphere sphere;
-
+ 
         std::vector<SceneObject> sceneObjects;
         std::vector<SceneObject> cylinders;
         std::vector<SceneObject> spheres;

@@ -31,10 +31,7 @@ namespace Chotra {
 
         Shader pbrShader;
         Shader lightsShader;
-        Shader pbrSphereTangentShader;
-        Shader pbrCylinderTangentShader;
-        Shader pbrCylinderTangentShader1;
-
+        
         Shader simpleDepthShader;
 
         Shader screenShader;
@@ -78,6 +75,7 @@ namespace Chotra {
         unsigned int depthMapFBO;
         unsigned int shadowMapSize = 1024;
         unsigned int depthMap;
+        glm::mat4 lightSpaceMatrix;
          
         unsigned int quadVAO = 0;
         unsigned int quadVBO;
@@ -94,7 +92,9 @@ namespace Chotra {
         void RenderQuad();
         void ConfigureMSAA();
         void ConfigureBloom();
+
         void ConfigureShadowMap();
+        void RenderShadowMap();
     };
 
 } // namespace Chotra
