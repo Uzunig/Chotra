@@ -160,7 +160,11 @@ namespace Chotra {
         ImGui::SetNextWindowPos(ImVec2(GetWidth() - 350, 0));
         ImGui::SetNextWindowSize(ImVec2(350,0));
 
-         ImGui::Begin("Rendering configuration");
+        ImGui::Begin("Rendering configuration");
+
+        if (ImGui::Checkbox("MSAA", &renderer->enableMSAA)) {
+            //TO DO: add samples amounts input
+        }
 
         if (ImGui::CollapsingHeader("Environment")) {
             ImGui::ColorPicker4("Color", renderer->backgroundColor);

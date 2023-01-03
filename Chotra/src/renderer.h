@@ -43,6 +43,7 @@ namespace Chotra {
 
         Shader backgroundShader;
 
+        bool enableMSAA = false;
         bool perspectiveProjection;    
         float backgroundColor[4] = { 0.2f, 0.2f, 0.3f, 1.0f };
         bool drawSkybox = true;
@@ -54,13 +55,19 @@ namespace Chotra {
         float shadowBiasMin = 0.00f;
         float shadowBiasMax = 0.0f;
         
+        unsigned int screenTexture; 
+        
+        // Framebuffer without MSAA
         unsigned int framebuffer;
-        unsigned int textureColorBufferMultiSampled;
         unsigned int rbo;
 
+        // Framebuffer with MSAA
+        unsigned int framebufferMSAA;
+        unsigned int textureColorBufferMultiSampled;
+        unsigned int rboMSAA;
         unsigned int intermediateFBO;
-        unsigned int screenTexture;
-                
+
+                     
         unsigned int hdrFBO;
         unsigned int colorBuffers[2];
         unsigned int rboDepth;
@@ -85,13 +92,22 @@ namespace Chotra {
         
         Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene);
 
+        void GenerateScreenTexture();
+
         void Init(GLFWwindow* window);
         void Render();
 
         void SetupQuad();
         void RenderQuad();
-        void ConfigureMSAA();
+        
+        void ConfigureFramebufferMSAA();
+        void RenderWithMSAA();
+
+        void ConfigureFramebuffer();
+        void RenderWithoutMSAA();
+
         void ConfigureBloom();
+        void RenderBloom();
 
         void ConfigureShadowMap();
         void RenderShadowMap();

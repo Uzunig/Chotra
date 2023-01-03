@@ -17,11 +17,23 @@ namespace Chotra {
         shaderBloomFinal("shaders/bloom_final.vs", "shaders/bloom_final.fs"),
         backgroundShader("shaders/background.vs", "shaders/background.fs") {
 
+        GenerateScreenTexture();
         SetupQuad();
         ConfigureShadowMap();
-        ConfigureMSAA();
+        ConfigureFramebufferMSAA();
+        ConfigureFramebuffer();
         ConfigureBloom();
 
+    }
+
+    void Renderer::GenerateScreenTexture() {
+        
+        glGenTextures(1, &screenTexture);
+
+        glBindTexture(GL_TEXTURE_2D, screenTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
     void Renderer::Init(GLFWwindow* window) {
@@ -49,18 +61,131 @@ namespace Chotra {
         screenShader.Use();
         screenShader.SetInt("screenTexture", 0);
 
-
     }
 
     void Renderer::Render() {
-       
+
         RenderShadowMap();
 
 
+        if (enableMSAA) {
+            RenderWithMSAA();
+        }
+        else {
+            RenderWithoutMSAA();
+        }
+
+        RenderBloom();
 
 
-        // 1. Отрисовываем обычную сцену в мультисэмплированные буферы
+
+
+
+
+        screenShader.Use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+
+        quads[0].RenderQuad();
+
+    }
+
+
+
+    void Renderer::SetupQuad() {
+        if (quadVAO == 0)
+        {
+
+            float quadVertices[] = {
+                // координаты      // текстурные коодинаты
+               -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+               -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+                1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+                1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+            };
+
+            // Установка VAO плоскости
+            glGenVertexArrays(1, &quadVAO);
+            glGenBuffers(1, &quadVBO);
+            glBindVertexArray(quadVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        }
+    }
+
+    void Renderer::RenderQuad() {
+
+        glBindVertexArray(quadVAO);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindVertexArray(0);
+
+    }
+
+    void Renderer::ConfigureFramebufferMSAA() {
+        // Конфигурируем MSAA фреймбуфер
+        glGenFramebuffers(1, &framebufferMSAA);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferMSAA);
+
+        // Создаем мультисэмплированную цветовую прикрепляемую текстуру
+        glGenTextures(1, &textureColorBufferMultiSampled);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled);
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 16, GL_RGBA16F, width, height, GL_TRUE);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled, 0);
+
+        // Создаем (также мультисэмплированный) рендербуфер для прикрепляемых объектов глубины трафарета
+        glGenRenderbuffers(1, &rboMSAA);
+        glBindRenderbuffer(GL_RENDERBUFFER, rboMSAA);
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, 16, GL_DEPTH24_STENCIL8, width, height);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboMSAA);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // Конфигурируем второй постпроцессинг фреймбуфер
+        glGenFramebuffers(1, &intermediateFBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+
+        // Создаем цветовую прикрепляемую текстуру
+        
+        glBindTexture(GL_TEXTURE_2D, screenTexture);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	// нам нужен только цветовой буфер
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void Renderer::ConfigureFramebuffer() {
+
+        // Конфигурируем второй постпроцессинг фреймбуфер
+        glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+        glBindTexture(GL_TEXTURE_2D, screenTexture);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	
+
+        // Создаем (также мультисэмплированный) рендербуфер для прикрепляемых объектов глубины трафарета
+        glGenRenderbuffers(1, &rbo);
+        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void Renderer::RenderWithMSAA() {
+        // 1. Отрисовываем обычную сцену в мультисэмплированные буферы
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferMSAA);
 
         // 2. Рендерим сцену как обычно, но используем при этом сгенерированную карту глубины/тени
         glViewport(0, 0, width, height);
@@ -124,170 +249,77 @@ namespace Chotra {
         }
 
         // 2. Теперь блитируем мультисэмплированный буфер(ы) в нормальный цветовой буфер промежуточного FBO. Изображение сохранено в screenTexture
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebufferMSAA);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-        // 3. Теперь рендерим прямоугольник с визуальными эффектами сцены, представленными текстурным изображением
-        glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glDisable(GL_DEPTH_TEST);
-
-        screenShader.Use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, screenTexture); // теперь в качестве текстуры прямоугольника используем преобразованный прикрепленный цветовой объект 
-        // Отрисовываем прямоугольник сцены
-        RenderQuad();
-
-        bool horizontal = true;
-        bool first_iteration = true;
-        unsigned int amount = 10;
-        shaderBlur.Use();
-
-        // Downsampling
-        for (unsigned int j = 0; j < 16; ++j) {
-            glViewport(0, 0, width / (j + 1) * 2, height / (j + 1) * 2);
-            // 2. Размываем яркие фрагменты с помощью двухпроходного размытия по Гауссу
-            horizontal = true;
-            first_iteration = true;
-            shaderBlur.Use();
-            for (unsigned int i = 0; i < amount; i++)
-            {
-                glBindFramebuffer(GL_FRAMEBUFFER, downPingpongFBO[j][horizontal]);
-                shaderBlur.SetInt("horizontal", horizontal);
-                if (first_iteration && (j == 0)) {
-                    glBindTexture(GL_TEXTURE_2D, first_iteration ? colorBuffers[1] : downPingpongColorbuffers[j][!horizontal]);
-                }
-                else {
-                    glBindTexture(GL_TEXTURE_2D, first_iteration ? downPingpongColorbuffers[j - 1][!horizontal] : downPingpongColorbuffers[j][!horizontal]);
-                }
-                RenderQuad();
-                horizontal = !horizontal;
-                if (first_iteration)
-                    first_iteration = false;
-            }
-        }
-
-
-
-        first_iteration = true;
-        // Upsampling
-        for (unsigned int j = 1; j < 16; ++j) {
-            glViewport(0, 0, width / (16 - j) * 2, height / (16 - j) * 2);
-
-            glBindFramebuffer(GL_FRAMEBUFFER, upFBO[j]);
-            combineShader.Use();
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, first_iteration ? downPingpongColorbuffers[15 - j][!horizontal] : upColorbuffers[j - 1]);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, downPingpongColorbuffers[15 - j][!horizontal]);
-
-            RenderQuad();
-
-            horizontal = !horizontal;
-            if (first_iteration)
-                first_iteration = false;
-
-        }
-
-
-        // 3. Теперь рендерим цветовой буфер (типа с плавающей точкой) на 2D-прямоугольник и сужаем диапазон значений HDR-цветов к цветовому диапазону значений заданного по умолчанию фреймбуфера
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shaderBloomFinal.Use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, upColorbuffers[15]);
-        shaderBloomFinal.SetInt("bloom", bloom);
-        shaderBloomFinal.SetFloat("exposure", exposure);
-        shaderBloomFinal.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
-
-        RenderQuad();
-
-        screenShader.Use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
-
-        quads[0].RenderQuad();
-
     }
 
-
-
-    void Renderer::SetupQuad() {
-        if (quadVAO == 0)
-        {
-
-            float quadVertices[] = {
-                // координаты      // текстурные коодинаты
-               -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-               -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-                1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-                1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-            };
-
-            // Установка VAO плоскости
-            glGenVertexArrays(1, &quadVAO);
-            glGenBuffers(1, &quadVBO);
-            glBindVertexArray(quadVAO);
-            glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-        }
-    }
-
-    void Renderer::RenderQuad() {
-
-        glBindVertexArray(quadVAO);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glBindVertexArray(0);
-
-    }
-
-    void Renderer::ConfigureMSAA() {
-        // Конфигурируем MSAA фреймбуфер
-        glGenFramebuffers(1, &framebuffer);
+    void Renderer::RenderWithoutMSAA() {
+        // 1. Отрисовываем обычную сцену в мультисэмплированные буферы
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-        // Создаем мультисэмплированную цветовую прикрепляемую текстуру
-        glGenTextures(1, &textureColorBufferMultiSampled);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled);
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 16, GL_RGBA16F, width, height, GL_TRUE);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled, 0);
+        // 2. Рендерим сцену как обычно, но используем при этом сгенерированную карту глубины/тени
+        glViewport(0, 0, width, height);
+        glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
 
-        // Создаем (также мультисэмплированный) рендербуфер для прикрепляемых объектов глубины трафарета
-        glGenRenderbuffers(1, &rbo);
-        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, 16, GL_DEPTH24_STENCIL8, width, height);
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+        glm::mat4 projection;
+        if (perspectiveProjection) {
+            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
+        }
+        else {
+            projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+        }
+        pbrShader.Use();
+        glm::mat4 view = camera.GetViewMatrix();
+        pbrShader.SetMat4("projection", projection);
+        pbrShader.SetMat4("view", view);
+        pbrShader.SetVec3("camPos", camera.Position);
+        pbrShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+        pbrShader.SetFloat("shadowBiasMin", shadowBiasMin);
+        pbrShader.SetFloat("shadowBiasMax", shadowBiasMax);
 
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        lightsShader.Use();
+        lightsShader.SetMat4("projection", projection);
+        lightsShader.SetMat4("view", view);
+        lightsShader.SetVec3("camPos", camera.Position);
 
-        // Конфигурируем второй постпроцессинг фреймбуфер
-        glGenFramebuffers(1, &intermediateFBO);
-        glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+        // Связываем предварительно вычисленные IBL-данные
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.irradianceMap);
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.prefilterMap);
+        glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, scene.environment.brdfLUTTexture);
+        glActiveTexture(GL_TEXTURE8);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
 
-        // Создаем цветовую прикрепляемую текстуру
-        glGenTextures(1, &screenTexture);
-        glBindTexture(GL_TEXTURE_2D, screenTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	// нам нужен только цветовой буфер
+        glActiveTexture(GL_TEXTURE0);
 
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+        for (unsigned int i = 0; i < scene.sceneLights.size(); ++i) {
+            pbrShader.Use();
+            pbrShader.SetVec3("lightPositions[" + std::to_string(i) + "]", scene.sceneLights[i].position);
+            pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", scene.sceneLights[i].color * (float)scene.sceneLights[i].brightness);
+        }
+
+        scene.DrawSceneObjects(pbrShader);
+
+
+        scene.DrawSceneLights(lightsShader);
+
+        if (drawSkybox) {
+            // Skybox drawing
+            backgroundShader.Use();
+            backgroundShader.SetMat4("projection", projection);
+            backgroundShader.SetMat4("view", view);
+            backgroundShader.SetFloat("exposure", backgroundExposure);
+            scene.environment.Draw();
+        }
+                
     }
 
     void Renderer::ConfigureBloom() {
@@ -383,6 +415,88 @@ namespace Chotra {
 
     }
 
+    void Renderer::RenderBloom() {
+
+        // 3. Теперь рендерим прямоугольник с визуальными эффектами сцены, представленными текстурным изображением
+        glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glDisable(GL_DEPTH_TEST);
+
+        screenShader.Use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, screenTexture); // теперь в качестве текстуры прямоугольника используем преобразованный прикрепленный цветовой объект 
+        // Отрисовываем прямоугольник сцены
+        RenderQuad();
+
+        bool horizontal = true;
+        bool first_iteration = true;
+        unsigned int amount = 10;
+        shaderBlur.Use();
+
+        // Downsampling
+        for (unsigned int j = 0; j < 16; ++j) {
+            glViewport(0, 0, width / (j + 1) * 2, height / (j + 1) * 2);
+            // 2. Размываем яркие фрагменты с помощью двухпроходного размытия по Гауссу
+            horizontal = true;
+            first_iteration = true;
+            shaderBlur.Use();
+            for (unsigned int i = 0; i < amount; i++)
+            {
+                glBindFramebuffer(GL_FRAMEBUFFER, downPingpongFBO[j][horizontal]);
+                shaderBlur.SetInt("horizontal", horizontal);
+                if (first_iteration && (j == 0)) {
+                    glBindTexture(GL_TEXTURE_2D, first_iteration ? colorBuffers[1] : downPingpongColorbuffers[j][!horizontal]);
+                }
+                else {
+                    glBindTexture(GL_TEXTURE_2D, first_iteration ? downPingpongColorbuffers[j - 1][!horizontal] : downPingpongColorbuffers[j][!horizontal]);
+                }
+                RenderQuad();
+                horizontal = !horizontal;
+                if (first_iteration)
+                    first_iteration = false;
+            }
+        }
+
+
+
+        first_iteration = true;
+        // Upsampling
+        for (unsigned int j = 1; j < 16; ++j) {
+            glViewport(0, 0, width / (16 - j) * 2, height / (16 - j) * 2);
+
+            glBindFramebuffer(GL_FRAMEBUFFER, upFBO[j]);
+            combineShader.Use();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, first_iteration ? downPingpongColorbuffers[15 - j][!horizontal] : upColorbuffers[j - 1]);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, downPingpongColorbuffers[15 - j][!horizontal]);
+
+            RenderQuad();
+
+            horizontal = !horizontal;
+            if (first_iteration)
+                first_iteration = false;
+
+        }
+
+
+        // 3. Теперь рендерим цветовой буфер (типа с плавающей точкой) на 2D-прямоугольник и сужаем диапазон значений HDR-цветов к цветовому диапазону значений заданного по умолчанию фреймбуфера
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, width, height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        shaderBloomFinal.Use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, upColorbuffers[15]);
+        shaderBloomFinal.SetInt("bloom", bloom);
+        shaderBloomFinal.SetFloat("exposure", exposure);
+        shaderBloomFinal.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
+
+        RenderQuad();
+    }
+
     void Renderer::ConfigureShadowMap() {
 
         glGenFramebuffers(1, &depthMapFBO);
@@ -409,7 +523,7 @@ namespace Chotra {
     void Renderer::RenderShadowMap() {
         // Scene rendering from light position
         glm::mat4 lightProjection, lightView;
-        
+
 
         float near_plane = 1.0f, far_plane = 100.0f;
         //lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)shadowMapSize / (GLfloat)shadowMapSize, near_plane, far_plane); // обратите внимание, что если вы используете матрицу перспективной проекции, то вам придется изменить положение света, так как текущего положения света недостаточно для отображения всей сцены
