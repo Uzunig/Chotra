@@ -2,20 +2,20 @@
 
 namespace Chotra {
 
-    Quad::Quad() {
-
+    Quad::Quad(unsigned int X, unsigned int Y) {
+        SetupQuad(X, Y);
     }
 
-    void Quad::SetupQuad() {
+    void Quad::SetupQuad(unsigned int X, unsigned int Y) {
         if (quadVAO == 0)
         {
 
             float quadVertices[] = {
-                // координаты      // текстурные коодинаты
-               -1.0f,  1.0f, 0.0f,     0.0f, 1.0f,
-               -1.0f,  0.4f, 0.0f,     0.0f, 0.0f,
-               -0.4f,  1.0f, 0.0f,     1.0f, 1.0f,
-               -0.4f,  0.4f, 0.0f,     1.0f, 0.0f,
+                // координаты                                              // текстурные коодинаты
+               -1.0f + (float)X * 0.5,  1.0f - (float)Y * 0.5,   0.0f,        0.0f, 1.0f,
+               -1.0f + (float)X * 0.5,  0.5f - (float)Y * 0.5,   0.0f,        0.0f, 0.0f,
+               -0.5f + (float)X * 0.5,  1.0f - (float)Y * 0.5,   0.0f,        1.0f, 1.0f,
+               -0.5f + (float)X * 0.5,  0.5f - (float)Y * 0.5,   0.0f,        1.0f, 0.0f,
             };
 
             // Установка VAO плоскости

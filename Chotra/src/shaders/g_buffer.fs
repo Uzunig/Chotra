@@ -7,8 +7,12 @@ in vec3 FragPos;
 in vec2 TexCoords;
 in vec3 Normal;
 
+// Параметры материала
 uniform sampler2D albedoMap;
-//uniform sampler2D texture_specular1;
+uniform sampler2D normalMap;
+uniform sampler2D metallicMap;
+uniform sampler2D roughnessMap;
+uniform sampler2D aoMap;
 
 void main()
 {    
@@ -19,7 +23,7 @@ void main()
     gNormal = normalize(Normal);
 	
     // И диффузную составляющую цвета каждого фрагмента
-    gAlbedoSpec.rgb = texture(albedoMap, TexCoords).rgb;
+    gAlbedoSpec = texture(albedoMap, TexCoords);
 	
     // Сохраним значение интенсивности отраженной составляющей в альфа-компоненте переменной gAlbedoSpec
     //gAlbedoSpec.a = texture(texture_specular1, TexCoords).r;

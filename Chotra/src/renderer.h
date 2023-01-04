@@ -44,6 +44,8 @@ namespace Chotra {
         Shader backgroundShader;
 
         Shader shaderGeometryPass;
+        Shader shaderLightingPass;
+        
 
         bool enableMSAA = true;
         int samplesNumber = 16;
@@ -63,7 +65,10 @@ namespace Chotra {
         unsigned int gBuffer;           // G-Buffer
         unsigned int gPosition;         // Textures
         unsigned int gNormal;
-        unsigned int gAlbedoSpec;
+        unsigned int gAlbedoMap;
+        unsigned int gMetallicMap;
+        unsigned int gRoughnessMap;
+        unsigned int gAoMap;
         unsigned int rboG;          //Renderbuffer for depth
         
 
@@ -122,8 +127,11 @@ namespace Chotra {
         void ConfigureShadowMap();
         void RenderShadowMap();
 
-        void ConfigureGBuffer();
-        void RenderGBuffer();
+        void ConfigureGeometryPass();
+        void RenderGeometryPass();
+
+        void ConfigureLightingPass();
+        void RenderLightingPass();
     };
 
 } // namespace Chotra

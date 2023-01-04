@@ -38,7 +38,6 @@ namespace Chotra {
         void SetupTextures();
         void SetupMesh();
         virtual void Draw(Shader& shader);
-        void Draw(Shader& shader1, unsigned int top_section, Shader& shader2, unsigned int bottom_section, Shader& shader3);
         unsigned int LoadTexture(std::string& path);
     };
 } // namspace Chotra

@@ -16,9 +16,11 @@ namespace Chotra {
         shaderBlur("shaders/blur.vs", "shaders/blur.fs"),
         shaderBloomFinal("shaders/bloom_final.vs", "shaders/bloom_final.fs"),
         backgroundShader("shaders/background.vs", "shaders/background.fs"),
-        shaderGeometryPass("shaders/g_buffer.vs", "shaders/g_buffer.fs") {
+        shaderGeometryPass("shaders/geometry_pass.vs", "shaders/geometry_pass.fs"),
+        shaderLightingPass("shaders/deferred_shading.vs", "shaders/deferred_shading.fs") {
 
-        ConfigureGBuffer();
+        ConfigureGeometryPass();
+        ConfigureLightingPass();
 
         GenerateScreenTexture();
         SetupQuad();
@@ -26,11 +28,11 @@ namespace Chotra {
         ConfigureFramebufferMSAA();
         ConfigureFramebuffer();
         ConfigureBloom();
-        
+
     }
 
     void Renderer::GenerateScreenTexture() {
-        
+
         glGenTextures(1, &screenTexture);
 
         glBindTexture(GL_TEXTURE_2D, screenTexture);
@@ -40,10 +42,26 @@ namespace Chotra {
     }
 
     void Renderer::Init(GLFWwindow* window) {
+        {
+            //Create debugging quads
+            Quad quad1 = Quad(0, 0);
+            quads.push_back(quad1);
 
-        Quad quad;
-        quad.SetupQuad();
-        quads.push_back(quad);
+            Quad quad2 = Quad(0, 1);
+            quads.push_back(quad2);
+
+            Quad quad3 = Quad(0, 2);
+            quads.push_back(quad3);
+
+            Quad quad4 = Quad(1, 0);
+            quads.push_back(quad4);
+
+            Quad quad5 = Quad(1, 1);
+            quads.push_back(quad5);
+
+            Quad quad6 = Quad(1, 2);
+            quads.push_back(quad6);
+        }
 
         // Активируем шейдер и передаем матрицы
         pbrShader.Use();
@@ -67,9 +85,10 @@ namespace Chotra {
     }
 
     void Renderer::Render() {
-        
-        RenderGBuffer();
 
+        RenderGeometryPass();
+        RenderLightingPass();
+        /*
         RenderShadowMap();
 
 
@@ -81,16 +100,29 @@ namespace Chotra {
         }
 
         RenderBloom();
+        */
 
+        //Draw debugging quads
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, gPosition);
-
         quads[0].RenderQuad();
 
+        glBindTexture(GL_TEXTURE_2D, gNormal);
+        quads[1].RenderQuad();
+
+        glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
+        quads[2].RenderQuad();
+
+        glBindTexture(GL_TEXTURE_2D, gMetallicMap);
+        quads[3].RenderQuad();
+
+        glBindTexture(GL_TEXTURE_2D, gRoughnessMap);
+        quads[4].RenderQuad();
+
+        glBindTexture(GL_TEXTURE_2D, gAoMap);
+        quads[5].RenderQuad();
     }
-
-
 
     void Renderer::SetupQuad() {
         if (quadVAO == 0)
@@ -153,7 +185,7 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
 
         // Создаем цветовую прикрепляемую текстуру
-        
+
         glBindTexture(GL_TEXTURE_2D, screenTexture);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	// нам нужен только цветовой буфер
 
@@ -169,7 +201,7 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
         glBindTexture(GL_TEXTURE_2D, screenTexture);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
 
         // Создаем рендербуфер для прикрепляемых объектов глубины трафарета
         glGenRenderbuffers(1, &rbo);
@@ -319,7 +351,7 @@ namespace Chotra {
             backgroundShader.SetFloat("exposure", backgroundExposure);
             scene.environment.Draw();
         }
-                
+
     }
 
     void Renderer::ConfigureBloom() {
@@ -549,11 +581,11 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void Renderer::ConfigureGBuffer() {
+    void Renderer::ConfigureGeometryPass() {
         // Конфигурирование g-буфера фреймбуфера
         glGenFramebuffers(1, &gBuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-        
+
 
         // Цветовой буфер позиций
         glGenTextures(1, &gPosition);
@@ -571,13 +603,41 @@ namespace Chotra {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
 
-        // Цветовой буфер значений цвета + отраженной составляющей
-        glGenTextures(1, &gAlbedoSpec);
-        glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
+        // Цветовой буфер значений цвета
+        glGenTextures(1, &gAlbedoMap);
+        glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpec, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoMap, 0);
+
+        // Metallic
+        glGenTextures(1, &gMetallicMap);
+        glBindTexture(GL_TEXTURE_2D, gMetallicMap);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gMetallicMap, 0);
+
+        // Roughnss
+        glGenTextures(1, &gRoughnessMap);
+        glBindTexture(GL_TEXTURE_2D, gRoughnessMap);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, gRoughnessMap, 0);
+
+        // AO
+        glGenTextures(1, &gAoMap);
+        glBindTexture(GL_TEXTURE_2D, gAoMap);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, gAoMap, 0);
+
+        // Указываем OpenGL на то, в какой прикрепленный цветовой буфер (заданного фреймбуфера) мы собираемся выполнять рендеринг 
+        unsigned int attachments[6] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5 };
+        glDrawBuffers(6, attachments);
 
         // Создаем и прикрепляем буфер глубины (рендербуфер)
         glGenRenderbuffers(1, &rboG);
@@ -588,30 +648,79 @@ namespace Chotra {
         // Проверяем готовность фреймбуфера
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cout << "Framebuffer not complete!" << std::endl;
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void Renderer::RenderGBuffer() {
-        // Рендер
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    void Renderer::RenderGeometryPass() {
+
+        glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+        glViewport(0, 0, width, height);
+        glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
 
-        // 1. Геометрический проход: выполняем рендеринг геометрических/цветовых данных сцены в g-буфер
-        glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
+        glm::mat4 projection;
+        if (perspectiveProjection) {
+            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
+        }
+        else {
+            projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+        }
         glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 model = glm::mat4(1.0f);
+
         shaderGeometryPass.Use();
         shaderGeometryPass.SetMat4("projection", projection);
         shaderGeometryPass.SetMat4("view", view);
-        
+
         scene.DrawSceneObjects(shaderGeometryPass);
 
-
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void Renderer::ConfigureLightingPass() {
+
+        // Конфигурация шейдеров
+        shaderLightingPass.Use();
+        shaderLightingPass.SetInt("gPosition", 0);
+        shaderLightingPass.SetInt("gNormal", 1);
+        shaderLightingPass.SetInt("gAlbedoSpec", 2);
+
+    }
+
+    void Renderer::RenderLightingPass() {
+        // 2. Проход освещения: вычисление освещение, перебирая попиксельно экранный прямоугольник, используя содержимое g-буфера
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        shaderLightingPass.Use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, gPosition);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, gNormal);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
+
+        shaderLightingPass.SetVec3("lights[" + std::to_string(0) + "].Position", scene.sceneLights[0].position);
+        shaderLightingPass.SetVec3("lights[" + std::to_string(0) + "].Color", scene.sceneLights[0].color);
+
+        // Обновляем параметры затухания и вычисляем радиус
+        const float constant = 1.0;
+        const float linear = 0.7;
+        const float quadratic = 1.8;
+        shaderLightingPass.SetFloat("lights[" + std::to_string(0) + "].Linear", linear);
+        shaderLightingPass.SetFloat("lights[" + std::to_string(0) + "].Quadratic", quadratic);
+
+        // Затем вычисляем радиус светового объема
+        const float maxBrightness = std::fmaxf(std::fmaxf(scene.sceneLights[0].color.r, scene.sceneLights[0].color.g), scene.sceneLights[0].color.b) * scene.sceneLights[0].brightness;
+        float radius = (-linear + std::sqrt(linear * linear - 4 * quadratic * (constant - (256.0f / 5.0f) * maxBrightness))) / (2.0f * quadratic);
+        shaderLightingPass.SetFloat("lights[" + std::to_string(0) + "].Radius", radius);
+
+        shaderLightingPass.SetVec3("viewPos", camera.Position);
+
+        glViewport(0, 0, width, height);
+        // Рендерим прямоугольник
+        RenderQuad();
+
+
     }
 
 } // namespace Chotra
