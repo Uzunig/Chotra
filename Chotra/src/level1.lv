@@ -12,7 +12,7 @@ SceneObject   OBJModel     1         0.0  3.0  0.0     0.0 0.0 0.0    2.0 2.0 2.
 
                          Number        Position          Angle          Scale        Velocity         rVelocity       Visible       Color        Brightness
 
-SceneLight    OBJModel     0       0.0 5.0 -5.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1     0.4 0.2 0.9        100
+SceneLight    OBJModel     0       -2.0 5.0  -5.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1      1.0 1.0 1.0        900
 
 //SceneLight    OBJModel     0       20.0 31.0 -60.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1     0.4 0.2 0.9        100
 //SceneLight    OBJModel     0       17.0 22.0 -60.0    0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0         1     0.4 0.2 0.9       100

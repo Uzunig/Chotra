@@ -16,17 +16,19 @@ namespace Chotra {
         shaderBlur("shaders/blur.vs", "shaders/blur.fs"),
         shaderBloomFinal("shaders/bloom_final.vs", "shaders/bloom_final.fs"),
         backgroundShader("shaders/background.vs", "shaders/background.fs"),
-        shaderGeometryPass("shaders/geometry_pass.vs", "shaders/geometry_pass.fs"),
-        shaderLightingPass("shaders/deferred_shading.vs", "shaders/deferred_shading.fs") {
+        shaderDeferredGeometryPass("shaders/deferred_geometry_pass.vs", "shaders/deferred_geometry_pass.fs"),
+        shaderDeferredLightingPass("shaders/deferred_lighting_pass.vs", "shaders/deferred_lighting_pass.fs") {
 
-        ConfigureGeometryPass();
-        ConfigureLightingPass();
 
         GenerateScreenTexture();
         SetupQuad();
         ConfigureShadowMap();
-        ConfigureFramebufferMSAA();
         ConfigureFramebuffer();
+        ConfigureFramebufferMSAA();
+
+        ConfigureGeometryPass();
+        ConfigureLightingPass();
+                
         ConfigureBloom();
 
     }
@@ -42,7 +44,7 @@ namespace Chotra {
     }
 
     void Renderer::Init(GLFWwindow* window) {
-        {
+        /* {
             //Create debugging quads
             Quad quad1 = Quad(0, 0);
             quads.push_back(quad1);
@@ -61,7 +63,7 @@ namespace Chotra {
 
             Quad quad6 = Quad(1, 2);
             quads.push_back(quad6);
-        }
+        }*/
 
         // Активируем шейдер и передаем матрицы
         pbrShader.Use();
@@ -74,6 +76,13 @@ namespace Chotra {
         lightsShader.SetInt("irradianceMap", 5);
         lightsShader.SetInt("prefilterMap", 6);
         lightsShader.SetInt("brdfLUT", 7);
+
+        // Активируем шейдер и передаем матрицы
+        shaderDeferredLightingPass.Use();
+        shaderDeferredLightingPass.SetInt("irradianceMap", 6);
+        shaderDeferredLightingPass.SetInt("prefilterMap", 7);
+        shaderDeferredLightingPass.SetInt("brdfLUT", 8);
+        
 
 
         backgroundShader.Use();
@@ -88,20 +97,20 @@ namespace Chotra {
 
         RenderGeometryPass();
         RenderLightingPass();
-        /*
+        
         RenderShadowMap();
 
-
+        /*
         if (enableMSAA) {
             RenderWithMSAA();
         }
         else {
             RenderWithoutMSAA();
         }
-
-        RenderBloom();
         */
-
+        RenderBloom();
+        
+        /*
         //Draw debugging quads
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
@@ -121,7 +130,7 @@ namespace Chotra {
         quads[4].RenderQuad();
 
         glBindTexture(GL_TEXTURE_2D, gAoMap);
-        quads[5].RenderQuad();
+        quads[5].RenderQuad();*/
     }
 
     void Renderer::SetupQuad() {
@@ -288,7 +297,7 @@ namespace Chotra {
     }
 
     void Renderer::RenderWithoutMSAA() {
-        // 1. Отрисовываем обычную сцену в мультисэмплированные буферы
+        // 1. Отрисовываем обычную сцену буферы
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
         // 2. Рендерим сцену как обычно, но используем при этом сгенерированную карту глубины/тени
@@ -535,7 +544,7 @@ namespace Chotra {
 
         glGenTextures(1, &depthMap);
         glBindTexture(GL_TEXTURE_2D, depthMap);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadowMapSize, shadowMapSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -566,7 +575,7 @@ namespace Chotra {
         simpleDepthShader.Use();
         simpleDepthShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-        glViewport(0, 0, shadowMapSize, shadowMapSize);
+        glViewport(0, 0, width, height);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
@@ -669,11 +678,11 @@ namespace Chotra {
         }
         glm::mat4 view = camera.GetViewMatrix();
 
-        shaderGeometryPass.Use();
-        shaderGeometryPass.SetMat4("projection", projection);
-        shaderGeometryPass.SetMat4("view", view);
+        shaderDeferredGeometryPass.Use();
+        shaderDeferredGeometryPass.SetMat4("projection", projection);
+        shaderDeferredGeometryPass.SetMat4("view", view);
 
-        scene.DrawSceneObjects(shaderGeometryPass);
+        scene.DrawSceneObjects(shaderDeferredGeometryPass);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -681,40 +690,55 @@ namespace Chotra {
     void Renderer::ConfigureLightingPass() {
 
         // Конфигурация шейдеров
-        shaderLightingPass.Use();
-        shaderLightingPass.SetInt("gPosition", 0);
-        shaderLightingPass.SetInt("gNormal", 1);
-        shaderLightingPass.SetInt("gAlbedoSpec", 2);
+        shaderDeferredLightingPass.Use();
+        shaderDeferredLightingPass.SetInt("gPosition", 0);
+        shaderDeferredLightingPass.SetInt("gNormal", 1);
+        shaderDeferredLightingPass.SetInt("gAlbedoMap", 2);
+        shaderDeferredLightingPass.SetInt("gMetallicMap", 3);
+        shaderDeferredLightingPass.SetInt("gRoughnessMap", 4);
+        shaderDeferredLightingPass.SetInt("gAoMap", 5);
 
     }
 
     void Renderer::RenderLightingPass() {
+
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         // 2. Проход освещения: вычисление освещение, перебирая попиксельно экранный прямоугольник, используя содержимое g-буфера
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shaderLightingPass.Use();
+        shaderDeferredLightingPass.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, gPosition);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, gNormal);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, gMetallicMap);
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, gRoughnessMap);
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, gAoMap);
 
-        shaderLightingPass.SetVec3("lights[" + std::to_string(0) + "].Position", scene.sceneLights[0].position);
-        shaderLightingPass.SetVec3("lights[" + std::to_string(0) + "].Color", scene.sceneLights[0].color);
+        // Связываем предварительно вычисленные IBL-данные
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.irradianceMap);
+        glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.prefilterMap);
+        glActiveTexture(GL_TEXTURE8);
+        glBindTexture(GL_TEXTURE_2D, scene.environment.brdfLUTTexture);
+       
+        glActiveTexture(GL_TEXTURE0);
 
-        // Обновляем параметры затухания и вычисляем радиус
-        const float constant = 1.0;
-        const float linear = 0.7;
-        const float quadratic = 1.8;
-        shaderLightingPass.SetFloat("lights[" + std::to_string(0) + "].Linear", linear);
-        shaderLightingPass.SetFloat("lights[" + std::to_string(0) + "].Quadratic", quadratic);
-
-        // Затем вычисляем радиус светового объема
-        const float maxBrightness = std::fmaxf(std::fmaxf(scene.sceneLights[0].color.r, scene.sceneLights[0].color.g), scene.sceneLights[0].color.b) * scene.sceneLights[0].brightness;
-        float radius = (-linear + std::sqrt(linear * linear - 4 * quadratic * (constant - (256.0f / 5.0f) * maxBrightness))) / (2.0f * quadratic);
-        shaderLightingPass.SetFloat("lights[" + std::to_string(0) + "].Radius", radius);
-
-        shaderLightingPass.SetVec3("viewPos", camera.Position);
+        for (unsigned int i = 0; i < scene.sceneLights.size(); ++i) {
+            shaderDeferredLightingPass.Use();
+            shaderDeferredLightingPass.SetVec3("lightPositions[" + std::to_string(i) + "]", scene.sceneLights[i].position);
+            shaderDeferredLightingPass.SetVec3("lightColors[" + std::to_string(i) + "]", scene.sceneLights[i].color * (float)scene.sceneLights[i].brightness);
+        }
+ 
+        shaderDeferredLightingPass.SetVec3("camPos", camera.Position);
+        shaderDeferredLightingPass.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+        shaderDeferredLightingPass.SetFloat("shadowBiasMin", shadowBiasMin);
+        shaderDeferredLightingPass.SetFloat("shadowBiasMax", shadowBiasMax);
 
         glViewport(0, 0, width, height);
         // Рендерим прямоугольник

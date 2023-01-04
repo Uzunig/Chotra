@@ -43,8 +43,8 @@ namespace Chotra {
 
         Shader backgroundShader;
 
-        Shader shaderGeometryPass;
-        Shader shaderLightingPass;
+        Shader shaderDeferredGeometryPass;
+        Shader shaderDeferredLightingPass;
         
 
         bool enableMSAA = true;

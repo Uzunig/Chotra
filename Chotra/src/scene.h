@@ -58,11 +58,7 @@ namespace Chotra {
         void Update(float dt);
         void DrawSceneObjects(Shader& shader);
         void DrawSceneLights(Shader& shader);
-
-        void DemoInit();
-        void DemoUpdate(float deltaTime);
-       
-        
+          
 
     };
 } // namspace Chotra
