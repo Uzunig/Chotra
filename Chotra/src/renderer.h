@@ -23,6 +23,9 @@ namespace Chotra {
 
         std::vector<Quad> quads;
 
+        glm::mat4 projection;
+        glm::mat4 view;
+
         Camera& camera;
         Scene& scene;
                                        

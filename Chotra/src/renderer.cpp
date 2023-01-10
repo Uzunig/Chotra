@@ -44,7 +44,7 @@ namespace Chotra {
     }
 
     void Renderer::Init(GLFWwindow* window) {
-        /* {
+         /* {
             //Create debugging quads
             Quad quad1 = Quad(0, 0);
             quads.push_back(quad1);
@@ -82,7 +82,8 @@ namespace Chotra {
         shaderDeferredLightingPass.SetInt("irradianceMap", 6);
         shaderDeferredLightingPass.SetInt("prefilterMap", 7);
         shaderDeferredLightingPass.SetInt("brdfLUT", 8);
-        
+        shaderDeferredLightingPass.SetInt("shadowMap", 9);
+    
 
 
         backgroundShader.Use();
@@ -95,11 +96,12 @@ namespace Chotra {
 
     void Renderer::Render() {
 
+        RenderShadowMap();
+
         RenderGeometryPass();
         RenderLightingPass();
         
-        RenderShadowMap();
-
+        
         /*
         if (enableMSAA) {
             RenderWithMSAA();
@@ -114,9 +116,9 @@ namespace Chotra {
         //Draw debugging quads
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, gPosition);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
         quads[0].RenderQuad();
-
+        
         glBindTexture(GL_TEXTURE_2D, gNormal);
         quads[1].RenderQuad();
 
@@ -234,15 +236,15 @@ namespace Chotra {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
 
-        glm::mat4 projection;
         if (perspectiveProjection) {
             projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
         }
+        view = camera.GetViewMatrix();
+
         pbrShader.Use();
-        glm::mat4 view = camera.GetViewMatrix();
         pbrShader.SetMat4("projection", projection);
         pbrShader.SetMat4("view", view);
         pbrShader.SetVec3("camPos", camera.Position);
@@ -306,26 +308,21 @@ namespace Chotra {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
 
-        glm::mat4 projection;
         if (perspectiveProjection) {
             projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
         }
+        view = camera.GetViewMatrix();
+
         pbrShader.Use();
-        glm::mat4 view = camera.GetViewMatrix();
         pbrShader.SetMat4("projection", projection);
         pbrShader.SetMat4("view", view);
         pbrShader.SetVec3("camPos", camera.Position);
         pbrShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
         pbrShader.SetFloat("shadowBiasMin", shadowBiasMin);
         pbrShader.SetFloat("shadowBiasMax", shadowBiasMax);
-
-        lightsShader.Use();
-        lightsShader.SetMat4("projection", projection);
-        lightsShader.SetMat4("view", view);
-        lightsShader.SetVec3("camPos", camera.Position);
 
         // Связываем предварительно вычисленные IBL-данные
         glActiveTexture(GL_TEXTURE5);
@@ -349,6 +346,11 @@ namespace Chotra {
 
         scene.DrawSceneObjects(pbrShader);
 
+
+        lightsShader.Use();
+        lightsShader.SetMat4("projection", projection);
+        lightsShader.SetMat4("view", view);
+        lightsShader.SetVec3("camPos", camera.Position);
 
         scene.DrawSceneLights(lightsShader);
 
@@ -669,21 +671,20 @@ namespace Chotra {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
 
-        glm::mat4 projection;
         if (perspectiveProjection) {
             projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
         }
-        glm::mat4 view = camera.GetViewMatrix();
+        view = camera.GetViewMatrix();
 
         shaderDeferredGeometryPass.Use();
         shaderDeferredGeometryPass.SetMat4("projection", projection);
         shaderDeferredGeometryPass.SetMat4("view", view);
 
         scene.DrawSceneObjects(shaderDeferredGeometryPass);
-
+        
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
@@ -703,6 +704,7 @@ namespace Chotra {
     void Renderer::RenderLightingPass() {
 
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
         // 2. Проход освещения: вычисление освещение, перебирая попиксельно экранный прямоугольник, используя содержимое g-буфера
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shaderDeferredLightingPass.Use();
@@ -726,6 +728,8 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.prefilterMap);
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, scene.environment.brdfLUTTexture);
+        glActiveTexture(GL_TEXTURE9);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
        
         glActiveTexture(GL_TEXTURE0);
 
@@ -741,10 +745,33 @@ namespace Chotra {
         shaderDeferredLightingPass.SetFloat("shadowBiasMax", shadowBiasMax);
 
         glViewport(0, 0, width, height);
+        
+        
         // Рендерим прямоугольник
         RenderQuad();
 
+        // 2.5. Копируем содержимое буфера глубины (геометрический проход) в буфер глубины заданного по умолчанию фреймбуфера
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer); // пишем в заданный по умолчанию фреймбуфер
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+
+        lightsShader.Use();
+        lightsShader.SetMat4("projection", projection);
+        lightsShader.SetMat4("view", view);
+        lightsShader.SetVec3("camPos", camera.Position);
+        scene.DrawSceneLights(lightsShader);
+
+        if (drawSkybox) {
+            // Skybox drawing
+            backgroundShader.Use();
+            backgroundShader.SetMat4("projection", projection);
+            backgroundShader.SetMat4("view", view);
+            backgroundShader.SetFloat("exposure", backgroundExposure);
+            scene.environment.Draw();
+        }
+                              
     }
 
 } // namespace Chotra
