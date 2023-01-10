@@ -220,6 +220,13 @@ namespace Chotra {
             
         }
 
+        if (ImGui::CollapsingHeader("SSAO")) {
+            ImGui::SliderInt("Kernel size", &renderer->kernelSizeSSAO, 0, 64);
+            ImGui::SliderFloat("radius SSAO", &renderer->radiusSSAO, 0.1f, 1.0f);
+            ImGui::SliderFloat("bias SSAO", &renderer->biasSSAO, 0.001f, 1.0f);
+            
+        }
+
 
         ImGui::End();
 

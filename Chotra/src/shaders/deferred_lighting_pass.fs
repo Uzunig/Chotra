@@ -20,6 +20,8 @@ uniform sampler2D shadowMap;
 uniform float shadowBiasMin;
 uniform float shadowBiasMax;
 uniform mat4 lightSpaceMatrix;
+
+uniform sampler2D ssaoMap;
  
 
 // Освещение
@@ -134,6 +136,8 @@ void main()
     float metallic = texture(gMetallicMap, TexCoords).r;
     float roughness = texture(gRoughnessMap, TexCoords).r;
     float ao = texture(gAoMap, TexCoords).r;
+    float ssao = texture(ssaoMap, TexCoords).r;
+
     
 
     // Вычисляем коэффициент отражения при перпендикулярном угле падения; в случае диэлектрика (например, пластик) - берем значение F0 равным 0.04,
@@ -199,7 +203,7 @@ void main()
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-    vec3 ambient = (kD * diffuse + specular) * ao;
+    vec3 ambient = (kD * diffuse + specular) * ao * ssao;
     
     // Вычисляем тень
     //float shadow = ShadowCalculation(FragPosLightSpace);   

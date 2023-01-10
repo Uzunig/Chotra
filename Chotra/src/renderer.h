@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <vector>
+#include <random>
 
 #include "environment.h"
 #include "camera.h"
@@ -46,6 +47,9 @@ namespace Chotra {
 
         Shader backgroundShader;
 
+        Shader shaderSSAO;
+        Shader shaderSSAOBlur;
+
         Shader shaderDeferredGeometryPass;
         Shader shaderDeferredLightingPass;
         
@@ -62,6 +66,10 @@ namespace Chotra {
         bool showShadows = true;
         float shadowBiasMin = 0.00f;
         float shadowBiasMax = 0.0f;
+
+        int kernelSizeSSAO = 64;
+        float radiusSSAO = 0.5;
+        float biasSSAO = 0.025;
         
         unsigned int screenTexture; 
                 
@@ -101,6 +109,13 @@ namespace Chotra {
         unsigned int shadowMapSize = 1024;
         unsigned int depthMap;
         glm::mat4 lightSpaceMatrix;
+
+        unsigned int ssaoFBO;
+        unsigned int ssaoBlurFBO;
+        unsigned int ssaoColorBuffer;
+        unsigned int ssaoMap;
+        unsigned int noiseTexture;
+        std::vector<glm::vec3> ssaoKernel;
          
         unsigned int quadVAO = 0;
         unsigned int quadVBO;
@@ -128,7 +143,10 @@ namespace Chotra {
         void RenderBloom();
 
         void ConfigureShadowMap();
-        void RenderShadowMap();
+        void GenerateShadowMap();
+        
+        void ConfigureSSAO();
+        void GenerateSSAOMap();
 
         void ConfigureGeometryPass();
         void RenderGeometryPass();
