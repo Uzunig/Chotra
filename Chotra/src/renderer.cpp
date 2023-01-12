@@ -83,11 +83,11 @@ namespace Chotra {
 
         // Активируем шейдер и передаем матрицы
         shaderDeferredLightingPass.Use();
-        shaderDeferredLightingPass.SetInt("irradianceMap", 6);
-        shaderDeferredLightingPass.SetInt("prefilterMap", 7);
-        shaderDeferredLightingPass.SetInt("brdfLUT", 8);
-        shaderDeferredLightingPass.SetInt("shadowMap", 9);
-        shaderDeferredLightingPass.SetInt("ssaoMap", 10);
+        shaderDeferredLightingPass.SetInt("irradianceMap", 4);
+        shaderDeferredLightingPass.SetInt("prefilterMap", 5);
+        shaderDeferredLightingPass.SetInt("brdfLUT", 6);
+        shaderDeferredLightingPass.SetInt("shadowMap", 7);
+        shaderDeferredLightingPass.SetInt("ssaoMap", 8);
     
 
 
@@ -129,7 +129,7 @@ namespace Chotra {
         
         glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
         quads[1].RenderQuad();
-
+        /*
         glBindTexture(GL_TEXTURE_2D, gMetallicMap);
         quads[2].RenderQuad();
         
@@ -140,7 +140,7 @@ namespace Chotra {
         quads[4].RenderQuad();
         
         glBindTexture(GL_TEXTURE_2D, gNormal);
-        quads[5].RenderQuad();/**/
+        quads[5].RenderQuad();*/
     }
 
     void Renderer::SetupQuad() {
@@ -766,28 +766,12 @@ namespace Chotra {
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, gAlbedoMap, 0);
 
         // Metallic
-        glGenTextures(1, &gMetallicMap);
-        glBindTexture(GL_TEXTURE_2D, gMetallicMap);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glGenTextures(1, &gMetalRoughAoMap);
+        glBindTexture(GL_TEXTURE_2D, gMetalRoughAoMap);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, gMetallicMap, 0);
-
-        // Roughnss
-        glGenTextures(1, &gRoughnessMap);
-        glBindTexture(GL_TEXTURE_2D, gRoughnessMap);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT6, GL_TEXTURE_2D, gRoughnessMap, 0);
-
-        // AO
-        glGenTextures(1, &gAoMap);
-        glBindTexture(GL_TEXTURE_2D, gAoMap);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT7, GL_TEXTURE_2D, gAoMap, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, gMetalRoughAoMap, 0);
 
         // Указываем OpenGL на то, в какой прикрепленный цветовой буфер (заданного фреймбуфера) мы собираемся выполнять рендеринг 
         unsigned int attachments[6] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5 };
@@ -838,10 +822,8 @@ namespace Chotra {
         shaderDeferredLightingPass.SetInt("gPosition", 0);
         shaderDeferredLightingPass.SetInt("gNormal", 1);
         shaderDeferredLightingPass.SetInt("gAlbedoMap", 2);
-        shaderDeferredLightingPass.SetInt("gMetallicMap", 3);
-        shaderDeferredLightingPass.SetInt("gRoughnessMap", 4);
-        shaderDeferredLightingPass.SetInt("gAoMap", 5);
-
+        shaderDeferredLightingPass.SetInt("gMetalRoughAoMap", 3);
+        
     }
 
     void Renderer::RenderLightingPass() {
@@ -858,22 +840,18 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
         glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, gMetallicMap);
-        glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_2D, gRoughnessMap);
-        glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_2D, gAoMap);
+        glBindTexture(GL_TEXTURE_2D, gMetalRoughAoMap);
 
         // Связываем предварительно вычисленные IBL-данные
-        glActiveTexture(GL_TEXTURE6);
+        glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.irradianceMap);
-        glActiveTexture(GL_TEXTURE7);
+        glActiveTexture(GL_TEXTURE5);
         glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.prefilterMap);
-        glActiveTexture(GL_TEXTURE8);
+        glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, scene.environment.brdfLUTTexture);
-        glActiveTexture(GL_TEXTURE9);
+        glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, depthMap);
-        glActiveTexture(GL_TEXTURE10);
+        glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, ssaoMap);
        
         glActiveTexture(GL_TEXTURE0);

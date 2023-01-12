@@ -4,9 +4,7 @@ layout (location = 1) out vec3 gViewPosition;
 layout (location = 2) out vec3 gNormal;
 layout (location = 3) out vec3 gViewNormal;
 layout (location = 4) out vec4 gAlbedoMap;
-layout (location = 5) out vec4 gMetallicMap;
-layout (location = 6) out vec4 gRoughnessMap;
-layout (location = 7) out vec4 gAoMap;
+layout (location = 5) out vec3 gMetalRoughAoMap;
 
 in vec3 FragPos;
 in vec3 ViewFragPos;
@@ -48,13 +46,15 @@ void main()
     gPosition = FragPos;
     gViewPosition = ViewFragPos;
 
-    gNormal = getNormalFromMap(Normal);	
-    gViewNormal = getNormalFromMap(ViewNormal);
+    //gNormal = getNormalFromMap(Normal);	
+    //gViewNormal = getNormalFromMap(ViewNormal);
+    gNormal = normalize(Normal);	
+    gViewNormal = normalize(ViewNormal);
 
     gAlbedoMap = texture(albedoMap, TexCoords);
-    gMetallicMap = texture(metallicMap, TexCoords);
-    gRoughnessMap = texture(roughnessMap, TexCoords);
-    gAoMap = texture(aoMap, TexCoords);		
+    gMetalRoughAoMap.r = texture(metallicMap, TexCoords).r;
+    gMetalRoughAoMap.g = texture(roughnessMap, TexCoords).r;
+    gMetalRoughAoMap.b = texture(aoMap, TexCoords).r;		
 	
     
 }

@@ -6,9 +6,7 @@ in vec2 TexCoords;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoMap;
-uniform sampler2D gMetallicMap;
-uniform sampler2D gRoughnessMap;
-uniform sampler2D gAoMap;
+uniform sampler2D gMetalRoughAoMap;
 
 // IBL
 uniform samplerCube irradianceMap;
@@ -133,9 +131,9 @@ void main()
     vec3 R = reflect(-V, N); 
 
     vec3 albedo = pow(texture(gAlbedoMap, TexCoords).rgb, vec3(2.2)); //pow 2.2, inverse gamma, if it needs
-    float metallic = texture(gMetallicMap, TexCoords).r;
-    float roughness = texture(gRoughnessMap, TexCoords).r;
-    float ao = texture(gAoMap, TexCoords).r;
+    float metallic = texture(gMetalRoughAoMap, TexCoords).r;
+    float roughness = texture(gMetalRoughAoMap, TexCoords).g;
+    float ao = texture(gMetalRoughAoMap, TexCoords).b;
     float ssao = texture(ssaoMap, TexCoords).r;
 
     

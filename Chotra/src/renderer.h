@@ -79,9 +79,7 @@ namespace Chotra {
         unsigned int gNormal;
         unsigned int gViewNormal;
         unsigned int gAlbedoMap;
-        unsigned int gMetallicMap;
-        unsigned int gRoughnessMap;
-        unsigned int gAoMap;
+        unsigned int gMetalRoughAoMap;
         unsigned int rboG;          //Renderbuffer for depth
         
 
