@@ -182,7 +182,7 @@ void main()
 	  // Вычисляем тень
         vec4  FragPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0); // TO DO: Вычислять снаружи 
         float shadow = ShadowCalculation(FragPosLightSpace);  
-
+        
         // Добавляем к исходящей энергитической яркости Lo
         Lo += ((kD * albedo / PI + specular) * radiance * NdotL) * (1.0 - shadow); // обратите внимание, что мы уже умножали BRDF на коэффициент Френеля(kS), поэтому нам не нужно снова умножать на kS
     }   
@@ -203,7 +203,7 @@ void main()
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-    vec3 ambient = (kD * diffuse + specular) * ao * ssao;
+    vec3 ambient = (kD * diffuse + specular) * ssao; // to add * ao
     
     // Вычисляем тень
     //float shadow = ShadowCalculation(FragPosLightSpace);   

@@ -1,1 +1,2 @@
 prefilterMap: make GUI for SANPLE_COUNT
+fix coordinate spaces in lighting pass of deferred rendering

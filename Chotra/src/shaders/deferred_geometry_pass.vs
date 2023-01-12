@@ -7,6 +7,7 @@ out vec3 FragPos;
 out vec3 ViewFragPos;
 out vec2 TexCoords;
 out vec3 Normal;
+out vec3 ViewNormal;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -21,9 +22,9 @@ void main()
     ViewFragPos = viewPos.xyz; 
     TexCoords = aTexCoords;
     
-    mat3 normalMatrix = transpose(inverse(mat3(view * model)));
+    mat3 normalMatrix = transpose(inverse(mat3(model)));
     Normal = normalMatrix * aNormal;
-	//Normal = mat3(model) * aNormal;
+    ViewNormal = mat3(view) * normalMatrix * aNormal;
 
     gl_Position = projection * view * worldPos;
 }

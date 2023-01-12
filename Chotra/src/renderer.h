@@ -74,8 +74,10 @@ namespace Chotra {
         unsigned int screenTexture; 
                 
         unsigned int gBuffer;           // G-Buffer
-        unsigned int gPosition;         // Textures
+        unsigned int gPosition; //TExtures
+        unsigned int gViewPosition; 
         unsigned int gNormal;
+        unsigned int gViewNormal;
         unsigned int gAlbedoMap;
         unsigned int gMetallicMap;
         unsigned int gRoughnessMap;

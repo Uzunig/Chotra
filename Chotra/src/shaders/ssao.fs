@@ -25,7 +25,7 @@ void main()
 
     // Получаем входные данные для алгоритма SSAO
     vec3 fragPos = texture(gPosition, TexCoords).xyz;
-    vec3 normal = normalize(texture(gNormal, TexCoords).rgb);
+    vec3 normal = normalize(texture(gNormal, TexCoords).xyz);
     vec3 randomVec = normalize(texture(texNoise, TexCoords * noiseScale).xyz);
 	
     // Создаем TBN-матрицу смены базиса: из касательного пространства в пространство вида
