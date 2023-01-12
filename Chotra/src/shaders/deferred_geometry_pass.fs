@@ -7,6 +7,8 @@ layout (location = 4) out vec4 gRoughnessMap;
 layout (location = 5) out vec4 gAoMap;
 
 in vec3 FragPos;
+in vec3 ViewFragPos;
+
 in vec2 TexCoords;
 in vec3 Normal;
 
@@ -45,7 +47,7 @@ void main()
     gAlbedoMap = texture(albedoMap, TexCoords);
     gMetallicMap = texture(metallicMap, TexCoords);
     gRoughnessMap = texture(roughnessMap, TexCoords);
-    gAoMap = texture(aoMap, TexCoords);		
-	
+    //gAoMap = texture(aoMap, TexCoords);		
+	gAoMap = vec4(ViewFragPos, 0.0);
     
 }

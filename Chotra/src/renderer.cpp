@@ -135,10 +135,10 @@ namespace Chotra {
 
         glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
         quads[3].RenderQuad();
-        /*
-        glBindTexture(GL_TEXTURE_2D, gRoughnessMap);
+        
+        glBindTexture(GL_TEXTURE_2D, gAoMap);
         quads[4].RenderQuad();
-
+        /*
         glBindTexture(GL_TEXTURE_2D, gAoMap);
         quads[5].RenderQuad();*/
     }
@@ -695,7 +695,7 @@ namespace Chotra {
         shaderSSAO.SetFloat("bias", biasSSAO);
         
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, gPosition);
+        glBindTexture(GL_TEXTURE_2D, gAoMap); // gPosition in view space
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, gNormal);
         glActiveTexture(GL_TEXTURE2);
