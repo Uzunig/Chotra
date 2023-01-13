@@ -23,8 +23,9 @@ void main()
     TexCoords = aTexCoords;
     
     //mat3 normalMatrix = transpose(inverse(mat3(model)));
-    Normal = mat3(model) * aNormal;
-    ViewNormal = mat3(view) * mat3(model) * aNormal;
+    mat3 normalMatrix = mat3(model);
+    Normal = normalMatrix * aNormal;
+    ViewNormal = mat3(view) * normalMatrix * aNormal;
 
     gl_Position = projection * view * worldPos;
 }
