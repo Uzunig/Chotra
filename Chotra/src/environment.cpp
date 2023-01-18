@@ -199,7 +199,7 @@ namespace Chotra {
     void Environment::SetBrdfLUTTexture() {
 
         // PBR: генерируем 2D LUT-текстуру при помощи используемых уравнений BRDF
-        Shader brdfShader("shaders/brdf.vs", "shaders/brdf.fs");
+        Shader brdfShader("shaders/screen_shader.vs", "shaders/brdf.fs");
                 
         // Выделяем необходимое количество памяти для LUT-текстуры
         glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);

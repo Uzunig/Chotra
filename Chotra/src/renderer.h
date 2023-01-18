@@ -50,6 +50,8 @@ namespace Chotra {
         Shader shaderSSAO;
         Shader shaderSSAOBlur;
 
+        //Shader shaderSSR;
+
         Shader shaderDeferredGeometryPass;
         Shader shaderDeferredLightingPass;
         
