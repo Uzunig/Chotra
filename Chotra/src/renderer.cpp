@@ -103,21 +103,21 @@ namespace Chotra {
 
         GenerateShadowMap();
                 
-        //RenderGeometryPass();
+        RenderGeometryPass();
 
-        //GenerateSSAOMap();
+        GenerateSSAOMap();
 
-        //RenderLightingPass();
+        RenderLightingPass();
         
         
-        
+        /*
         if (enableMSAA) {
             RenderWithMSAA();
         }
         else {
             RenderWithoutMSAA();
         }
-        
+        */
         RenderBloom();
         
         
