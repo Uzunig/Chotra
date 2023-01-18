@@ -124,7 +124,7 @@ namespace Chotra {
         //Draw debugging quads
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, gNormal);
+        glBindTexture(GL_TEXTURE_2D, ssaoMap);
         quads[0].RenderQuad();
         
         glBindTexture(GL_TEXTURE_2D, gViewNormal);

@@ -23,7 +23,7 @@ uniform sampler2D aoMap;
 
 
 // Простой трюк, чтобы получить касательные нормали в мировом пространстве, чтобы упростить код PBR
-vec3 getNormalFromMap()
+vec3 getNormalFromMap(vec3 normal)
 {
     vec3 tangentNormal = texture(normalMap, TexCoords).xyz * 2.0 - 1.0;
 
@@ -32,7 +32,7 @@ vec3 getNormalFromMap()
     vec2 st1 = dFdx(TexCoords);
     vec2 st2 = dFdy(TexCoords);
 
-    vec3 N   = normalize(Normal);
+    vec3 N   = normalize(normal);
     vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
     vec3 B  = -normalize(cross(N, T));
     mat3 TBN = mat3(T, B, N);
@@ -46,10 +46,10 @@ void main()
     gPosition = FragPos;
     gViewPosition = ViewFragPos;
 
-    gNormal = getNormalFromMap();	
+    gNormal = getNormalFromMap(Normal);	
     //gNormal = normalize(Normal);	    
-    //gViewNormal = getNormalFromMap(ViewNormal);
-    gViewNormal = normalize(ViewNormal);
+    gViewNormal = getNormalFromMap(ViewNormal);
+    //gViewNormal = normalize(ViewNormal);
 
     gAlbedoMap = texture(albedoMap, TexCoords);
     gMetalRoughAoMap.r = texture(metallicMap, TexCoords).r;
