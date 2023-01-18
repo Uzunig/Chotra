@@ -47,8 +47,8 @@ void main()
     gViewPosition = ViewFragPos;
 
     gNormal = getNormalFromMap();	
+    //gNormal = normalize(Normal);	    
     //gViewNormal = getNormalFromMap(ViewNormal);
-    //gNormal = normalize(Normal);	
     gViewNormal = normalize(ViewNormal);
 
     gAlbedoMap = texture(albedoMap, TexCoords);

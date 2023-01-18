@@ -22,10 +22,10 @@ void main()
     ViewFragPos = viewPos.xyz; 
     TexCoords = aTexCoords;
     
-    //mat3 normalMatrix = transpose(inverse(mat3(model)));
-    mat3 normalMatrix = mat3(model);
-    Normal = normalMatrix * aNormal;
-    ViewNormal = mat3(view) * normalMatrix * aNormal;
+    mat3 normalMatrix = transpose(inverse(mat3(model)));
+    //mat3 normalMatrix = mat3(model);
+    Normal = normalize(vec3(normalMatrix * aNormal));
+    ViewNormal = normalize(vec3(mat3(view) * normalMatrix * aNormal));
 
     gl_Position = projection * view * worldPos;
 }
