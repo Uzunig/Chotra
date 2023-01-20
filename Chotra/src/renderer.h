@@ -72,6 +72,10 @@ namespace Chotra {
         int kernelSizeSSAO = 64;
         float radiusSSAO = 0.5;
         float biasSSAO = 0.025;
+
+        float rayStep = 0.15f;
+        int iterationCount = 100;
+        float distanceBias = 0.005f;
         
         unsigned int screenTexture; 
                 
@@ -115,6 +119,7 @@ namespace Chotra {
         unsigned int ssaoFBO;
         unsigned int ssaoBlurFBO;
         unsigned int ssaoColorBuffer;
+        unsigned int reflectedUvMap;
         unsigned int ssaoMap;
         unsigned int noiseTexture;
         std::vector<glm::vec3> ssaoKernel;

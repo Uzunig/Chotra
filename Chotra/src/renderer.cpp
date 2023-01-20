@@ -125,10 +125,10 @@ namespace Chotra {
         //Draw debugging quads
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, ssaoMap);
+        glBindTexture(GL_TEXTURE_2D, gViewNormal);
         quads[0].RenderQuad();
         
-        glBindTexture(GL_TEXTURE_2D, gViewNormal);
+        glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
         quads[1].RenderQuad();
         /*
         glBindTexture(GL_TEXTURE_2D, gMetallicMap);
@@ -619,8 +619,20 @@ namespace Chotra {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
+
+        glGenTextures(1, &reflectedUvMap);
+        glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, reflectedUvMap, 0);
+
+        // Указываем OpenGL на то, в какой прикрепленный цветовой буфер (заданного фреймбуфера) мы собираемся выполнять рендеринг 
+        unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+        glDrawBuffers(2, attachments);
+
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "SSAO Framebuffer not complete!" << std::endl;
+            std::cout << "SSAO_SSR Framebuffer not complete!" << std::endl;
 
         // И стадия размытия
         glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
@@ -672,6 +684,7 @@ namespace Chotra {
         shaderSSAO.SetInt("gPosition", 0);
         shaderSSAO.SetInt("gNormal", 1);
         shaderSSAO.SetInt("texNoise", 2);
+        shaderSSAO.SetInt("gAlbedoMap", 3);
 
         shaderSSAOBlur.Use();
         shaderSSAOBlur.SetInt("ssaoInput", 0);
@@ -695,12 +708,20 @@ namespace Chotra {
         shaderSSAO.SetFloat("radius", radiusSSAO);
         shaderSSAO.SetFloat("bias", biasSSAO);
         
+        shaderSSAO.SetFloat("rayStep", rayStep);
+        shaderSSAO.SetInt("iterationCount", iterationCount);
+        shaderSSAO.SetFloat("distanceBias", distanceBias);
+
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, gViewPosition); // gPosition in view space
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, gViewNormal);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, noiseTexture);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
+
         RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -886,7 +907,7 @@ namespace Chotra {
         lightsShader.SetMat4("view", view);
         lightsShader.SetVec3("camPos", camera.Position);
         scene.DrawSceneLights(lightsShader);
-
+        /*
         if (drawSkybox) {
             // Skybox drawing
             backgroundShader.Use();
@@ -895,7 +916,7 @@ namespace Chotra {
             backgroundShader.SetFloat("exposure", backgroundExposure);
             scene.environment.Draw();
         }
-                              
+                 */             
     }
 
 } // namespace Chotra
