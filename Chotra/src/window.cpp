@@ -223,14 +223,15 @@ namespace Chotra {
         if (ImGui::CollapsingHeader("SSAO")) {
             ImGui::SliderInt("Kernel size", &renderer->kernelSizeSSAO, 0, 64);
             ImGui::SliderFloat("radius SSAO", &renderer->radiusSSAO, 0.1f, 1.0f);
-            ImGui::SliderFloat("distanceBias", &renderer->distanceBias, 0.001f, 1.0f);
+            ImGui::SliderFloat("distanceBias", &renderer->biasSSAO, 0.001f, 1.0f);
             
         }
 
         if (ImGui::CollapsingHeader("SSR")) {
+            ImGui::SliderFloat("biasSSR", &renderer->biasSSR, 0.001f, 10.0f);
             ImGui::SliderFloat("rayStep", &renderer->rayStep, 0.01f, 1.0f);
             ImGui::SliderInt("iterationCount", &renderer->iterationCount, 0, 3000);
-            ImGui::SliderFloat("bias SSAO", &renderer->distanceBias, 0.001f, 1.0f);
+            ImGui::SliderFloat("accuracy", &renderer->accuracySSR, 0.001f, 1.0f);
 
         }
 

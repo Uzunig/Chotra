@@ -89,6 +89,7 @@ namespace Chotra {
         shaderDeferredLightingPass.SetInt("brdfLUT", 6);
         shaderDeferredLightingPass.SetInt("shadowMap", 7);
         shaderDeferredLightingPass.SetInt("ssaoMap", 8);
+        shaderDeferredLightingPass.SetInt("ssrMap", 9);
     
 
 
@@ -625,7 +626,13 @@ namespace Chotra {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, reflectedUvMap, 0);
+
+        // Генерируем мипмап-карты, OpenGL автоматически выделит нужное количество памяти
+        //glGenerateMipmap(GL_TEXTURE_2D);
 
         // Указываем OpenGL на то, в какой прикрепленный цветовой буфер (заданного фреймбуфера) мы собираемся выполнять рендеринг 
         unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
@@ -706,11 +713,12 @@ namespace Chotra {
         shaderSSAO.SetMat4("view", view);
         shaderSSAO.SetInt("kernelSize", kernelSizeSSAO);
         shaderSSAO.SetFloat("radius", radiusSSAO);
-        shaderSSAO.SetFloat("bias", biasSSAO);
+        shaderSSAO.SetFloat("biasSSAO", biasSSAO);
         
+        shaderSSAO.SetFloat("biasSSR", biasSSR);
         shaderSSAO.SetFloat("rayStep", rayStep);
         shaderSSAO.SetInt("iterationCount", iterationCount);
-        shaderSSAO.SetFloat("distanceBias", distanceBias);
+        shaderSSAO.SetFloat("accuracySSR", accuracySSR);
 
 
         glActiveTexture(GL_TEXTURE0);
@@ -721,7 +729,7 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, noiseTexture);
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
-
+                
         RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -759,8 +767,8 @@ namespace Chotra {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gViewPosition, 0);
 
         // Normals in world space
@@ -875,6 +883,8 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, depthMap);
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, ssaoMap);
+        glActiveTexture(GL_TEXTURE9);
+        glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
        
         glActiveTexture(GL_TEXTURE0);
 
@@ -899,15 +909,13 @@ namespace Chotra {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer); // пишем в заданный по умолчанию фреймбуфер
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
+        
         lightsShader.Use();
         lightsShader.SetMat4("projection", projection);
         lightsShader.SetMat4("view", view);
         lightsShader.SetVec3("camPos", camera.Position);
         scene.DrawSceneLights(lightsShader);
-        /*
+        
         if (drawSkybox) {
             // Skybox drawing
             backgroundShader.Use();
@@ -916,7 +924,7 @@ namespace Chotra {
             backgroundShader.SetFloat("exposure", backgroundExposure);
             scene.environment.Draw();
         }
-                 */             
+                              
     }
 
 } // namespace Chotra

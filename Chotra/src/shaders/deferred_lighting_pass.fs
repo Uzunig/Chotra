@@ -20,6 +20,7 @@ uniform float shadowBiasMax;
 uniform mat4 lightSpaceMatrix;
 
 uniform sampler2D ssaoMap;
+uniform sampler2D ssrMap;
  
 
 // Освещение
@@ -135,6 +136,7 @@ void main()
     float roughness = texture(gMetalRoughAoMap, TexCoords).g;
     float ao = texture(gMetalRoughAoMap, TexCoords).b;
     float ssao = texture(ssaoMap, TexCoords).r;
+    vec3 ssr = texture(ssrMap, TexCoords).rgb;
 
     
 
@@ -197,9 +199,10 @@ void main()
     
     // Производим выборки из префильтрованной карты LUT-текстуры BRDF и затем объединяем их вместе в соответствии с аппроксимацией разделенной суммы, чтобы получить зеркальную часть IBL
     const float MAX_REFLECTION_LOD = 4.0;
-    vec3 prefilteredColor = textureLod(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;    
+    vec3 prefilteredColor = textureLod(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;
+    vec4 reflectedColor = textureLod(ssrMap, TexCoords,  roughness * MAX_REFLECTION_LOD).rgba;
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-    vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+    vec3 specular = mix(prefilteredColor, reflectedColor.rgb, 0.5 * reflectedColor.a ) * (F * brdf.x + brdf.y);
 
     vec3 ambient = (kD * diffuse + specular) * ao * ssao; 
     

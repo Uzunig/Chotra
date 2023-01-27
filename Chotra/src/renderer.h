@@ -73,10 +73,11 @@ namespace Chotra {
         float radiusSSAO = 0.5;
         float biasSSAO = 0.025;
 
-        float rayStep = 0.15f;
-        int iterationCount = 100;
-        float distanceBias = 0.005f;
-        
+        float biasSSR = 5.0f;
+        float rayStep = 0.03f;
+        int iterationCount = 1000;
+        float accuracySSR = 0.03f;
+                
         unsigned int screenTexture; 
                 
         unsigned int gBuffer;           // G-Buffer

@@ -17,7 +17,7 @@ void main()
 {		
     vec2 uv = SampleSphericalMap(normalize(WorldPos));
     vec3 color = texture(equirectangularMap, uv).rgb;
-	//vec3 color = vec3(0.0, 0.0, 0.0); // absolute black environment
+    //vec3 color = vec3(0.0f, 0.0f, 0.0f); // Black environment
     
     FragColor = vec4(color, 1.0);
 }

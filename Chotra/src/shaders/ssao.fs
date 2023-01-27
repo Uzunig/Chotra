@@ -1,6 +1,6 @@
 #version 330 core
 layout (location = 0) out float FragColor;
-layout (location = 1) out vec3 reflectedUv;
+layout (location = 1) out vec4 reflectedUv;
 
 in vec2 TexCoords;
 
@@ -14,7 +14,7 @@ uniform vec3 samples[64];
 // Параметры SSAO
 uniform int kernelSize;
 uniform float radius;
-uniform float bias;
+uniform float biasSSAO;
 
 const vec2 noiseScale = vec2(1920.0/4.0, 1080.0/4.0); 
 
@@ -22,17 +22,17 @@ uniform mat4 projection;
 uniform mat4 view;
 
 
+uniform float biasSSR;
 uniform float rayStep;
 uniform int iterationCount;
-uniform float distanceBias;
+uniform float accuracySSR;
 
-vec3 SSR(vec3 position, vec3 reflection)
+vec4 SSR(vec3 position, vec3 reflection)
 {
     vec3 step = rayStep * reflection;
-    vec3 marchingPosition = position + step * 10.0f;
+    vec3 marchingPosition = position + step * biasSSR;
     	
-    //vec3 outColor = texture(gAlbedoMap, TexCoords).xyz;
-    vec3 outColor = vec3(0.0);
+    vec4 outColor = vec4(0.0f, 1.0f, 0.0f, 0.0f);
     
     for (int i = 0; i < iterationCount; i++) {
         vec4 marchingUV = vec4(marchingPosition, 1.0);
@@ -42,17 +42,22 @@ vec3 SSR(vec3 position, vec3 reflection)
 
         // Получаем значения глубины точки выборки
         float depthFromScreen = abs(texture(gPosition, marchingUV.xy).z); 
-        float delta = abs(abs(marchingPosition.z) - depthFromScreen);
+        float delta = abs(marchingPosition.z) - depthFromScreen;
 
-        if (delta < distanceBias) {
-			
-			outColor = texture(gAlbedoMap, marchingUV.xy).xyz; 
-            return outColor;
-		}
+        if (abs(delta) < accuracySSR) {
+			//step *= sign(delta) * (-0.5);
+//            if (abs(delta) < (accuracySSR * 0.5)) {
+
+			    outColor = vec4(texture(gAlbedoMap, marchingUV.xy).xyz, 1.0); 
+                return outColor;
+  //          }
+    //        outColor = vec4(texture(gAlbedoMap, marchingUV.xy).xyz, 1.0); 
+        }    
         marchingPosition += step;
     }
     
     return outColor;
+    
 }
 
 
@@ -89,7 +94,7 @@ void main()
         
         // Проверка диапазонна и суммирование
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
-        occlusion += (sampleDepth >= sample.z + bias ? 1.0 : 0.0) * rangeCheck;           
+        occlusion += (sampleDepth >= sample.z + biasSSAO ? 1.0 : 0.0) * rangeCheck;           
     }
     occlusion = 1.0 - (occlusion / kernelSize);
     
