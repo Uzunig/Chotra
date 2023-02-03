@@ -20,7 +20,8 @@ namespace Chotra {
         shaderSSAOBlur("shaders/screen_shader.vs", "shaders/ssao_blur.fs"),
         //shaderSSR("shaders/screen_shader.vs", "shaders/ssr.fs"),
         shaderDeferredGeometryPass("shaders/deferred_geometry_pass.vs", "shaders/deferred_geometry_pass.fs"),
-        shaderDeferredLightingPass("shaders/deferred_lighting_pass.vs", "shaders/deferred_lighting_pass.fs") {
+        shaderDeferredLightingPass("shaders/deferred_lighting_pass.vs", "shaders/deferred_lighting_pass.fs"),
+        shaderRenderOnScreen("shaders/screen_shader.vs", "shaders/render_on_screen.fs") {
 
 
         GenerateScreenTexture();
@@ -35,7 +36,7 @@ namespace Chotra {
         ConfigureSSAO();
 
         ConfigureBloom();
-
+        
     }
 
     void Renderer::GenerateScreenTexture() {
@@ -99,6 +100,9 @@ namespace Chotra {
         screenShader.Use();
         screenShader.SetInt("screenTexture", 0);
 
+        shaderRenderOnScreen.Use();
+        shaderRenderOnScreen.SetInt("screenTexture", 0);
+
     }
 
     void Renderer::Render() {
@@ -121,7 +125,7 @@ namespace Chotra {
         }
         */
         RenderBloom();
-       
+        RenderOnScreen();
 
         
         
@@ -537,7 +541,7 @@ namespace Chotra {
 
 
         // 3. Теперь рендерим цветовой буфер (типа с плавающей точкой) на 2D-прямоугольник и сужаем диапазон значений HDR-цветов к цветовому диапазону значений заданного по умолчанию фреймбуфера
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shaderBloomFinal.Use();
@@ -547,8 +551,7 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, upColorbuffers[15]);
         shaderBloomFinal.SetInt("bloom", bloom);
         shaderBloomFinal.SetFloat("exposure", exposure);
-        shaderBloomFinal.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
-
+        
         RenderQuad();
     }
 
@@ -730,7 +733,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, noiseTexture);
         glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
+        glBindTexture(GL_TEXTURE_2D, screenTexture); // screen texture from the previous frame (I'm not sure it is correct or not)
                 
         RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -927,6 +930,25 @@ namespace Chotra {
             scene.environment.Draw();
         }
                               
+    }
+
+
+    void Renderer::RenderOnScreen() {
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        shaderRenderOnScreen.Use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, screenTexture);
+        shaderRenderOnScreen.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
+        
+        glViewport(0, 0, width, height);
+
+        // Рендерим прямоугольник
+        RenderQuad();
+         
+
     }
 
    

@@ -55,6 +55,8 @@ namespace Chotra {
         Shader shaderDeferredGeometryPass;
         Shader shaderDeferredLightingPass;
 
+        Shader shaderRenderOnScreen;
+
              
         int renderingMode = 1;
 
@@ -163,6 +165,8 @@ namespace Chotra {
 
         void ConfigureLightingPass();
         void RenderLightingPass();
+
+        void RenderOnScreen();
 
     };
 

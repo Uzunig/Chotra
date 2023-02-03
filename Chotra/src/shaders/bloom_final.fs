@@ -3,8 +3,6 @@ out vec4 FragColor;
 
 in vec2 TexCoords;
 
-uniform float gamma;
-
 uniform sampler2D scene;
 uniform sampler2D bloomBlur;
 uniform bool bloom;
@@ -22,7 +20,6 @@ void main()
       //vec3 result = hdrColor / (hdrColor + vec3(1.0));
       //vec3 result = hdrColor;
     
-	// Гамма-коррекция       
-    result = pow(result, vec3(1.0 / gamma));
+	
     FragColor = vec4(result, 1.0);
 }
