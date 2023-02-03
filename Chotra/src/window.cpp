@@ -155,16 +155,15 @@ namespace Chotra {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        //ImGui::ShowDemoWindow();
+        ImGui::ShowDemoWindow();
 
         ImGui::SetNextWindowPos(ImVec2(GetWidth() - 350, 0));
         ImGui::SetNextWindowSize(ImVec2(350,0));
 
         ImGui::Begin("Rendering configuration");
 
-        ImGui::RadioButton("Forward shading", &renderer->renderingMode, 0);
-        ImGui::RadioButton("Deferred shading", &renderer->renderingMode, 1);
-
+        ImGui::Combo("Rendring mode", &renderer->renderingMode, "Forward shading\0Deferred shading\0");
+               
         if (ImGui::CollapsingHeader("Environment")) {
             ImGui::ColorPicker4("Color", renderer->backgroundColor);
             ImGui::Checkbox("Draw skybox", &renderer->drawSkybox);
@@ -189,8 +188,8 @@ namespace Chotra {
         if (renderer->renderingMode == 1) {
 
             if (ImGui::CollapsingHeader("SSAO")) {
-                ImGui::SliderInt("Kernel size", &renderer->kernelSizeSSAO, 0, 64);
-                ImGui::SliderFloat("radius SSAO", &renderer->radiusSSAO, 0.1f, 1.0f);
+                ImGui::SliderInt("Kernel size", &renderer->kernelSizeSSAO, 0, 100);
+                ImGui::SliderFloat("radius SSAO", &renderer->radiusSSAO, 0.1f, 3.0f);
                 ImGui::SliderFloat("distanceBias", &renderer->biasSSAO, 0.001f, 1.0f);
 
             }
