@@ -162,9 +162,8 @@ namespace Chotra {
 
         ImGui::Begin("Rendering configuration");
 
-        if (ImGui::Checkbox("MSAA", &renderer->enableMSAA)) {
-            //add input samplesNumber
-        }
+        ImGui::RadioButton("Forward shading", &renderer->renderingMode, 0);
+        ImGui::RadioButton("Deferred shading", &renderer->renderingMode, 1);
 
         if (ImGui::CollapsingHeader("Environment")) {
             ImGui::ColorPicker4("Color", renderer->backgroundColor);
@@ -179,28 +178,30 @@ namespace Chotra {
 
         }
 
-        
-        if (!scene->sceneLights.empty()) {
-            ImGui::SetNextWindowPos(ImVec2(GetWidth()-600, 0));
-            ImGui::SetNextWindowSize(ImVec2(250, 0));
-            ImGui::Begin("Point lights");
-            //ImGui::BeginGroup();
-            for (int i = 0; i < scene->sceneLights.size(); ++i) {
-                //ImGui::BeginChild(std::to_string(i).c_str());
-                if (ImGui::CollapsingHeader(("Light " + std::to_string(i)).c_str())) {
-                    ImGui::Text(("Light " + std::to_string(i)).c_str());
-                    ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
-                    ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
-                    ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
-                    ImGui::SliderFloat(("r " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.r, 0.005f, 1.0f);
-                    ImGui::SliderFloat(("g " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.g, 0.005f, 1.0f);
-                    ImGui::SliderFloat(("b " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.b, 0.005f, 1.0f);
-                    ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &scene->sceneLights[i].brightness, 0, 10000);
-                }
-               // ImGui::EndChild();
+
+        if (renderer->renderingMode == 0) {
+
+            if (ImGui::Checkbox("MSAA", &renderer->enableMSAA)) {
+                //add input samplesNumber
             }
-            //ImGui::EndGroup();
-            ImGui::End();     
+        }
+                
+        if (renderer->renderingMode == 1) {
+
+            if (ImGui::CollapsingHeader("SSAO")) {
+                ImGui::SliderInt("Kernel size", &renderer->kernelSizeSSAO, 0, 64);
+                ImGui::SliderFloat("radius SSAO", &renderer->radiusSSAO, 0.1f, 1.0f);
+                ImGui::SliderFloat("distanceBias", &renderer->biasSSAO, 0.001f, 1.0f);
+
+            }
+
+            if (ImGui::CollapsingHeader("SSR")) {
+                ImGui::SliderFloat("biasSSR", &renderer->biasSSR, 0.001f, 10.0f);
+                ImGui::SliderFloat("rayStep", &renderer->rayStep, 0.01f, 1.0f);
+                ImGui::SliderInt("iterationCount", &renderer->iterationCount, 0, 3000);
+                ImGui::SliderFloat("accuracy", &renderer->accuracySSR, 0.001f, 1.0f);
+
+            }
         }
 
         if (ImGui::CollapsingHeader("Post effects")) {
@@ -220,21 +221,28 @@ namespace Chotra {
             
         }
 
-        if (ImGui::CollapsingHeader("SSAO")) {
-            ImGui::SliderInt("Kernel size", &renderer->kernelSizeSSAO, 0, 64);
-            ImGui::SliderFloat("radius SSAO", &renderer->radiusSSAO, 0.1f, 1.0f);
-            ImGui::SliderFloat("distanceBias", &renderer->biasSSAO, 0.001f, 1.0f);
-            
+        if (!scene->sceneLights.empty()) {
+            ImGui::SetNextWindowPos(ImVec2(GetWidth() - 600, 0));
+            ImGui::SetNextWindowSize(ImVec2(250, 0));
+            ImGui::Begin("Point lights");
+            //ImGui::BeginGroup();
+            for (int i = 0; i < scene->sceneLights.size(); ++i) {
+                //ImGui::BeginChild(std::to_string(i).c_str());
+                if (ImGui::CollapsingHeader(("Light " + std::to_string(i)).c_str())) {
+                    ImGui::Text(("Light " + std::to_string(i)).c_str());
+                    ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
+                    ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
+                    ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
+                    ImGui::SliderFloat(("r " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.r, 0.005f, 1.0f);
+                    ImGui::SliderFloat(("g " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.g, 0.005f, 1.0f);
+                    ImGui::SliderFloat(("b " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.b, 0.005f, 1.0f);
+                    ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &scene->sceneLights[i].brightness, 0, 10000);
+                }
+                // ImGui::EndChild();
+            }
+            //ImGui::EndGroup();
+            ImGui::End();
         }
-
-        if (ImGui::CollapsingHeader("SSR")) {
-            ImGui::SliderFloat("biasSSR", &renderer->biasSSR, 0.001f, 10.0f);
-            ImGui::SliderFloat("rayStep", &renderer->rayStep, 0.01f, 1.0f);
-            ImGui::SliderInt("iterationCount", &renderer->iterationCount, 0, 3000);
-            ImGui::SliderFloat("accuracy", &renderer->accuracySSR, 0.001f, 1.0f);
-
-        }
-
 
         ImGui::End();
 

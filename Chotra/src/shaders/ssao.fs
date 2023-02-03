@@ -27,18 +27,29 @@ uniform float rayStep;
 uniform int iterationCount;
 uniform float accuracySSR;
 
-vec4 SSR(vec3 position, vec3 reflection)
+vec4 SSR(vec4 position, vec3 reflection)
 {
-    vec3 step = rayStep * reflection;
-    vec3 marchingPosition = position + step * biasSSR;
-    	
     vec4 outColor = vec4(0.0f, 1.0f, 0.0f, 0.0f);
     
+    if (position.a != 2.0) {    // TO DO: to optimize!
+        return vec4(1.0f, 0.0f, 0.0f, 0.0f);;
+    }
+
+    vec3 step = rayStep * reflection;
+    vec3 marchingPosition = position.xyz + step * biasSSR;
+    	
+        
+
     for (int i = 0; i < iterationCount; i++) {
         vec4 marchingUV = vec4(marchingPosition, 1.0);
         marchingUV = projection * marchingUV;
         marchingUV.xyz /= marchingUV.w; // деление перспективы
         marchingUV.xyz = marchingUV.xyz * 0.5 + 0.5; // приведение к диапазону 0.0 - 1.0
+
+        float alphaFromScreen = texture(gPosition, marchingUV.xy).a; 
+        if (alphaFromScreen != 2.0) {    // TO DO: to optimize!
+            return vec4(0.0f, 0.0f, 1.0f, 0.0f);;
+        }
 
         // Получаем значения глубины точки выборки
         float depthFromScreen = abs(texture(gPosition, marchingUV.xy).z); 
@@ -46,12 +57,14 @@ vec4 SSR(vec3 position, vec3 reflection)
 
         if (abs(delta) < accuracySSR) {
 			//step *= sign(delta) * (-0.5);
-//            if (abs(delta) < (accuracySSR * 0.5)) {
+            //if (abs(delta) < (accuracySSR * 0.5)) {
 
-			    outColor = vec4(texture(gAlbedoMap, marchingUV.xy).xyz, 1.0); 
-                return outColor;
-  //          }
-    //        outColor = vec4(texture(gAlbedoMap, marchingUV.xy).xyz, 1.0); 
+			  //  outColor = vec4(texture(gAlbedoMap, marchingUV.xy).xyz, 1.0); 
+                //return outColor;
+            //}
+            //outColor = vec4(1.0f, 0.0f, 0.0f, 0.0f);
+            outColor = vec4(texture(gAlbedoMap, marchingUV.xy).xyz, 1.0);
+            return outColor;
         }    
         marchingPosition += step;
     }
@@ -65,7 +78,7 @@ void main()
 {
 
     // Получаем входные данные для алгоритма SSAO
-    vec3 fragPos = texture(gPosition, TexCoords).xyz;
+    vec4 fragPos = texture(gPosition, TexCoords);
     vec3 normal = normalize(texture(gNormal, TexCoords).xyz);
     vec3 randomVec = normalize(texture(texNoise, TexCoords * noiseScale).xyz);
 	
@@ -81,7 +94,7 @@ void main()
     {
         // Получаем позицию точки выборки
         vec3 sample = TBN * samples[i];
-        sample = fragPos + sample * radius; 
+        sample = fragPos.xyz + sample * radius; 
         
         // Проецируем координаты точки выборки (для получения позиции на экране/текстуре)
         vec4 offset = vec4(sample, 1.0);
@@ -102,7 +115,7 @@ void main()
 
 
     //SSR
-    vec3 reflectionDirection = normalize(reflect(normalize(fragPos), normalize(normal)));
+    vec3 reflectionDirection = normalize(reflect(normalize(fragPos.xyz), normalize(normal)));
     reflectedUv = SSR(fragPos, reflectionDirection);
 	
 }

@@ -136,9 +136,7 @@ void main()
     float roughness = texture(gMetalRoughAoMap, TexCoords).g;
     float ao = texture(gMetalRoughAoMap, TexCoords).b;
     float ssao = texture(ssaoMap, TexCoords).r;
-    vec3 ssr = texture(ssrMap, TexCoords).rgb;
-
-    
+       
 
     // Вычисляем коэффициент отражения при перпендикулярном угле падения; в случае диэлектрика (например, пластик) - берем значение F0 равным 0.04,
 	// а если металл, то используем цвет альбедо (принцип металличности)    

@@ -54,7 +54,9 @@ namespace Chotra {
 
         Shader shaderDeferredGeometryPass;
         Shader shaderDeferredLightingPass;
-        
+
+             
+        int renderingMode = 1;
 
         bool enableMSAA = true;
         int samplesNumber = 16;
@@ -161,6 +163,7 @@ namespace Chotra {
 
         void ConfigureLightingPass();
         void RenderLightingPass();
+
     };
 
 } // namespace Chotra

@@ -108,7 +108,7 @@ namespace Chotra {
         RenderGeometryPass();
 
         GenerateSSAOMap();
-
+                
         RenderLightingPass();
         
         
@@ -121,12 +121,14 @@ namespace Chotra {
         }
         */
         RenderBloom();
+       
+
         
         
         //Draw debugging quads
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, gViewNormal);
+        glBindTexture(GL_TEXTURE_2D, gViewPosition);
         quads[0].RenderQuad();
         
         glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
@@ -926,5 +928,7 @@ namespace Chotra {
         }
                               
     }
+
+   
 
 } // namespace Chotra
