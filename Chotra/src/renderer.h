@@ -77,10 +77,10 @@ namespace Chotra {
         float radiusSSAO = 0.5;
         float biasSSAO = 0.025;
 
-        float biasSSR = 5.0f;
-        float rayStep = 0.03f;
-        int iterationCount = 1000;
-        float accuracySSR = 0.03f;
+        float biasSSR = 20.0f; // 20,0
+        float rayStep = 0.014f; // 0,014f
+        int iterationCount = 1400; // 1400
+        float accuracySSR = 0.05f; // 0.05f
                 
         unsigned int screenTexture; 
                 
@@ -141,6 +141,10 @@ namespace Chotra {
 
         void Init(GLFWwindow* window);
         void Render();
+        void ForwardRender();
+        void DeferredRender();
+
+        void DrawDebuggingQuads();
 
         void SetupQuad();
         void RenderQuad();

@@ -4,8 +4,8 @@ layout (location = 1) out vec4 reflectedUv;
 
 in vec2 TexCoords;
 
-uniform sampler2D gPosition;
-uniform sampler2D gNormal;
+uniform sampler2D gViewPosition;
+uniform sampler2D gViewNormal;
 uniform sampler2D texNoise;
 uniform sampler2D gAlbedoMap;
 
@@ -32,7 +32,7 @@ vec4 SSR(vec4 position, vec3 reflection)
     vec4 outColor = vec4(0.0f, 1.0f, 0.0f, 0.0f);
     
     if (position.a != 2.0) {    // TO DO: to optimize!
-        return vec4(1.0f, 0.0f, 0.0f, 0.0f);;
+        return vec4(1.0f, 0.0f, 0.0f, 0.0f);
     }
 
     vec3 step = rayStep * reflection;
@@ -46,22 +46,22 @@ vec4 SSR(vec4 position, vec3 reflection)
         marchingUV.xyz /= marchingUV.w; // деление перспективы
         marchingUV.xyz = marchingUV.xyz * 0.5 + 0.5; // приведение к диапазону 0.0 - 1.0
 
-        float alphaFromScreen = texture(gPosition, marchingUV.xy).a; 
+        float alphaFromScreen = texture(gViewPosition, marchingUV.xy).a; 
         if (alphaFromScreen != 2.0) {    // TO DO: to optimize!
             return vec4(0.0f, 0.0f, 1.0f, 0.0f);;
         }
 
         // Получаем значения глубины точки выборки
-        float depthFromScreen = abs(texture(gPosition, marchingUV.xy).z); 
+        float depthFromScreen = abs(texture(gViewPosition, marchingUV.xy).z); 
         float delta = abs(marchingPosition.z) - depthFromScreen;
 
         if (abs(delta) < accuracySSR) {
-			//step *= sign(delta) * (-0.5);
-            //if (abs(delta) < (accuracySSR * 0.5)) {
+			step *= sign(delta) * (-0.5);
+            if (abs(delta) < (accuracySSR * 0.5)) {
 
-			  //  outColor = vec4(texture(gAlbedoMap, marchingUV.xy).xyz, 1.0); 
-                //return outColor;
-            //}
+			    outColor = vec4(texture(gAlbedoMap, marchingUV.xy).xyz, 1.0); 
+                return outColor;
+            }
             //outColor = vec4(1.0f, 0.0f, 0.0f, 0.0f);
             outColor = vec4(texture(gAlbedoMap, marchingUV.xy).xyz, 1.0);
             return outColor;
@@ -78,8 +78,8 @@ void main()
 {
 
     // Получаем входные данные для алгоритма SSAO
-    vec4 fragPos = texture(gPosition, TexCoords);
-    vec3 normal = normalize(texture(gNormal, TexCoords).xyz);
+    vec4 fragPos = texture(gViewPosition, TexCoords);
+    vec3 normal = normalize(texture(gViewNormal, TexCoords).xyz);
     vec3 randomVec = normalize(texture(texNoise, TexCoords * noiseScale).xyz);
 	
     // Создаем TBN-матрицу смены базиса: из касательного пространства в пространство вида
@@ -103,7 +103,7 @@ void main()
         offset.xyz = offset.xyz * 0.5 + 0.5; // приведение к диапазону 0.0 - 1.0
         
         // Получаем значения глубины точки выборки
-        float sampleDepth = texture(gPosition, offset.xy).z; 
+        float sampleDepth = texture(gViewPosition, offset.xy).z; 
         
         // Проверка диапазонна и суммирование
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));

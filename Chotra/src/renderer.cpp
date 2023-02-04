@@ -107,46 +107,66 @@ namespace Chotra {
 
     void Renderer::Render() {
 
-        GenerateShadowMap();
-                
-        RenderGeometryPass();
+        if (renderingMode == 0) {
+            ForwardRender();
 
-        GenerateSSAOMap();
-                
-        RenderLightingPass();
-        
-        
-        /*
+        } else if (renderingMode == 1) {
+            DeferredRender();
+
+        }
+    }
+
+    void Renderer::ForwardRender() {
+
+        GenerateShadowMap();
+
         if (enableMSAA) {
             RenderWithMSAA();
         }
         else {
             RenderWithoutMSAA();
         }
-        */
+
         RenderBloom();
         RenderOnScreen();
 
+        DrawDebuggingQuads();
+    }
+
+    void Renderer::DeferredRender() {
+
+        GenerateShadowMap();
+        RenderGeometryPass();
+        GenerateSSAOMap();
+        RenderLightingPass();
+                      
+        RenderBloom();
+        RenderOnScreen();
+
+        DrawDebuggingQuads();
         
-        
+    }
+
+    void Renderer::DrawDebuggingQuads() {
+
         //Draw debugging quads
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, ssaoMap);
+        glBindTexture(GL_TEXTURE_2D, gViewPosition);
         quads[0].RenderQuad();
+
+        glBindTexture(GL_TEXTURE_2D, gViewNormal);
+        quads[1].RenderQuad();
         
         glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
-        quads[1].RenderQuad();
-        /*
-        glBindTexture(GL_TEXTURE_2D, gMetallicMap);
         quads[2].RenderQuad();
-        
+        /*
         glBindTexture(GL_TEXTURE_2D, gRoughnessMap);
         quads[3].RenderQuad();
-                        
+
         glBindTexture(GL_TEXTURE_2D, gAoMap);
         quads[4].RenderQuad();
-        
+
         glBindTexture(GL_TEXTURE_2D, gNormal);
         quads[5].RenderQuad();*/
     }
@@ -693,8 +713,8 @@ namespace Chotra {
 
  
         shaderSSAO.Use();
-        shaderSSAO.SetInt("gPosition", 0);
-        shaderSSAO.SetInt("gNormal", 1);
+        shaderSSAO.SetInt("gViewPosition", 0);
+        shaderSSAO.SetInt("gViewNormal", 1);
         shaderSSAO.SetInt("texNoise", 2);
         shaderSSAO.SetInt("gAlbedoMap", 3);
 
@@ -733,7 +753,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, noiseTexture);
         glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, screenTexture); // screen texture from the previous frame (I'm not sure it is correct or not)
+        glBindTexture(GL_TEXTURE_2D, gAlbedoMap); // screen texture from the previous frame (I'm not sure it is correct or not)
                 
         RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

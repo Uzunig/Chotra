@@ -200,7 +200,7 @@ void main()
     vec3 prefilteredColor = textureLod(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;
     vec4 reflectedColor = textureLod(ssrMap, TexCoords,  roughness * MAX_REFLECTION_LOD).rgba;
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-    vec3 specular = mix(prefilteredColor, reflectedColor.rgb, 0.5 * reflectedColor.a ) * (F * brdf.x + brdf.y);
+    vec3 specular = mix(prefilteredColor, reflectedColor.rgb, 1.0 * reflectedColor.a ) * (F * brdf.x + brdf.y);
 
     vec3 ambient = (kD * diffuse + specular) * ao * ssao; 
     

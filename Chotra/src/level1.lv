@@ -2,14 +2,18 @@ Type          Path
 ObjModel     models/figure_1.obj
 ObjModel     models/armor/armor.obj
 ObjModel     models/radio/radio.obj
+ObjModel     models/sphere.obj
+ObjModel     models/plane.obj
+
  
 
                          Number        Position          Angle          Scale        Velocity         rVelocity       Visible
                          
-SceneObject   OBJModel     0         0.0  -1.0  0.0     0.0 0.0 0.0    20.0 1.0 20.0    0.0 0.0 0.0     0.0 0.0 0.0          1
-SceneObject   OBJModel     0         3.0  1.0  0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
+SceneObject   OBJModel     4         0.0  0.5  0.0     0.0 0.0 0.0    2.0 1.0 2.0    0.0 0.0 0.0     0.0 0.0 0.0          1
+SceneObject   OBJModel     0         3.0  1.5   0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
 SceneObject   OBJModel     1         0.0   1.5  0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
 SceneObject   OBJModel     2         0.0   2.0  -5.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
+SceneObject   OBJModel     3        -3.0   1.5   0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
 
 
                          Number        Position          Angle          Scale        Velocity         rVelocity       Visible       Color        Brightness
