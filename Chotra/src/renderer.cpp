@@ -866,7 +866,6 @@ namespace Chotra {
         shaderDeferredGeometryPass.SetMat4("view", view);
 
         scene.DrawSceneObjects(shaderDeferredGeometryPass);
-        scene.DrawSceneLights(shaderDeferredGeometryPass);
         
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
