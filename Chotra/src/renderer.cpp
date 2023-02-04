@@ -854,7 +854,7 @@ namespace Chotra {
         glEnable(GL_DEPTH_TEST);
 
         if (perspectiveProjection) {
-            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
+            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.01f, 50.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
