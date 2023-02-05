@@ -249,7 +249,7 @@ namespace Chotra {
 
         glBindTexture(GL_TEXTURE_2D, screenTexture);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
-
+                
         // Создаем рендербуфер для прикрепляемых объектов глубины трафарета
         glGenRenderbuffers(1, &rbo);
         glBindRenderbuffer(GL_RENDERBUFFER, rbo);
@@ -753,7 +753,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, noiseTexture);
         glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, gAlbedoMap); // screen texture from the previous frame (I'm not sure it is correct or not)
+        glBindTexture(GL_TEXTURE_2D, screenTexture); // screen texture from the previous frame (I'm not sure it is correct or not)
                 
         RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -924,32 +924,32 @@ namespace Chotra {
         shaderDeferredLightingPass.SetFloat("shadowBiasMin", shadowBiasMin);
         shaderDeferredLightingPass.SetFloat("shadowBiasMax", shadowBiasMax);
 
-        glViewport(0, 0, width, height);
         
-        
-        // Рендерим прямоугольник
-        RenderQuad();
+            glViewport(0, 0, width, height);
 
-        // 2.5. Копируем содержимое буфера глубины (геометрический проход) в буфер глубины заданного по умолчанию фреймбуфера
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer); // пишем в заданный по умолчанию фреймбуфер
-        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        
-        lightsShader.Use();
-        lightsShader.SetMat4("projection", projection);
-        lightsShader.SetMat4("view", view);
-        lightsShader.SetVec3("camPos", camera.Position);
-        scene.DrawSceneLights(lightsShader);
-        
-        if (drawSkybox) {
-            // Skybox drawing
-            backgroundShader.Use();
-            backgroundShader.SetMat4("projection", projection);
-            backgroundShader.SetMat4("view", view);
-            backgroundShader.SetFloat("exposure", backgroundExposure);
-            scene.environment.Draw();
-        }
-                              
+
+            // Рендерим прямоугольник
+            RenderQuad();
+
+            // 2.5. Копируем содержимое буфера глубины (геометрический проход) в буфер глубины заданного по умолчанию фреймбуфера
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer); // пишем в заданный по умолчанию фреймбуфер
+            glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+            lightsShader.Use();
+            lightsShader.SetMat4("projection", projection);
+            lightsShader.SetMat4("view", view);
+            lightsShader.SetVec3("camPos", camera.Position);
+            scene.DrawSceneLights(lightsShader);
+
+            if (drawSkybox) {
+                // Skybox drawing
+                backgroundShader.Use();
+                backgroundShader.SetMat4("projection", projection);
+                backgroundShader.SetMat4("view", view);
+                backgroundShader.SetFloat("exposure", backgroundExposure);
+                scene.environment.Draw();
+            }
     }
 
 

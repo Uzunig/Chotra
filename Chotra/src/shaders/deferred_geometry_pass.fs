@@ -12,7 +12,7 @@ in vec3 Normal;
 in vec3 ViewNormal;
 
 in vec2 TexCoords;
-
+ 
 
 // Параметры материала
 uniform sampler2D albedoMap;
