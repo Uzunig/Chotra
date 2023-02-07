@@ -34,7 +34,7 @@ namespace Chotra {
 
         /* Create a windowed mode window and its OpenGL context */
         glfwWindow = glfwCreateWindow(windowData.width, windowData.height, windowData.title.c_str(), NULL, NULL);
-        
+
         if (!glfwWindow) {
             glfwTerminate();
             std::cout << "Failed to create the window" << std::endl;
@@ -60,11 +60,11 @@ namespace Chotra {
             [](GLFWwindow* window, int width, int height) {
 
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-                data.width = width;
-                data.height = height;
-               
-                WindowResizeEvent event(width, height);
-                data.eventCallbackFn(event);
+        data.width = width;
+        data.height = height;
+
+        WindowResizeEvent event(width, height);
+        data.eventCallbackFn(event);
             }
         );
 
@@ -73,8 +73,8 @@ namespace Chotra {
 
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 
-                WindowCloseEvent event;
-                data.eventCallbackFn(event);
+        WindowCloseEvent event;
+        data.eventCallbackFn(event);
             }
         );
 
@@ -82,14 +82,15 @@ namespace Chotra {
             [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-                if (action == GLFW_PRESS) {
-                    KeyPressedEvent event(key, scancode, action, mods);
-                    data.eventCallbackFn(event);
+        if (action == GLFW_PRESS) {
+            KeyPressedEvent event(key, scancode, action, mods);
+            data.eventCallbackFn(event);
 
-                } else if ((action == GLFW_RELEASE)) {
-                    KeyReleasedEvent event(key, scancode, action, mods);
-                    data.eventCallbackFn(event);
-                }
+        }
+        else if ((action == GLFW_RELEASE)) {
+            KeyReleasedEvent event(key, scancode, action, mods);
+            data.eventCallbackFn(event);
+        }
 
             }
         );
@@ -98,14 +99,15 @@ namespace Chotra {
             [](GLFWwindow* window, int button, int action, int mods) {
 
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-                if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-                    MouseRightButtonPressedEvent event(button, action, mods);
-                    data.eventCallbackFn(event);
+        if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+            MouseRightButtonPressedEvent event(button, action, mods);
+            data.eventCallbackFn(event);
 
-                } else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
-                    MouseRightButtonReleasedEvent event(button, action, mods);
-                    data.eventCallbackFn(event);
-                }
+        }
+        else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+            MouseRightButtonReleasedEvent event(button, action, mods);
+            data.eventCallbackFn(event);
+        }
 
             }
         );
@@ -115,8 +117,8 @@ namespace Chotra {
 
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 
-                MouseMovedEvent event(newX, newY);
-                data.eventCallbackFn(event);
+        MouseMovedEvent event(newX, newY);
+        data.eventCallbackFn(event);
             }
         );
 
@@ -155,10 +157,10 @@ namespace Chotra {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        //ImGui::ShowDemoWindow();
+        ImGui::ShowDemoWindow();
 
         ImGui::SetNextWindowPos(ImVec2(GetWidth() - 350, 0));
-        ImGui::SetNextWindowSize(ImVec2(350,0));
+        ImGui::SetNextWindowSize(ImVec2(350, 0));
 
         ImGui::Begin("Rendering configuration");
 
@@ -185,7 +187,7 @@ namespace Chotra {
                 //add input samplesNumber
             }
         }
-                
+
         if (renderer->renderingMode == 1) {
 
             if (ImGui::CollapsingHeader("SSAO")) {
@@ -213,38 +215,65 @@ namespace Chotra {
         if (ImGui::CollapsingHeader("Shadows")) {
             ImGui::Checkbox("Show shadows", &renderer->showShadows);
             if (renderer->showShadows) {
-                
+
                 ImGui::SliderFloat("Bias min", &renderer->shadowBiasMin, 0.0f, 0.1f);
                 ImGui::SliderFloat("Bias max", &renderer->shadowBiasMax, 0.0f, 0.1f);
-               
-            }
-            
-        }
 
-        if (!scene->sceneLights.empty()) {
-            ImGui::SetNextWindowPos(ImVec2(GetWidth() - 600, 0));
-            ImGui::SetNextWindowSize(ImVec2(250, 0));
-            ImGui::Begin("Point lights");
-            //ImGui::BeginGroup();
-            for (int i = 0; i < scene->sceneLights.size(); ++i) {
-                //ImGui::BeginChild(std::to_string(i).c_str());
-                if (ImGui::CollapsingHeader(("Light " + std::to_string(i)).c_str())) {
-                    ImGui::Text(("Light " + std::to_string(i)).c_str());
-                    ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
-                    ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
-                    ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
-                    ImGui::SliderFloat(("r " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.r, 0.005f, 1.0f);
-                    ImGui::SliderFloat(("g " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.g, 0.005f, 1.0f);
-                    ImGui::SliderFloat(("b " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.b, 0.005f, 1.0f);
-                    ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &scene->sceneLights[i].brightness, 0, 10000);
-                }
-                // ImGui::EndChild();
             }
-            //ImGui::EndGroup();
-            ImGui::End();
-        }
 
+        }
         ImGui::End();
+
+        ImGui::SetNextWindowPos(ImVec2(GetWidth() - 600, 0));
+        ImGui::SetNextWindowSize(ImVec2(250, 0));
+        ImGui::Begin("Scene collection");
+
+        if (ImGui::CollapsingHeader("Models")) {
+            
+            if (!scene->objModels.empty()) {
+                for (int i = 0; i < scene->objModels.size(); ++i) {
+                    if (ImGui::TreeNode(("Model " + std::to_string(i)).c_str())) {
+                        ImGui::Text(("Model " + std::to_string(i)).c_str());
+                        ImGui::TreePop();
+                    }
+                }
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Scene objects")) {
+            if (!scene->sceneObjects.empty()) {
+                for (int i = 0; i < scene->sceneObjects.size(); ++i) {
+                    if (ImGui::TreeNode(("Object " + std::to_string(i)).c_str())) {
+                        ImGui::Text(("Object " + std::to_string(i)).c_str());
+                        ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
+                        ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
+                        ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
+                        ImGui::TreePop();
+                    }
+                }
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Lights")) {
+            if (!scene->sceneLights.empty()) {
+                for (int i = 0; i < scene->sceneLights.size(); ++i) {
+
+                    if (ImGui::TreeNode(("Light " + std::to_string(i)).c_str())) {
+                        ImGui::Text(("Light " + std::to_string(i)).c_str());
+                        ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
+                        ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
+                        ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
+                        ImGui::SliderFloat(("r " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.r, 0.005f, 1.0f);
+                        ImGui::SliderFloat(("g " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.g, 0.005f, 1.0f);
+                        ImGui::SliderFloat(("b " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.b, 0.005f, 1.0f);
+                        ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &scene->sceneLights[i].brightness, 0, 10000);
+                        ImGui::TreePop();
+                    }
+                }
+            }
+        }
+        ImGui::End();
+
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -261,7 +290,8 @@ namespace Chotra {
     void Window::SetPlayerMode(bool playerMode) {
         if (this->playerMode = playerMode) {
             glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        } else {
+        }
+        else {
             glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
     }
@@ -269,7 +299,8 @@ namespace Chotra {
     bool Window::GetPlayerMode() {
         if (playerMode) {
             return true;
-        } else {
+        }
+        else {
             return false;
         }
 
@@ -282,7 +313,8 @@ namespace Chotra {
     bool Window::GetFirstMouse() {
         if (firstMouse) {
             return true;
-        } else {
+        }
+        else {
             return false;
         }
 
