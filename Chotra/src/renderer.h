@@ -98,6 +98,11 @@ namespace Chotra {
         unsigned int framebuffer;
         unsigned int rbo;
 
+        // Framebuffer without MSAA
+        unsigned int framebufferPrevious;
+        unsigned int rboPrevious;
+        unsigned int screenTexturePrevious;
+
         // Framebuffer with MSAA
         unsigned int framebufferMSAA;
         unsigned int textureColorBufferMultiSampled;

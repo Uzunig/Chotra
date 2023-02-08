@@ -164,6 +164,8 @@ namespace Chotra {
 
         ImGui::Begin("Rendering configuration");
 
+        ImGui::BeginChild("Child0", ImVec2(350, 500), false, 0);
+
         ImGui::RadioButton("Forward shading", &renderer->renderingMode, 0);
         ImGui::RadioButton("Deferred shading", &renderer->renderingMode, 1);
 
@@ -222,6 +224,12 @@ namespace Chotra {
             }
 
         }
+        ImGui::EndChild();
+
+        ImGui::BeginChild("Child1", ImVec2(350, 500), false, 0);
+        // Properties
+        ImGui::EndChild();
+
         ImGui::End();
 
         ImGui::SetNextWindowPos(ImVec2(GetWidth() - 600, 0));

@@ -47,6 +47,13 @@ namespace Chotra {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glGenTextures(1, &screenTexturePrevious);
+
+        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
     void Renderer::Init(GLFWwindow* window) {
@@ -256,6 +263,24 @@ namespace Chotra {
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // Конфигурируем второй постпроцессинг фреймбуфер
+        glGenFramebuffers(1, &framebufferPrevious);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPrevious);
+
+        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexturePrevious, 0);
+
+        // Создаем рендербуфер для прикрепляемых объектов глубины трафарета
+        glGenRenderbuffers(1, &rboPrevious);
+        glBindRenderbuffer(GL_RENDERBUFFER, rboPrevious);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboPrevious);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
@@ -573,6 +598,8 @@ namespace Chotra {
         shaderBloomFinal.SetFloat("exposure", exposure);
         
         RenderQuad();
+
+        
     }
 
     void Renderer::ConfigureShadowMap() {
@@ -753,7 +780,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, noiseTexture);
         glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, screenTexture); // screen texture from the previous frame (I'm not sure it is correct or not)
+        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious); // screen texture from the previous frame (I'm not sure it is correct or not)
                 
         RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -954,6 +981,20 @@ namespace Chotra {
 
 
     void Renderer::RenderOnScreen() {
+
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPrevious);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        shaderRenderOnScreen.Use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, screenTexture);
+        shaderRenderOnScreen.SetFloat("gamma", gammaCorrection ? 1.0f : 1.0f);
+
+        glViewport(0, 0, width, height);
+
+        // Рендерим прямоугольник
+        RenderQuad();
+
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
