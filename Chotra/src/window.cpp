@@ -166,6 +166,59 @@ namespace Chotra {
 
         ImGui::BeginChild("Child0", ImVec2(350, 500), false, 0);
 
+        if (ImGui::TreeNode("Scene collection")) {
+            if (ImGui::TreeNode("Models"))
+            {
+                static int selected = -1;
+                if (!scene->objModels.empty()) {
+                    for (int i = 0; i < scene->objModels.size(); ++i) {
+                        if (ImGui::Selectable(("Model " + std::to_string(i)).c_str(), selected == i)) {
+                            selected = i;
+                        }
+                    }
+                }
+                ImGui::TreePop();
+            }
+
+            if (ImGui::TreeNode("Scene objects")) {
+                if (!scene->sceneObjects.empty()) {
+                    for (int i = 0; i < scene->sceneObjects.size(); ++i) {
+                        if (ImGui::TreeNode(("Object " + std::to_string(i)).c_str())) {
+                            ImGui::Text(("Object " + std::to_string(i)).c_str());
+                            ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
+                            ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
+                            ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
+                            ImGui::TreePop();
+                        }
+                    }
+                }
+                ImGui::TreePop();
+            }
+
+            if (ImGui::TreeNode("Lights")) {
+                if (!scene->sceneLights.empty()) {
+                    for (int i = 0; i < scene->sceneLights.size(); ++i) {
+
+                        if (ImGui::TreeNode(("Light " + std::to_string(i)).c_str())) {
+                            ImGui::Text(("Light " + std::to_string(i)).c_str());
+                            ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
+                            ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
+                            ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
+                            ImGui::SliderFloat(("r " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.r, 0.005f, 1.0f);
+                            ImGui::SliderFloat(("g " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.g, 0.005f, 1.0f);
+                            ImGui::SliderFloat(("b " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.b, 0.005f, 1.0f);
+                            ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &scene->sceneLights[i].brightness, 0, 10000);
+                            ImGui::TreePop();
+                        }
+                    }
+                }
+                ImGui::TreePop();
+            }
+            ImGui::TreePop();
+        }
+
+
+
         ImGui::RadioButton("Forward shading", &renderer->renderingMode, 0);
         ImGui::RadioButton("Deferred shading", &renderer->renderingMode, 1);
 
@@ -228,59 +281,13 @@ namespace Chotra {
 
         ImGui::BeginChild("Child1", ImVec2(350, 500), false, 0);
         // Properties
+        ImGui::Text("Properties ");
+
         ImGui::EndChild();
 
         ImGui::End();
 
-        ImGui::SetNextWindowPos(ImVec2(GetWidth() - 600, 0));
-        ImGui::SetNextWindowSize(ImVec2(250, 0));
-        ImGui::Begin("Scene collection");
 
-        if (ImGui::CollapsingHeader("Models")) {
-            
-            if (!scene->objModels.empty()) {
-                for (int i = 0; i < scene->objModels.size(); ++i) {
-                    if (ImGui::TreeNode(("Model " + std::to_string(i)).c_str())) {
-                        ImGui::Text(("Model " + std::to_string(i)).c_str());
-                        ImGui::TreePop();
-                    }
-                }
-            }
-        }
-
-        if (ImGui::CollapsingHeader("Scene objects")) {
-            if (!scene->sceneObjects.empty()) {
-                for (int i = 0; i < scene->sceneObjects.size(); ++i) {
-                    if (ImGui::TreeNode(("Object " + std::to_string(i)).c_str())) {
-                        ImGui::Text(("Object " + std::to_string(i)).c_str());
-                        ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
-                        ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
-                        ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
-                        ImGui::TreePop();
-                    }
-                }
-            }
-        }
-
-        if (ImGui::CollapsingHeader("Lights")) {
-            if (!scene->sceneLights.empty()) {
-                for (int i = 0; i < scene->sceneLights.size(); ++i) {
-
-                    if (ImGui::TreeNode(("Light " + std::to_string(i)).c_str())) {
-                        ImGui::Text(("Light " + std::to_string(i)).c_str());
-                        ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
-                        ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
-                        ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
-                        ImGui::SliderFloat(("r " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.r, 0.005f, 1.0f);
-                        ImGui::SliderFloat(("g " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.g, 0.005f, 1.0f);
-                        ImGui::SliderFloat(("b " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.b, 0.005f, 1.0f);
-                        ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &scene->sceneLights[i].brightness, 0, 10000);
-                        ImGui::TreePop();
-                    }
-                }
-            }
-        }
-        ImGui::End();
 
 
         ImGui::Render();
