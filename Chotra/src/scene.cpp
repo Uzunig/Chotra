@@ -3,7 +3,7 @@
 namespace Chotra {
 
     Scene::Scene()
-        : environment("hdr/industrial_sunset_02_4k.hdr") {
+        : environment("hdr/Sky.hdr") {
 
         LoadSceneFromFile("level1.lv");
         

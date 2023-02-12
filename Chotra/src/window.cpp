@@ -3,6 +3,24 @@
 
 namespace Chotra {
 
+    // Examples Apps (accessible from the "Examples" menu)
+    static bool show_app_main_menu_bar = false;
+    static bool show_app_documents = false;
+
+    static bool show_app_console = false;
+    static bool show_app_log = false;
+    static bool show_app_layout = false;
+    static bool show_app_property_editor = false;
+    static bool show_app_long_text = false;
+    static bool show_app_auto_resize = false;
+    static bool show_app_constrained_resize = false;
+    static bool show_app_simple_overlay = false;
+    static bool show_app_fullscreen = false;
+    static bool show_app_window_titles = false;
+    static bool show_app_custom_rendering = false;
+
+
+    static int selected = -1;
     static bool GLFW_initialized = false;
 
     Window::Window(std::string title, unsigned int width, unsigned int height)
@@ -142,6 +160,36 @@ namespace Chotra {
         glfwTerminate();
     }
 
+    void Window::ShowProperties(int selected) {
+        if (selected == -1) {
+            return;
+
+        }
+        else if (selected < 100) {
+            int i = selected;
+            ImGui::Text(("Object " + std::to_string(i)).c_str());
+            ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
+            ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
+            ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
+
+        }
+        else if ((selected >= 100) && (selected < 200)) {
+            int i = selected - 100;
+            ImGui::Text(("Light " + std::to_string(i)).c_str());
+            ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
+            ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
+            ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
+            ImGui::SliderFloat(("r " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.r, 0.005f, 1.0f);
+            ImGui::SliderFloat(("g " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.g, 0.005f, 1.0f);
+            ImGui::SliderFloat(("b " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.b, 0.005f, 1.0f);
+            ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &scene->sceneLights[i].brightness, 0, 10000);
+        }
+        else if ((selected >= 200) && (selected < 300)) {
+            int i = selected - 200;
+            ImGui::Text(("Model " + std::to_string(i)).c_str());
+        }
+    }
+
     void Window::OnUpdate(float deltaTime) {
 
         camera->ProcessKeyboard(deltaTime);
@@ -160,65 +208,54 @@ namespace Chotra {
         ImGui::ShowDemoWindow();
 
         ImGui::SetNextWindowPos(ImVec2(GetWidth() - 350, 0));
-        ImGui::SetNextWindowSize(ImVec2(350, 0));
+        ImGui::SetNextWindowSize(ImVec2(350, 500));
 
-        ImGui::Begin("Rendering configuration");
-
-        ImGui::BeginChild("Child0", ImVec2(350, 500), false, 0);
-
+        ImGui::Begin("Scene configuration");
+               
         if (ImGui::TreeNode("Scene collection")) {
-            if (ImGui::TreeNode("Models"))
+            
+            if (ImGui::TreeNode("Scene objects"))
             {
-                static int selected = -1;
                 if (!scene->objModels.empty()) {
-                    for (int i = 0; i < scene->objModels.size(); ++i) {
-                        if (ImGui::Selectable(("Model " + std::to_string(i)).c_str(), selected == i)) {
+                    for (int i = 0; i < scene->sceneObjects.size(); ++i) {
+                        if (ImGui::Selectable(("Objects " + std::to_string(i)).c_str(), selected == i)) {
                             selected = i;
                         }
                     }
                 }
                 ImGui::TreePop();
             }
-
-            if (ImGui::TreeNode("Scene objects")) {
-                if (!scene->sceneObjects.empty()) {
-                    for (int i = 0; i < scene->sceneObjects.size(); ++i) {
-                        if (ImGui::TreeNode(("Object " + std::to_string(i)).c_str())) {
-                            ImGui::Text(("Object " + std::to_string(i)).c_str());
-                            ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
-                            ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
-                            ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
-                            ImGui::TreePop();
-                        }
-                    }
-                }
-                ImGui::TreePop();
-            }
-
-            if (ImGui::TreeNode("Lights")) {
-                if (!scene->sceneLights.empty()) {
+            
+            if (ImGui::TreeNode("Lights"))
+            {
+                if (!scene->objModels.empty()) {
                     for (int i = 0; i < scene->sceneLights.size(); ++i) {
-
-                        if (ImGui::TreeNode(("Light " + std::to_string(i)).c_str())) {
-                            ImGui::Text(("Light " + std::to_string(i)).c_str());
-                            ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
-                            ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
-                            ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
-                            ImGui::SliderFloat(("r " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.r, 0.005f, 1.0f);
-                            ImGui::SliderFloat(("g " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.g, 0.005f, 1.0f);
-                            ImGui::SliderFloat(("b " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.b, 0.005f, 1.0f);
-                            ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &scene->sceneLights[i].brightness, 0, 10000);
-                            ImGui::TreePop();
+                        if (ImGui::Selectable(("Light " + std::to_string(i)).c_str(), selected == 100 + i)) {
+                            selected = 100 + i;
                         }
                     }
                 }
                 ImGui::TreePop();
             }
+            
             ImGui::TreePop();
         }
+        ImGui::End();
 
 
 
+        ImGui::SetNextWindowPos(ImVec2(GetWidth() - 350, 500));
+        ImGui::SetNextWindowSize(ImVec2(350, GetHeight() - 500));
+
+        ImGui::Begin("Properties");
+        ShowProperties(selected);
+
+        ImGui::End();
+
+        ImGui::SetNextWindowPos(ImVec2(GetWidth() - 700, 0));
+        ImGui::SetNextWindowSize(ImVec2(350, 0));
+
+        ImGui::Begin("Rendering options");
         ImGui::RadioButton("Forward shading", &renderer->renderingMode, 0);
         ImGui::RadioButton("Deferred shading", &renderer->renderingMode, 1);
 
@@ -277,17 +314,43 @@ namespace Chotra {
             }
 
         }
-        ImGui::EndChild();
-
-        ImGui::BeginChild("Child1", ImVec2(350, 500), false, 0);
-        // Properties
-        ImGui::Text("Properties ");
-
-        ImGui::EndChild();
-
         ImGui::End();
 
 
+        ImGui::SetNextWindowPos(ImVec2(0, GetHeight() - 220));
+        ImGui::SetNextWindowSize(ImVec2(GetWidth() - 350, 220));
+
+        ImGui::Begin("Assets");
+
+        ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+        if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
+        {
+            if (ImGui::BeginTabItem("Geometry"))
+            {
+                if (!scene->objModels.empty()) {
+                    for (int i = 0; i < scene->objModels.size(); ++i) {
+                        if (ImGui::Selectable(("Model " + std::to_string(i)).c_str(), selected == 200 + i, 0, ImVec2(100, 100))) {
+                            selected = 200 + i;
+                        }
+                        ImGui::SameLine();
+                        ImGui::Text(" ");
+                        ImGui::SameLine();
+                    }
+                }
+
+                ImGui::EndTabItem();
+            }
+
+            if (ImGui::BeginTabItem("Materials"))
+            {
+                ImGui::Text("This is the Broccoli tab!\nblah blah blah blah blah");
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
+
+        }
+
+        ImGui::End();
 
 
         ImGui::Render();
