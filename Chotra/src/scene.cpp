@@ -63,7 +63,10 @@ namespace Chotra {
                 if (s == "ObjModel") {
                     std::string model_path;
                     level_file >> model_path;
-                    objModels.push_back(ObjModel(model_path));
+                    ObjModel obj = ObjModel(model_path);
+                    Material mtl = Material(obj.mtl_path);
+                    objModels.push_back(obj);
+                    materials.push_back(mtl);
 
                 } else if (s == "SceneObject") {
                     std::string meshType;
@@ -91,7 +94,7 @@ namespace Chotra {
                     level_file >> visible;
 
                     if (meshType == "OBJModel") {
-                        sceneObjects.push_back(SceneObject(objModels[i], position, angle,
+                        sceneObjects.push_back(SceneObject(objModels[i], materials[i], position, angle, // TO DO: materials 
                             scale, velocity, rVelocity, visible));
                     } 
 
@@ -127,7 +130,7 @@ namespace Chotra {
                     level_file >> intensity;
 
                     if (meshType == "OBJModel") {
-                        sceneLights.push_back(SceneLight(objModels[i], position, angle,
+                        sceneLights.push_back(SceneLight(objModels[i], materials[i], position, angle,
                             scale, velocity, rVelocity, visible, color, intensity));
                     } 
                 }

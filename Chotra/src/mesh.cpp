@@ -2,7 +2,7 @@
 #include "stb_image.h"
 
 namespace Chotra {
-
+    /*
     void Mesh::SetupTextures() {
 
         Texture texture;
@@ -33,7 +33,7 @@ namespace Chotra {
         texture.id = LoadTexture(texture.path);
         textures.push_back(texture);
     }
-
+    */
     void Mesh::SetupMesh() {
 
         glGenVertexArrays(1, &VAO);
@@ -59,7 +59,7 @@ namespace Chotra {
 
         glBindVertexArray(0);
     }
-
+    /*
     void Mesh::Draw(Shader& shader) {
 
         for (int i = 0; i < textures.size(); ++i) {
@@ -82,7 +82,7 @@ namespace Chotra {
         // Считается хорошей практикой возвращать значения переменных к их первоначальным значениям
         glActiveTexture(GL_TEXTURE0);
     }
-
+    
      unsigned int Mesh::LoadTexture(std::string& path) {
 
         unsigned int textureID;
@@ -122,7 +122,7 @@ namespace Chotra {
         }
 
         return textureID;
-    }
+    }*/
 
 } // namspace Chotra
 

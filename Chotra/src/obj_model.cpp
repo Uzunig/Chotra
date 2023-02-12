@@ -7,7 +7,7 @@ namespace Chotra {
         LoadModel(path);
         SetupMesh();
     }
-
+    /*
     void ObjModel::Draw(Shader& shader) {
 
         for (unsigned int i = 0; i < textures.size(); i++) {
@@ -29,7 +29,7 @@ namespace Chotra {
         // Считается хорошей практикой возвращать значения переменных к их первоначальным значениям
         glActiveTexture(GL_TEXTURE0);
     }
-
+    */
     void ObjModel::LoadModel(std::string const& obj_path) {
 
         std::vector<glm::vec3> vertices;
@@ -108,7 +108,9 @@ namespace Chotra {
 
         }
         else {
-            while (mtl_file) {
+
+            mtl_path = directory + mtl_filename;
+            /*while (mtl_file) {
                 std::string s;
                 mtl_file >> s;
                 std::string texture_filename;
@@ -153,7 +155,7 @@ namespace Chotra {
                     texture.id = LoadTexture(texture.path);
                     textures.push_back(texture);
                 }
-            }
+            }*/
         }
     }
 

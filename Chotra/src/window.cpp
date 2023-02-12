@@ -187,6 +187,16 @@ namespace Chotra {
         else if ((selected >= 200) && (selected < 300)) {
             int i = selected - 200;
             ImGui::Text(("Model " + std::to_string(i)).c_str());
+                        
+        }
+        else if ((selected >= 300) && (selected < 400)) {
+            int i = selected - 300;
+            ImGui::Text(("Material " + std::to_string(i)).c_str());
+
+            for (int j = 0; j < scene->materials[i].textures.size(); ++j) {
+                ImGui::Text(scene->materials[i].textures[j].type.c_str());
+                ImGui::Text(scene->materials[i].textures[j].path.c_str());
+            }
         }
     }
 
@@ -337,14 +347,22 @@ namespace Chotra {
                         ImGui::SameLine();
                     }
                 }
-
                 ImGui::EndTabItem();
             }
 
             if (ImGui::BeginTabItem("Materials"))
             {
-                ImGui::Text("This is the Broccoli tab!\nblah blah blah blah blah");
-                ImGui::EndTabItem();
+                if (!scene->materials.empty()) {
+                    for (int i = 0; i < scene->materials.size(); ++i) {
+                        if (ImGui::Selectable(("Material " + std::to_string(i)).c_str(), selected == 300 + i, 0, ImVec2(100, 100))) {
+                            selected = 300 + i;
+                        }
+                        ImGui::SameLine();
+                        ImGui::Text(" ");
+                        ImGui::SameLine();
+                    }
+                    ImGui::EndTabItem();
+                }
             }
             ImGui::EndTabBar();
 

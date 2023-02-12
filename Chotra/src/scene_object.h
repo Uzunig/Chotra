@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "mesh.h"
+#include "material.h"
 #include "environment.h"
 
 
@@ -14,6 +15,7 @@ namespace Chotra {
     class SceneObject {
     public:
         Mesh& mesh;
+        Material& material;
        
         glm::vec3 position;
         glm::vec3 angle;
@@ -25,7 +27,7 @@ namespace Chotra {
         int visible;
         
 
-        SceneObject(Mesh& mesh, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, int visible);
+        SceneObject(Mesh& mesh, Material& material, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, int visible);
         void Draw(Shader& shader);
         void UpdateModelMatrix();
     };

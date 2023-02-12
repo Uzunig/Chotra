@@ -20,6 +20,9 @@ add_library(Chotra STATIC
 	src/environment.cpp
 	src/environment.h
 
+      src/material.cpp
+	src/material.h
+
 	src/mesh.cpp
 	src/mesh.h
 

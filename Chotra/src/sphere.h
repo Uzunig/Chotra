@@ -13,7 +13,7 @@ namespace Chotra {
         const float PI = 3.14159265358979323846;
 
         Sphere();
-        using Mesh::Draw;
+        //using Mesh::Draw;
     };
 } // namspace Chotra
 
