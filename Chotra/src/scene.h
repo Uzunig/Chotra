@@ -23,22 +23,19 @@
 #include "scene_light.h"
 #include "dashboard.h"
 #include "obj_model.h"
+#include "environment.h"
 
 
 namespace Chotra {
-
-    // Класс Game содержит все связанные с игрой параметры состояния и различный функционал. 
-    // Он объединяет все игровые данные в один класс, обеспечивая тем самым простой доступ к каждому из компонентов класса и возможность управления ими
+        
     class Scene {
     public:
-
                
-        std::string background_path = "hdr/industrial_sunset_02_4k.hdr";
+              
 
         std::vector<ObjModel> objModels;
-        Cylinder cylinder;
-        Sphere sphere;
-
+        std::vector<Material> materials;
+ 
         std::vector<SceneObject> sceneObjects;
         std::vector<SceneObject> cylinders;
         std::vector<SceneObject> spheres;
@@ -46,7 +43,7 @@ namespace Chotra {
         std::vector<SceneLight> sceneLights;
 
                 
-        //Background background;
+        Environment environment;
 
         // Конструктор
         Scene();
@@ -58,15 +55,11 @@ namespace Chotra {
         
         void LoadSceneFromFile(std::string const& path);
 
-        // Игровой цикл
+       
         void Update(float dt);
         void DrawSceneObjects(Shader& shader);
         void DrawSceneLights(Shader& shader);
-
-        void DemoInit();
-        void DemoUpdate(float deltaTime);
-       
-        
+          
 
     };
 } // namspace Chotra

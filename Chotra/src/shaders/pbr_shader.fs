@@ -3,7 +3,7 @@ out vec4 FragColor;
 in vec2 TexCoords;
 in vec3 WorldPos;
 in vec3 Normal;
-//in vec4 FragPosLightSpace;
+in vec4 FragPosLightSpace;
 
 
 // Параметры материала
@@ -17,6 +17,12 @@ uniform sampler2D aoMap;
 uniform samplerCube irradianceMap;
 uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
+
+// Shadows
+uniform sampler2D shadowMap;
+uniform float shadowBiasMin;
+uniform float shadowBiasMax; 
+
 
 // Освещение
 uniform vec3 lightPositions[7];
@@ -89,6 +95,49 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }   
 
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    // Выполняем деление перспективы
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+	
+    // Трансформируем в диапазон [0,1]
+    projCoords = projCoords * 0.5 + 0.5;
+	
+    // Получаем наиболее близкое значение глубины исходя из перспективы глазами источника света (используя в диапазон [0,1] fragPosLight в качестве координат)
+    float closestDepth = texture(shadowMap, projCoords.xy).r; 
+	
+    // Получаем глубину текущего фрагмента исходя из перспективы глазами источника света
+    float currentDepth = projCoords.z;
+	
+    // Вычисляем смещение (на основе разрешения карты глубины и наклона)
+    vec3 normal = normalize(Normal);
+    vec3 lightDir = normalize(lightPositions[0] - WorldPos);
+    float bias = max(shadowBiasMax * (1.0 - dot(normal, lightDir)), shadowBiasMin);
+	
+    // Проверка нахождения текущего фрагмента в тени
+    // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+	
+    // PCF
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+        }    
+    }
+    shadow /= 9.0;
+    
+    // Оставляем значение тени на уровне 0.0 за границей дальней плоскости пирамиды видимости глазами источника света
+    if(projCoords.z > 1.0)
+        shadow = 0.0;
+        
+    return shadow;
+}
+
+
 void main()
 {		
     // Свойства материала
@@ -110,7 +159,7 @@ void main()
     // Уравнение отражения
     vec3 Lo = vec3(0.0);
 
-	for(int i = 0; i < 7; ++i) 
+    for(int i = 0; i < 1; ++i) 
     {
         // Вычисляем энергетическую яркость каждого источника света
         vec3 L = normalize(lightPositions[i] - WorldPos);
@@ -141,8 +190,11 @@ void main()
         // Масштабируем освещенность при помощи NdotL
         float NdotL = max(dot(N, L), 0.0);        
 
+	  // Вычисляем тень
+        float shadow = ShadowCalculation(FragPosLightSpace);  
+
         // Добавляем к исходящей энергитической яркости Lo
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL; // обратите внимание, что мы уже умножали BRDF на коэффициент Френеля(kS), поэтому нам не нужно снова умножать на kS
+        Lo += ((kD * albedo / PI + specular) * radiance * NdotL) * (1.0 - shadow); // обратите внимание, что мы уже умножали BRDF на коэффициент Френеля(kS), поэтому нам не нужно снова умножать на kS
     }   
    
     // Фоновая составляющая освещения (теперь мы используем IBL)
@@ -164,7 +216,7 @@ void main()
     vec3 ambient = (kD * diffuse + specular) * ao;
     
     // Вычисляем тень
-//    float shadow = ShadowCalculation(FragPosLightSpace);   
+    //float shadow = ShadowCalculation(FragPosLightSpace);   
  
     vec3 color = ambient + Lo;
 

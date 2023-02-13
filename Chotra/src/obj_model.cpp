@@ -7,7 +7,7 @@ namespace Chotra {
         LoadModel(path);
         SetupMesh();
     }
-
+    /*
     void ObjModel::Draw(Shader& shader) {
 
         for (unsigned int i = 0; i < textures.size(); i++) {
@@ -29,7 +29,7 @@ namespace Chotra {
         // Считается хорошей практикой возвращать значения переменных к их первоначальным значениям
         glActiveTexture(GL_TEXTURE0);
     }
-
+    */
     void ObjModel::LoadModel(std::string const& obj_path) {
 
         std::vector<glm::vec3> vertices;
@@ -48,6 +48,8 @@ namespace Chotra {
 
         }
         else {
+            name = obj_path.substr(obj_path.find_last_of('/') + 1, obj_path.length());
+
             glm::vec3 vertice;
             glm::vec3 normal;
             glm::vec2 texcoord;
@@ -92,23 +94,25 @@ namespace Chotra {
                 }
             }
             obj_file.close();
-            for (unsigned int i = 0; i < vIndices.size(); ++i) {
-                Vertex vertex;
-                vertex.Position = vertices[vIndices[i]];
-                vertex.TexCoords = texcoords[uvIndices[i]];
-                vertex.Normal = normals[nIndices[i]];
-                this->vertices.push_back(vertex);
-
+            if (!vIndices.empty()) {
+                for (unsigned int i = 0; i < vIndices.size(); ++i) {
+                    Vertex vertex;
+                    vertex.Position = vertices[vIndices[i]];
+                    vertex.TexCoords = texcoords[uvIndices[i]];
+                    vertex.Normal = normals[nIndices[i]];
+                    this->vertices.push_back(vertex);
+                }
             }
         }
 
         std::ifstream mtl_file(directory + mtl_filename);
         if (!mtl_file) {
             std::cout << "The MTL file could not open for writing!" << std::endl;
-
         }
         else {
-            while (mtl_file) {
+
+            mtl_path = directory + mtl_filename;
+            /*while (mtl_file) {
                 std::string s;
                 mtl_file >> s;
                 std::string texture_filename;
@@ -153,7 +157,7 @@ namespace Chotra {
                     texture.id = LoadTexture(texture.path);
                     textures.push_back(texture);
                 }
-            }
+            }*/
         }
     }
 

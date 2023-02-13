@@ -15,7 +15,7 @@
 
 #include "camera.h"
 #include "scene.h"
-#include "background.h"
+//#include "background.h"
 #include "renderer.h"
  
 namespace Chotra {
@@ -45,9 +45,11 @@ namespace Chotra {
         void SetFirstMouse(bool firstMouse);
         bool GetFirstMouse();
 
+        void ShowProperties(int selected);
+
         std::unique_ptr<Camera> camera;
         std::unique_ptr<Scene> scene;
-        std::unique_ptr<Background> background;
+        //std::unique_ptr<Background> background;
         std::unique_ptr<Renderer> renderer;
         
 

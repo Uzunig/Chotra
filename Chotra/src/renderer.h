@@ -8,28 +8,35 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "background.h"
+#include <vector>
+#include <random>
+
+#include "environment.h"
 #include "camera.h"
 #include "shader.h"
 #include "scene.h"
+#include "quad.h"
 
 namespace Chotra {
 
     class Renderer {
     public:
-        
+
+        std::vector<Quad> quads;
+
+        glm::mat4 projection;
+        glm::mat4 view;
+
         Camera& camera;
         Scene& scene;
-        Background& background;
-                
+                                       
         unsigned int& width;
         unsigned int& height;
 
         Shader pbrShader;
         Shader lightsShader;
-        Shader pbrSphereTangentShader;
-        Shader pbrCylinderTangentShader;
-        Shader pbrCylinderTangentShader1;
+        
+        Shader simpleDepthShader;
 
         Shader screenShader;
         Shader downSamplingShader;
@@ -40,6 +47,21 @@ namespace Chotra {
 
         Shader backgroundShader;
 
+        Shader shaderSSAO;
+        Shader shaderSSAOBlur;
+
+        //Shader shaderSSR;
+
+        Shader shaderDeferredGeometryPass;
+        Shader shaderDeferredLightingPass;
+
+        Shader shaderRenderOnScreen;
+
+             
+        int renderingMode = 1;
+
+        bool enableMSAA = true;
+        int samplesNumber = 16;
         bool perspectiveProjection;    
         float backgroundColor[4] = { 0.2f, 0.2f, 0.3f, 1.0f };
         bool drawSkybox = true;
@@ -47,14 +69,47 @@ namespace Chotra {
         float exposure = 1.0f;
         float backgroundExposure = 2.0f;
         bool gammaCorrection = true;
+        bool showShadows = true;
+        float shadowBiasMin = 0.00f;
+        float shadowBiasMax = 0.0f;
+
+        int kernelSizeSSAO = 64;
+        float radiusSSAO = 0.5;
+        float biasSSAO = 0.025;
+
+        float biasSSR = 20.0f; // 20,0
+        float rayStep = 0.014f; // 0,014f
+        int iterationCount = 1400; // 1400
+        float accuracySSR = 0.05f; // 0.05f
+                
+        unsigned int screenTexture; 
+                
+        unsigned int gBuffer;           // G-Buffer
+        unsigned int gPosition; //TExtures
+        unsigned int gViewPosition; 
+        unsigned int gNormal;
+        unsigned int gViewNormal;
+        unsigned int gAlbedoMap;
+        unsigned int gMetalRoughAoMap;
+        unsigned int rboG;          //Renderbuffer for depth
         
+
+        // Framebuffer without MSAA
         unsigned int framebuffer;
-        unsigned int textureColorBufferMultiSampled;
         unsigned int rbo;
 
+        // Framebuffer without MSAA
+        unsigned int framebufferPrevious;
+        unsigned int rboPrevious;
+        unsigned int screenTexturePrevious;
+
+        // Framebuffer with MSAA
+        unsigned int framebufferMSAA;
+        unsigned int textureColorBufferMultiSampled;
+        unsigned int rboMSAA;
         unsigned int intermediateFBO;
-        unsigned int screenTexture;
-                
+
+                     
         unsigned int hdrFBO;
         unsigned int colorBuffers[2];
         unsigned int rboDepth;
@@ -66,19 +121,62 @@ namespace Chotra {
         unsigned int upFBO[16];
         unsigned int upColorbuffers[16];
 
+        unsigned int depthMapFBO;
+        unsigned int shadowMapSize = 1024;
+        unsigned int depthMap;
+        glm::mat4 lightSpaceMatrix;
+
+        unsigned int ssaoFBO;
+        unsigned int ssaoBlurFBO;
+        unsigned int ssaoColorBuffer;
+        unsigned int reflectedUvMap;
+        unsigned int ssaoMap;
+        unsigned int noiseTexture;
+        std::vector<glm::vec3> ssaoKernel;
+         
         unsigned int quadVAO = 0;
         unsigned int quadVBO;
 
+       
+
         
-        Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene, Background& background);
+        Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene);
+
+        void GenerateScreenTexture();
 
         void Init(GLFWwindow* window);
         void Render();
+        void ForwardRender();
+        void DeferredRender();
+
+        void DrawDebuggingQuads();
 
         void SetupQuad();
         void RenderQuad();
-        void ConfigureMSAA();
+        
+        void ConfigureFramebufferMSAA();
+        void RenderWithMSAA();
+
+        void ConfigureFramebuffer();
+        void RenderWithoutMSAA();
+
         void ConfigureBloom();
+        void RenderBloom();
+
+        void ConfigureShadowMap();
+        void GenerateShadowMap();
+        
+        void ConfigureSSAO();
+        void GenerateSSAOMap();
+
+        void ConfigureGeometryPass();
+        void RenderGeometryPass();
+
+        void ConfigureLightingPass();
+        void RenderLightingPass();
+
+        void RenderOnScreen();
+
     };
 
 } // namespace Chotra

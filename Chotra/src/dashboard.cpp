@@ -12,6 +12,6 @@ namespace Chotra {
     void Dashboard::Draw(Shader& shader) {
         shader.Use();
         shader.SetInt("row", row);
-        mesh.Draw(shader);
+        //mesh.Draw(shader);
     }
 } // namspace Chotra

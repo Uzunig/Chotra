@@ -7,10 +7,7 @@ add_library(Chotra STATIC
 	includes/Chotra/Events/event.h      
 	
 	src/application.cpp
-
-	src/background.cpp
-	src/background.h
-
+	
 	src/camera.cpp
 	src/camera.h
 
@@ -19,6 +16,12 @@ add_library(Chotra STATIC
 
 	src/dashboard.cpp
 	src/dashboard.h
+
+	src/environment.cpp
+	src/environment.h
+
+      src/material.cpp
+	src/material.h
 
 	src/mesh.cpp
 	src/mesh.h
@@ -46,6 +49,9 @@ add_library(Chotra STATIC
 
 	src/stb_image.cpp
 	src/stb_image.h
+
+	src/quad.cpp
+	src/quad.h
 
       src/window.h
       src/window.cpp

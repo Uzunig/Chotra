@@ -6,13 +6,19 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "mesh.h"
+#include "material.h"
+#include "environment.h"
+
 
 namespace Chotra {
 
     class SceneObject {
     public:
         Mesh& mesh;
+        Material& material;
 
+        std::string name;
+       
         glm::vec3 position;
         glm::vec3 angle;
         glm::vec3 pivot;
@@ -21,14 +27,10 @@ namespace Chotra {
         glm::vec3 velocity;
         glm::vec3 rVelocity;
         int visible;
-        float deformation;
-        int deformationVector;
+        
 
-        SceneObject(Mesh& mesh, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
-            int visible, float deformation = 0.0f, int deformatioVector = 0);
+        SceneObject(Mesh& mesh, Material& material, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, int visible);
         void Draw(Shader& shader);
-        void Draw(Shader& shader1, Shader& shader2, Shader& shader3);
-        void Deformation(float dt);
         void UpdateModelMatrix();
     };
 } // namspace Chotra

@@ -29,7 +29,7 @@ namespace Chotra {
                 indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
             }
         }
-        SetupTextures();
+        //SetupTextures();
         SetupMesh();
     }
 } // namspace Chotra
