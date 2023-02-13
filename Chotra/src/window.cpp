@@ -14,7 +14,7 @@ namespace Chotra {
         : windowData({ title, width, height }) {
 
         int resultCode = Init();
-        
+
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui_ImplOpenGL3_Init();
@@ -164,7 +164,7 @@ namespace Chotra {
         ofn.nMaxFileTitle = 0;
         ofn.lpstrInitialDir = NULL;
         ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-        
+
         if (GetOpenFileNameA(&ofn))
         {
             ImGui::Begin("Open File Dialog Example");
@@ -180,6 +180,8 @@ namespace Chotra {
         }
         else if (selected < 100) {
             int i = selected;
+            ImGui::Text("Scene object:");
+            ImGui::SameLine();
             ImGui::Text(scene->sceneObjects[i].name.c_str());
             ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
             ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
@@ -188,6 +190,8 @@ namespace Chotra {
         }
         else if ((selected >= 100) && (selected < 200)) {
             int i = selected - 100;
+            ImGui::Text("Light:");
+            ImGui::SameLine();
             ImGui::Text(scene->sceneLights[i].name.c_str());
             ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
             ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
@@ -199,24 +203,54 @@ namespace Chotra {
         }
         else if ((selected >= 200) && (selected < 300)) {
             int i = selected - 200;
+            ImGui::Text("Geometry:");
+            ImGui::SameLine();
             ImGui::Text(scene->objModels[i].name.c_str());
-                        
+            ImGui::Spacing();
+
+            if (ImGui::Button("..."))
+            {
+                // ShowOpenFileDialog();
+            }
+            ImGui::SameLine();
+            char str0[128];
+            strcpy(str0, scene->objModels[i].obj_path.c_str());
+            ImGui::InputText(scene->objModels[i].name.c_str(), str0, IM_ARRAYSIZE(str0));
+            if (str0 != scene->objModels[i].obj_path.c_str()) {
+                scene->objModels[i].obj_path = str0;
+            }
+            ImGui::Spacing();
+            ImGui::Separator();
+
         }
         else if ((selected >= 300) && (selected < 400)) {
             int i = selected - 300;
+            ImGui::Text("Material:");
+            ImGui::SameLine();
             ImGui::Text(scene->materials[i].name.c_str());
-            
+            ImGui::Spacing();
+            if (ImGui::Button("..."))
+            {
+                // ShowOpenFileDialog();
+            }
+            ImGui::SameLine();
+            {
+                char str0[128];
+                strcpy(str0, scene->materials[i].mtl_path.c_str());
+                ImGui::InputText(scene->materials[i].name.c_str(), str0, IM_ARRAYSIZE(str0));
+            }
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Text("Textures:");
             for (int j = 0; j < scene->materials[i].textures.size(); ++j) {
-                ImGui::Text(scene->materials[i].textures[j].type.c_str());
-
-                //char str0[128] str0 = scene->materials[i].textures[j].path.c_str();
-                //ImGui::InputText("input text", str0, IM_ARRAYSIZE(str0));
-                //ImGui::SameLine();
-                if (ImGui::Button("Open"))
+                if (ImGui::Button("..."))
                 {
-                   // ShowOpenFileDialog();
+                    // ShowOpenFileDialog();
                 }
-                //ImGui::Text(scene->materials[i].textures[j].path.c_str());
+                ImGui::SameLine();
+                char str0[128];
+                strcpy(str0, scene->materials[i].textures[j].path.c_str());
+                ImGui::InputText(scene->materials[i].textures[j].type.c_str(), str0, IM_ARRAYSIZE(str0));
             }
         }
     }
@@ -231,7 +265,7 @@ namespace Chotra {
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize.x = static_cast<float>(GetWidth());
         io.DisplaySize.y = static_cast<float>(GetHeight());
-        
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -242,9 +276,9 @@ namespace Chotra {
         ImGui::SetNextWindowSize(ImVec2(350, 500));
 
         ImGui::Begin("Scene configuration");
-                       
+
         if (ImGui::TreeNode("Scene collection")) {
-            
+
             if (ImGui::TreeNode("Scene objects"))
             {
                 if (!scene->objModels.empty()) {
@@ -256,7 +290,7 @@ namespace Chotra {
                 }
                 ImGui::TreePop();
             }
-            
+
             if (ImGui::TreeNode("Lights"))
             {
                 if (!scene->objModels.empty()) {
@@ -268,7 +302,7 @@ namespace Chotra {
                 }
                 ImGui::TreePop();
             }
-            
+
             ImGui::TreePop();
         }
         ImGui::End();
@@ -394,7 +428,7 @@ namespace Chotra {
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        
+
         glfwSwapBuffers(glfwWindow);
         glfwPollEvents();
     }

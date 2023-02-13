@@ -1,5 +1,7 @@
 #version 330 core
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 Previous;
+//out vec4 FragColor;
 
 in vec2 TexCoords;
 
@@ -200,15 +202,18 @@ void main()
     vec3 prefilteredColor = textureLod(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;
     vec4 reflectedColor = textureLod(ssrMap, TexCoords,  roughness * MAX_REFLECTION_LOD).rgba;
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-    vec3 specular = mix(prefilteredColor, reflectedColor.rgb, 1.0 * reflectedColor.a ) * (F * brdf.x + brdf.y);
+
+    vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+    vec3 specular1 = mix(prefilteredColor, reflectedColor.rgb, 1.0 * reflectedColor.a ) * (F * brdf.x + brdf.y);
 
     vec3 ambient = (kD * diffuse + specular) * ao * ssao; 
+    vec3 ambient1 = (kD * diffuse + specular1) * ao * ssao; 
     
     // Вычисляем тень
     //float shadow = ShadowCalculation(FragPosLightSpace);   
  
     vec3 color = ambient + Lo;
-
+    vec3 color1 = ambient1 + Lo;
     // Тональная компрессия HDR
     //color = color / (color + vec3(1.0));
     
@@ -216,6 +221,7 @@ void main()
     //color = pow(color, vec3(1.0/2.2)); 
 
     FragColor = vec4(color , 1.0);
+    Previous = vec4(color1 , 1.0);
 
    
 }

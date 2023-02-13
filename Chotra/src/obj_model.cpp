@@ -49,6 +49,7 @@ namespace Chotra {
         }
         else {
             name = obj_path.substr(obj_path.find_last_of('/') + 1, obj_path.length());
+            this->obj_path = obj_path;
 
             glm::vec3 vertice;
             glm::vec3 normal;

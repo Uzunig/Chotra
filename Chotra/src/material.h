@@ -23,6 +23,7 @@ namespace Chotra {
     class Material {
     public:
         Material(std::string path);
+        std::string mtl_path;
         std::string name;
         std::vector<Texture> textures;
         

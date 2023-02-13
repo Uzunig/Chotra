@@ -162,7 +162,7 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, gViewPosition);
         quads[0].RenderQuad();
 
-        glBindTexture(GL_TEXTURE_2D, gViewNormal);
+        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious);
         quads[1].RenderQuad();
         
         glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
@@ -272,8 +272,14 @@ namespace Chotra {
         glGenFramebuffers(1, &framebufferPrevious);
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferPrevious);
 
+        glBindTexture(GL_TEXTURE_2D, screenTexture);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
+
         glBindTexture(GL_TEXTURE_2D, screenTexturePrevious);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexturePrevious, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, screenTexturePrevious, 0);
+
+        unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+        glDrawBuffers(2, attachments);
 
         // Создаем рендербуфер для прикрепляемых объектов глубины трафарета
         glGenRenderbuffers(1, &rboPrevious);
@@ -910,7 +916,7 @@ namespace Chotra {
 
     void Renderer::RenderLightingPass() {
 
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPrevious);
 
         // 2. Проход освещения: вычисление освещение, перебирая попиксельно экранный прямоугольник, используя содержимое g-буфера
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -981,21 +987,7 @@ namespace Chotra {
 
 
     void Renderer::RenderOnScreen() {
-
-        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPrevious);
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shaderRenderOnScreen.Use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, screenTexture);
-        shaderRenderOnScreen.SetFloat("gamma", gammaCorrection ? 1.0f : 1.0f);
-
-        glViewport(0, 0, width, height);
-
-        // Рендерим прямоугольник
-        RenderQuad();
-
-
+      
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
