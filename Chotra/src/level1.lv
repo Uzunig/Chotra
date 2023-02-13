@@ -1,24 +1,24 @@
-Type          Path  
-ObjModel     models/figure_1.obj
-ObjModel     models/armor/armor.obj
-ObjModel     models/radio/radio.obj
-ObjModel     models/sphere.obj
-ObjModel     models/plane.obj
+Type                 Path  
+ObjModel         models/figure_1.obj
+ObjModel         models/armor/armor.obj
+ObjModel         models/radio/radio.obj
+ObjModel         models/sphere.obj
+ObjModel         models/plane.obj
 
  
 
-                         Number        Position          Angle          Scale        Velocity         rVelocity       Visible
+               Name              Number        Position          Angle          Scale        Velocity         rVelocity       Visible
                          
-SceneObject   OBJModel     4         0.0  0.5  0.0     0.0 0.0 0.0    2.0 1.0 2.0    0.0 0.0 0.0     0.0 0.0 0.0          1
-SceneObject   OBJModel     0         3.0  1.5   0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
-SceneObject   OBJModel     1         0.0   1.5  0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
-SceneObject   OBJModel     2         0.0   2.0  -5.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
-SceneObject   OBJModel     3        -3.0   1.5   0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
+SceneObject  object_0   OBJModel     4         0.0  0.5  0.0     0.0 0.0 0.0    2.0 1.0 2.0    0.0 0.0 0.0     0.0 0.0 0.0          1
+SceneObject  object_1   OBJModel     0         3.0  1.5   0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
+SceneObject  object_2   OBJModel     1         0.0   1.5  0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
+SceneObject  object_3   OBJModel     2         0.0   2.0  -5.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
+SceneObject  object_4   OBJModel     3        -3.0   1.5   0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
 
 
-                         Number        Position          Angle          Scale        Velocity         rVelocity       Visible       Color        Brightness
+               Name                 Number        Position          Angle          Scale        Velocity         rVelocity       Visible       Color        Brightness
 
-SceneLight    OBJModel     0       -2.0 5.0  -5.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1      1.0 1.0 1.0        900
+SceneLight    light_0    OBJModel     0       -2.0 5.0  -5.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1      1.0 1.0 1.0        900
 
 //SceneLight    OBJModel     0       20.0 31.0 -60.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1     0.4 0.2 0.9        100
 //SceneLight    OBJModel     0       17.0 22.0 -60.0    0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0         1     0.4 0.2 0.9       100
