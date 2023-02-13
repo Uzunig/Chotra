@@ -3,23 +3,6 @@
 
 namespace Chotra {
 
-    // Examples Apps (accessible from the "Examples" menu)
-    static bool show_app_main_menu_bar = false;
-    static bool show_app_documents = false;
-
-    static bool show_app_console = false;
-    static bool show_app_log = false;
-    static bool show_app_layout = false;
-    static bool show_app_property_editor = false;
-    static bool show_app_long_text = false;
-    static bool show_app_auto_resize = false;
-    static bool show_app_constrained_resize = false;
-    static bool show_app_simple_overlay = false;
-    static bool show_app_fullscreen = false;
-    static bool show_app_window_titles = false;
-    static bool show_app_custom_rendering = false;
-
-
     static int selected = -1;
     static bool GLFW_initialized = false;
 
@@ -27,7 +10,7 @@ namespace Chotra {
         : windowData({ title, width, height }) {
 
         int resultCode = Init();
-
+        
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui_ImplOpenGL3_Init();
@@ -167,7 +150,7 @@ namespace Chotra {
         }
         else if (selected < 100) {
             int i = selected;
-            ImGui::Text(("Object " + std::to_string(i)).c_str());
+            ImGui::Text(scene->sceneObjects[i].name.c_str());
             ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
             ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
             ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
@@ -175,7 +158,7 @@ namespace Chotra {
         }
         else if ((selected >= 100) && (selected < 200)) {
             int i = selected - 100;
-            ImGui::Text(("Light " + std::to_string(i)).c_str());
+            ImGui::Text(scene->sceneLights[i].name.c_str());
             ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
             ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
             ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
@@ -186,16 +169,16 @@ namespace Chotra {
         }
         else if ((selected >= 200) && (selected < 300)) {
             int i = selected - 200;
-            ImGui::Text(("Model " + std::to_string(i)).c_str());
+            ImGui::Text(scene->objModels[i].name.c_str());
                         
         }
         else if ((selected >= 300) && (selected < 400)) {
             int i = selected - 300;
-            ImGui::Text(("Material " + std::to_string(i)).c_str());
-
+            ImGui::Text(scene->materials[i].name.c_str());
+            
             for (int j = 0; j < scene->materials[i].textures.size(); ++j) {
                 ImGui::Text(scene->materials[i].textures[j].type.c_str());
-                ImGui::Text(scene->materials[i].textures[j].path.c_str());
+                //ImGui::Text(scene->materials[i].textures[j].path.c_str());
             }
         }
     }
@@ -210,7 +193,7 @@ namespace Chotra {
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize.x = static_cast<float>(GetWidth());
         io.DisplaySize.y = static_cast<float>(GetHeight());
-
+        
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -361,8 +344,8 @@ namespace Chotra {
                         ImGui::Text(" ");
                         ImGui::SameLine();
                     }
-                    ImGui::EndTabItem();
                 }
+                ImGui::EndTabItem();
             }
             ImGui::EndTabBar();
 
@@ -373,7 +356,7 @@ namespace Chotra {
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+        
         glfwSwapBuffers(glfwWindow);
         glfwPollEvents();
     }

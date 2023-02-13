@@ -48,6 +48,8 @@ namespace Chotra {
 
         }
         else {
+            name = obj_path.substr(obj_path.find_last_of('/') + 1, obj_path.length());
+
             glm::vec3 vertice;
             glm::vec3 normal;
             glm::vec2 texcoord;
@@ -92,20 +94,20 @@ namespace Chotra {
                 }
             }
             obj_file.close();
-            for (unsigned int i = 0; i < vIndices.size(); ++i) {
-                Vertex vertex;
-                vertex.Position = vertices[vIndices[i]];
-                vertex.TexCoords = texcoords[uvIndices[i]];
-                vertex.Normal = normals[nIndices[i]];
-                this->vertices.push_back(vertex);
-
+            if (!vIndices.empty()) {
+                for (unsigned int i = 0; i < vIndices.size(); ++i) {
+                    Vertex vertex;
+                    vertex.Position = vertices[vIndices[i]];
+                    vertex.TexCoords = texcoords[uvIndices[i]];
+                    vertex.Normal = normals[nIndices[i]];
+                    this->vertices.push_back(vertex);
+                }
             }
         }
 
         std::ifstream mtl_file(directory + mtl_filename);
         if (!mtl_file) {
             std::cout << "The MTL file could not open for writing!" << std::endl;
-
         }
         else {
 

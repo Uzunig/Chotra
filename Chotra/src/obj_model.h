@@ -12,6 +12,7 @@ namespace Chotra {
         ObjModel(std::string const& path);
         //virtual void Draw(Shader& shader);
        
+        std::string name;
         std::string mtl_path;
     private:
         unsigned int VBO, EBO;

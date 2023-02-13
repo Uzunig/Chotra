@@ -16,36 +16,44 @@ namespace Chotra {
     
     void Scene::Update(float deltaTime) {
         float dt = deltaTime * 50.0f;
-        for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
-            if (sceneObjects[i].visible) {
-                sceneObjects[i].position += sceneObjects[i].velocity * dt;
-                sceneObjects[i].angle += sceneObjects[i].rVelocity * dt;
-                sceneObjects[i].UpdateModelMatrix();
+        if (!sceneObjects.empty()) {
+            for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
+                if (sceneObjects[i].visible) {
+                    sceneObjects[i].position += sceneObjects[i].velocity * dt;
+                    sceneObjects[i].angle += sceneObjects[i].rVelocity * dt;
+                    sceneObjects[i].UpdateModelMatrix();
+                }
             }
         }
-        for (unsigned int i = 0; i < sceneLights.size(); ++i) {
-            if (sceneLights[i].visible) {
-                sceneLights[i].position += sceneLights[i].velocity * dt;
-                sceneLights[i].angle += sceneLights[i].rVelocity * dt;
-                sceneLights[i].UpdateModelMatrix();
+        if (!sceneLights.empty()) {
+            for (unsigned int i = 0; i < sceneLights.size(); ++i) {
+                if (sceneLights[i].visible) {
+                    sceneLights[i].position += sceneLights[i].velocity * dt;
+                    sceneLights[i].angle += sceneLights[i].rVelocity * dt;
+                    sceneLights[i].UpdateModelMatrix();
+                }
             }
         }
     }
         
     void Scene::DrawSceneObjects(Shader& shader) {
-        for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
-            if (sceneObjects[i].visible) {
-                sceneObjects[i].Draw(shader);
+        if (!sceneObjects.empty()) {
+            for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
+                if (sceneObjects[i].visible) {
+                    sceneObjects[i].Draw(shader);
+                }
             }
         }
     }
 
     void Scene::DrawSceneLights(Shader& shader) {
-        for (unsigned int i = 0; i < sceneLights.size(); ++i) {
-            if (sceneLights[i].visible) {
-                shader.Use();
-                shader.SetVec3("lightsColor", sceneLights[i].color * (float)sceneLights[i].brightness);
-                sceneLights[i].Draw(shader);
+        if (!sceneLights.empty()) {
+            for (unsigned int i = 0; i < sceneLights.size(); ++i) {
+                if (sceneLights[i].visible) {
+                    shader.Use();
+                    shader.SetVec3("lightsColor", sceneLights[i].color * (float)sceneLights[i].brightness);
+                    sceneLights[i].Draw(shader);
+                }
             }
         }
     }
@@ -69,9 +77,12 @@ namespace Chotra {
                     materials.push_back(mtl);
 
                 } else if (s == "SceneObject") {
+                    std::string name;
+                    level_file >> name;
+
                     std::string meshType;
                     level_file >> meshType;
-                    
+                  
                     unsigned int i;
                     level_file >> i;
 
@@ -92,13 +103,16 @@ namespace Chotra {
 
                     int visible;
                     level_file >> visible;
-
+                   
                     if (meshType == "OBJModel") {
-                        sceneObjects.push_back(SceneObject(objModels[i], materials[i], position, angle, // TO DO: materials 
+                        sceneObjects.push_back(SceneObject(objModels[i], materials[i], name, position, angle, // TO DO: materials 
                             scale, velocity, rVelocity, visible));
                     } 
 
                 } else if (s == "SceneLight") {
+                    std::string name;
+                    level_file >> name;
+                    
                     std::string meshType;
                     level_file >> meshType;
 
@@ -130,7 +144,7 @@ namespace Chotra {
                     level_file >> intensity;
 
                     if (meshType == "OBJModel") {
-                        sceneLights.push_back(SceneLight(objModels[i], materials[i], position, angle,
+                        sceneLights.push_back(SceneLight(objModels[i], materials[i], name, position, angle,
                             scale, velocity, rVelocity, visible, color, intensity));
                     } 
                 }
