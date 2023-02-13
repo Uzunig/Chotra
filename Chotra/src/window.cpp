@@ -1,6 +1,10 @@
 
 #include "window.h"
 
+//#include <commdlg.h>
+#include <Windows.h>
+#include <GLFW/glfw3native.h>
+
 namespace Chotra {
 
     static int selected = -1;
@@ -142,6 +146,32 @@ namespace Chotra {
         glfwDestroyWindow(glfwWindow);
         glfwTerminate();
     }
+    /*
+    void ShowOpenFileDialog()
+    {
+        char fileName[MAX_PATH];
+        fileName[0] = '\0';
+
+        OPENFILENAME ofn;
+        ZeroMemory(&ofn, sizeof(ofn));
+        ofn.lStructSize = sizeof(ofn);
+        ofn.hwndOwner = NULL;
+        ofn.lpstrFile = fileName;
+        ofn.nMaxFile = MAX_PATH;
+        ofn.lpstrFilter = "All\0*.*\0Text\0*.TXT\0";
+        ofn.nFilterIndex = 1;
+        ofn.lpstrFileTitle = NULL;
+        ofn.nMaxFileTitle = 0;
+        ofn.lpstrInitialDir = NULL;
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+        
+        if (GetOpenFileNameA(&ofn))
+        {
+            ImGui::Begin("Open File Dialog Example");
+            ImGui::Text("Selected file: %s", fileName);
+            ImGui::End();
+        }
+    }*/
 
     void Window::ShowProperties(int selected) {
         if (selected == -1) {
@@ -178,6 +208,14 @@ namespace Chotra {
             
             for (int j = 0; j < scene->materials[i].textures.size(); ++j) {
                 ImGui::Text(scene->materials[i].textures[j].type.c_str());
+
+                //char str0[128] str0 = scene->materials[i].textures[j].path.c_str();
+                //ImGui::InputText("input text", str0, IM_ARRAYSIZE(str0));
+                //ImGui::SameLine();
+                if (ImGui::Button("Open"))
+                {
+                   // ShowOpenFileDialog();
+                }
                 //ImGui::Text(scene->materials[i].textures[j].path.c_str());
             }
         }
@@ -204,7 +242,7 @@ namespace Chotra {
         ImGui::SetNextWindowSize(ImVec2(350, 500));
 
         ImGui::Begin("Scene configuration");
-               
+                       
         if (ImGui::TreeNode("Scene collection")) {
             
             if (ImGui::TreeNode("Scene objects"))
