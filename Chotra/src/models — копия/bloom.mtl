@@ -1,0 +1,15 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl None
+Ns 500
+Ka 0.8 0.8 0.8
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+map_Kd textures/plastic/albedo.png
+map_Bump textures/plastic/normal.png
+map_Pm textures/plastic/metallic.png
+map_Pr textures/plastic/roughness.png
+map_AO textures/plastic/ao.png

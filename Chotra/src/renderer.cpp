@@ -761,7 +761,7 @@ namespace Chotra {
         // 2. Генерируем текстуру для SSAO
         glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
         glClear(GL_COLOR_BUFFER_BIT);
-        shaderSSAO.Use();
+        shaderSSAO.Use(); 
 
         // Посылаем ядро + поворот 
         for (unsigned int i = 0; i < 64; ++i) {
