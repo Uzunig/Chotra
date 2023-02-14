@@ -3,6 +3,7 @@
 
 //#include <commdlg.h>
 #include <Windows.h>
+//#include <shobjidl.h> 
 #include <GLFW/glfw3native.h>
 
 namespace Chotra {
@@ -146,7 +147,8 @@ namespace Chotra {
         glfwDestroyWindow(glfwWindow);
         glfwTerminate();
     }
-    /*
+
+    
     void ShowOpenFileDialog()
     {
         char fileName[MAX_PATH];
@@ -171,7 +173,7 @@ namespace Chotra {
             ImGui::Text("Selected file: %s", fileName);
             ImGui::End();
         }
-    }*/
+    }
 
     void Window::ShowProperties(int selected) {
         if (selected == -1) {
@@ -210,7 +212,7 @@ namespace Chotra {
 
             if (ImGui::Button("..."))
             {
-                // ShowOpenFileDialog();
+                ShowOpenFileDialog();
             }
             ImGui::SameLine();
             char str0[128];
@@ -231,7 +233,7 @@ namespace Chotra {
             ImGui::Spacing();
             if (ImGui::Button("..."))
             {
-                // ShowOpenFileDialog();
+                ShowOpenFileDialog();
             }
             ImGui::SameLine();
             {
@@ -243,9 +245,9 @@ namespace Chotra {
             ImGui::Separator();
             ImGui::Text("Textures:");
             for (int j = 0; j < scene->materials[i].textures.size(); ++j) {
-                if (ImGui::Button("..."))
+                if (ImGui::Button("T"))
                 {
-                    // ShowOpenFileDialog();
+                    ShowOpenFileDialog();
                 }
                 ImGui::SameLine();
                 char str0[128];
