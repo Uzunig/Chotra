@@ -6,6 +6,8 @@
 //#include <shobjidl.h> 
 #include <GLFW/glfw3native.h>
 
+#include "platform_utils.h"
+
 namespace Chotra {
 
     static int selected = -1;
@@ -147,34 +149,7 @@ namespace Chotra {
         glfwDestroyWindow(glfwWindow);
         glfwTerminate();
     }
-
-    
-    void ShowOpenFileDialog()
-    {
-        char fileName[MAX_PATH];
-        fileName[0] = '\0';
-
-        OPENFILENAME ofn;
-        ZeroMemory(&ofn, sizeof(ofn));
-        ofn.lStructSize = sizeof(ofn);
-        ofn.hwndOwner = NULL;
-        ofn.lpstrFile = fileName;
-        ofn.nMaxFile = MAX_PATH;
-        ofn.lpstrFilter = "All\0*.*\0Text\0*.TXT\0";
-        ofn.nFilterIndex = 1;
-        ofn.lpstrFileTitle = NULL;
-        ofn.nMaxFileTitle = 0;
-        ofn.lpstrInitialDir = NULL;
-        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-
-        if (GetOpenFileNameA(&ofn))
-        {
-            ImGui::Begin("Open File Dialog Example");
-            ImGui::Text("Selected file: %s", fileName);
-            ImGui::End();
-        }
-    }
-
+            
     void Window::ShowProperties(int selected) {
         if (selected == -1) {
             return;
@@ -212,7 +187,7 @@ namespace Chotra {
 
             if (ImGui::Button("..."))
             {
-                ShowOpenFileDialog();
+                scene->objModels[i].obj_path = FileDialogs::OpenFile("");
             }
             ImGui::SameLine();
             char str0[128];
@@ -233,7 +208,7 @@ namespace Chotra {
             ImGui::Spacing();
             if (ImGui::Button("..."))
             {
-                ShowOpenFileDialog();
+                FileDialogs::OpenFile("");
             }
             ImGui::SameLine();
             {
@@ -247,7 +222,7 @@ namespace Chotra {
             for (int j = 0; j < scene->materials[i].textures.size(); ++j) {
                 if (ImGui::Button("T"))
                 {
-                    ShowOpenFileDialog();
+                    FileDialogs::OpenFile("");
                 }
                 ImGui::SameLine();
                 char str0[128];
