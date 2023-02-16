@@ -187,7 +187,10 @@ namespace Chotra {
 
             if (ImGui::Button("..."))
             {
-                scene->objModels[i].obj_path = FileDialogs::OpenFile("");
+                std::string s = FileDialogs::OpenFile("");
+                if (scene->objModels[i].obj_path != s) {
+                    scene->objModels[i].obj_path = s;
+                }
             }
             ImGui::SameLine();
             char str0[128];

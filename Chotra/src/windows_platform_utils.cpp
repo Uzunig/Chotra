@@ -13,7 +13,7 @@ namespace Chotra {
         char fileName[MAX_PATH];
         fileName[0] = '\0';
 
-        OPENFILENAMEA ofn;
+        OPENFILENAME ofn;
         ZeroMemory(&ofn, sizeof(ofn));
         ofn.lStructSize = sizeof(ofn);
         ofn.hwndOwner = NULL; // TO DO: select a native window
@@ -26,7 +26,7 @@ namespace Chotra {
         ofn.lpstrInitialDir = NULL;
         ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-        if (GetOpenFileNameA(&ofn))
+        if (GetOpenFileName(&ofn))
         {
              /*
             ImGui::Begin("Open File Dialog Example");
