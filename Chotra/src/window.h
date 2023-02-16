@@ -51,7 +51,8 @@ namespace Chotra {
         std::unique_ptr<Scene> scene;
         //std::unique_ptr<Background> background;
         std::unique_ptr<Renderer> renderer;
-        
+
+            
 
         glm::vec2 lastMousePosition;
         

@@ -188,7 +188,8 @@ namespace Chotra {
             if (ImGui::Button("..."))
             {
                 std::string s = FileDialogs::OpenFile("");
-                if (scene->objModels[i].obj_path != s) {
+                if ((s != "") && (s != scene->objModels[i].obj_path)) {
+                    // TO DO: Check selectet object before any change.
                     scene->objModels[i].obj_path = s;
                 }
             }
