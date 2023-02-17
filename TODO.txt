@@ -1,4 +1,7 @@
-fix normal maps into deferred rendering
+To create suitable architecture for engine!
+
+To pass to XML format and to make loader for collection files 
+Vector Geometry must contain all types of geometry
 
 prefilterMap: make GUI for SANPLE_COUNT
-fix coordinate spaces in lighting pass of deferred rendering
+Is it necessary to make a colletcion of environments?
