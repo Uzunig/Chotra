@@ -15,11 +15,13 @@
 
 #include "camera.h"
 #include "scene.h"
-//#include "background.h"
 #include "renderer.h"
+
  
+
 namespace Chotra {
-    
+
+
     class Window {
     public:
 
@@ -51,6 +53,7 @@ namespace Chotra {
         std::unique_ptr<Scene> scene;
         //std::unique_ptr<Background> background;
         std::unique_ptr<Renderer> renderer;
+        std::unique_ptr<class Gui> gui;
 
             
 

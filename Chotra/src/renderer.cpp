@@ -56,7 +56,7 @@ namespace Chotra {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
-    void Renderer::Init(GLFWwindow* window) {
+    void Renderer::Init() {
           {
             //Create debugging quads
             Quad quad1 = Quad(0, 0);

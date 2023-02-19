@@ -144,7 +144,7 @@ namespace Chotra {
 
         void GenerateScreenTexture();
 
-        void Init(GLFWwindow* window);
+        void Init();
         void Render();
         void ForwardRender();
         void DeferredRender();

@@ -7,6 +7,7 @@
 #include <GLFW/glfw3native.h>
 
 #include "platform_utils.h"
+#include "gui.h"
 
 namespace Chotra {
 
@@ -137,7 +138,8 @@ namespace Chotra {
         scene = std::make_unique<Scene>();
         //background = std::make_unique<Background>(*scene);
         renderer = std::make_unique<Renderer>(windowData.width, windowData.height, *camera, *scene);
-        renderer->Init(glfwWindow);
+        renderer->Init();
+        gui = std::make_unique<Gui>(this);
 
         lastMousePosition = glm::vec2(GetWidth() / 2, GetHeight() / 2);
 
@@ -243,6 +245,9 @@ namespace Chotra {
         scene->Update(deltaTime);
         renderer->Render();
 
+        gui->Show();
+        gui->Render();
+/*
         ImGuiIO& io = ImGui::GetIO();
         io.DisplaySize.x = static_cast<float>(GetWidth());
         io.DisplaySize.y = static_cast<float>(GetHeight());
@@ -257,6 +262,9 @@ namespace Chotra {
         ImGui::SetNextWindowSize(ImVec2(350, 500));
 
         ImGui::Begin("Scene configuration");
+
+        ImGui::Text("dear imgui says hello! (%s) (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
+        ImGui::Spacing();
 
         if (ImGui::TreeNode("Scene collection")) {
 
@@ -409,7 +417,7 @@ namespace Chotra {
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+        */
         glfwSwapBuffers(glfwWindow);
         glfwPollEvents();
     }
