@@ -1,7 +1,7 @@
 To create suitable architecture for engine!
 
-To pass to XML format and to make loader for collection files 
-Vector Geometry must contain all types of geometry
+To pass to JSON format and to make loader for collection files 
+To change vector objModels to vector geometry that containes all types og geometry
 
 prefilterMap: make GUI for SANPLE_COUNT
 Is it necessary to make a colletcion of environments?
