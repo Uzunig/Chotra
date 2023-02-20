@@ -59,6 +59,7 @@ namespace Chotra {
 
         glm::vec2 lastMousePosition;
         
+        int fps = 0;
 
     private:
 
@@ -74,7 +75,7 @@ namespace Chotra {
 
         GLFWwindow* glfwWindow = nullptr;
         WindowData windowData;
-
+        
         bool playerMode = false;
         bool firstMouse = true;
 

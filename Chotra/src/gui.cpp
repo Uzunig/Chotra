@@ -60,6 +60,7 @@ namespace Chotra {
         ShowCollectionBar();
         ShowAssetsBar();
         ShowPropertiesBar();
+        ShowScoreBar();
 
 
     }
@@ -73,6 +74,9 @@ namespace Chotra {
         Update();
 
         ImGui::Begin("Chotra Engine GUI", p_open, window_flags);
+
+        ImGui::Text("Logo");
+        ImGui::SameLine();
 
         // Menu Bar
         if (ImGui::BeginMenuBar()) {
@@ -93,6 +97,22 @@ namespace Chotra {
                     ImGui::EndMenu();
                 }
                 if (ImGui::MenuItem("Save", NULL)) {}
+
+                if (ImGui::BeginMenu("Colors"))
+                {
+                    float sz = ImGui::GetTextLineHeight();
+                    for (int i = 0; i < ImGuiCol_COUNT; i++)
+                    {
+                        const char* name = ImGui::GetStyleColorName((ImGuiCol)i);
+                        ImVec2 p = ImGui::GetCursorScreenPos();
+                        ImGui::GetWindowDrawList()->AddRectFilled(p, ImVec2(p.x + sz, p.y + sz), ImGui::GetColorU32((ImGuiCol)i));
+                        ImGui::Dummy(ImVec2(sz, sz));
+                        ImGui::SameLine();
+                        ImGui::MenuItem(name);
+                    }
+                    ImGui::EndMenu();
+                }
+
                 if (ImGui::MenuItem("Quit", NULL)) {}
                 
                 ImGui::EndMenu();
@@ -145,7 +165,7 @@ namespace Chotra {
     void Gui::ShowPropertiesBar() {
 
         ImGui::SetNextWindowPos(ImVec2(p_mainWindow->GetWidth() - 350, 500));
-        ImGui::SetNextWindowSize(ImVec2(350, p_mainWindow->GetHeight() - 500));
+        ImGui::SetNextWindowSize(ImVec2(350, p_mainWindow->GetHeight() - 630));
 
         ImGui::Begin("Properties");
 
@@ -234,6 +254,19 @@ namespace Chotra {
                 ImGui::InputText(p_mainWindow->scene->materials[i].textures[j].type.c_str(), str0, IM_ARRAYSIZE(str0));
             }
         }
+        ImGui::End();
+    }
+
+
+    void Gui::ShowScoreBar() {
+
+        ImGui::SetNextWindowPos(ImVec2(p_mainWindow->GetWidth() - 350, 950));
+        ImGui::SetNextWindowSize(ImVec2(350, p_mainWindow->GetHeight() - 950));
+
+        ImGui::Begin("Score");
+
+        ImGui::Text(("fps = " + std::to_string(p_mainWindow->fps)).c_str());
+        
         ImGui::End();
     }
 

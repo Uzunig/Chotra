@@ -31,6 +31,7 @@ namespace Chotra {
 
 
         int selected = -1;
+        
 
         Gui(Window* p_mainWindow);
         void Init();
@@ -39,6 +40,7 @@ namespace Chotra {
         void ShowTopBar();
         void ShowCollectionBar();
         void ShowPropertiesBar();
+        void ShowScoreBar();
         void ShowAssetsBar();
         void Render();
 

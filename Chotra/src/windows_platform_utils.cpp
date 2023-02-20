@@ -9,7 +9,7 @@
 namespace Chotra {
 
     std::string FileDialogs::OpenFile(const char* filter) {
-
+        /*
         char fileName[MAX_PATH];
         fileName[0] = '\0';
 
@@ -24,19 +24,34 @@ namespace Chotra {
         ofn.lpstrFileTitle = NULL;
         ofn.nMaxFileTitle = 0;
         ofn.lpstrInitialDir = NULL;
-        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
         if (GetOpenFileName(&ofn))
         {
-             /*
-            ImGui::Begin("Open File Dialog Example");
-            ImGui::Text("Selected file: %s", fileName);
-            ImGui::End();
-            */
             return ofn.lpstrFile;
         }
 
+        return std::string();*/
+
+        OPENFILENAMEA ofn;
+        CHAR szFile[260] = { 0 };
+        CHAR currentDir[256] = { 0 };
+        ZeroMemory(&ofn, sizeof(OPENFILENAME));
+        ofn.lStructSize = sizeof(OPENFILENAME);
+        //ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::Get().GetWindow().GetNativeWindow());
+        ofn.lpstrFile = szFile;
+        ofn.nMaxFile = sizeof(szFile);
+        if (GetCurrentDirectoryA(256, currentDir))
+            ofn.lpstrInitialDir = currentDir;
+        ofn.lpstrFilter = filter;
+        ofn.nFilterIndex = 1;
+        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+        if (GetOpenFileNameA(&ofn) == TRUE)
+            return ofn.lpstrFile;
+
         return std::string();
+
     }
 
     std::string FileDialogs::SaveFile(const char* filetr) {

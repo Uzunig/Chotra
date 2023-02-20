@@ -151,95 +151,11 @@ namespace Chotra {
         glfwDestroyWindow(glfwWindow);
         glfwTerminate();
     }
-            
-    void Window::ShowProperties(int selected) {
-        if (selected == -1) {
-            return;
 
-        }
-        else if (selected < 100) {
-            int i = selected;
-            ImGui::Text("Scene object:");
-            ImGui::SameLine();
-            ImGui::Text(scene->sceneObjects[i].name.c_str());
-            ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
-
-        }
-        else if ((selected >= 100) && (selected < 200)) {
-            int i = selected - 100;
-            ImGui::Text("Light:");
-            ImGui::SameLine();
-            ImGui::Text(scene->sceneLights[i].name.c_str());
-            ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
-            ImGui::SliderFloat(("r " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.r, 0.005f, 1.0f);
-            ImGui::SliderFloat(("g " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.g, 0.005f, 1.0f);
-            ImGui::SliderFloat(("b " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.b, 0.005f, 1.0f);
-            ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &scene->sceneLights[i].brightness, 0, 10000);
-        }
-        else if ((selected >= 200) && (selected < 300)) {
-            int i = selected - 200;
-            ImGui::Text("Geometry:");
-            ImGui::SameLine();
-            ImGui::Text(scene->objModels[i].name.c_str());
-            ImGui::Spacing();
-
-            if (ImGui::Button("..."))
-            {
-                std::string s = FileDialogs::OpenFile("");
-                if ((s != "") && (s != scene->objModels[i].obj_path)) {
-                    // TO DO: Check selectet object before any change.
-                    scene->objModels[i].obj_path = s;
-                }
-            }
-            ImGui::SameLine();
-            char str0[128];
-            strcpy(str0, scene->objModels[i].obj_path.c_str());
-            ImGui::InputText(scene->objModels[i].name.c_str(), str0, IM_ARRAYSIZE(str0));
-            if (str0 != scene->objModels[i].obj_path.c_str()) {
-                scene->objModels[i].obj_path = str0;
-            }
-            ImGui::Spacing();
-            ImGui::Separator();
-
-        }
-        else if ((selected >= 300) && (selected < 400)) {
-            int i = selected - 300;
-            ImGui::Text("Material:");
-            ImGui::SameLine();
-            ImGui::Text(scene->materials[i].name.c_str());
-            ImGui::Spacing();
-            if (ImGui::Button("..."))
-            {
-                FileDialogs::OpenFile("");
-            }
-            ImGui::SameLine();
-            {
-                char str0[128];
-                strcpy(str0, scene->materials[i].mtl_path.c_str());
-                ImGui::InputText(scene->materials[i].name.c_str(), str0, IM_ARRAYSIZE(str0));
-            }
-            ImGui::Spacing();
-            ImGui::Separator();
-            ImGui::Text("Textures:");
-            for (int j = 0; j < scene->materials[i].textures.size(); ++j) {
-                if (ImGui::Button("T"))
-                {
-                    FileDialogs::OpenFile("");
-                }
-                ImGui::SameLine();
-                char str0[128];
-                strcpy(str0, scene->materials[i].textures[j].path.c_str());
-                ImGui::InputText(scene->materials[i].textures[j].type.c_str(), str0, IM_ARRAYSIZE(str0));
-            }
-        }
-    }
 
     void Window::OnUpdate(float deltaTime) {
 
+        fps = 1 / deltaTime;
         camera->ProcessKeyboard(deltaTime);
         //scene->DemoUpdate(deltaTime);
         scene->Update(deltaTime);
