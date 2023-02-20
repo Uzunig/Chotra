@@ -12,7 +12,7 @@ namespace Chotra {
    
     class Gui {
     public:
-
+        
         class Window* p_mainWindow;
         
         bool* p_open = NULL;
@@ -43,6 +43,8 @@ namespace Chotra {
         void ShowScoreBar();
         void ShowAssetsBar();
         void Render();
+
+        void AddMaterialModal();
 
         
     };

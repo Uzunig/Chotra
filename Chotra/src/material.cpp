@@ -63,38 +63,13 @@ namespace Chotra {
             }
         }
     }
-
-    void Material::SetupTextures() {
-
-        Texture texture;
-
-        texture.type = "albedoMap";
-        texture.path = "models/textures/earth/albedo.png";
-        texture.id = LoadTexture(texture.path);
-        textures.push_back(texture);
-
-        texture.type = "normalMap";
-        texture.path = "models/textures/earth/normal.png";
-        texture.id = LoadTexture(texture.path);
-        textures.push_back(texture);
-
-        texture.type = "metallicMap";
-        texture.path = "models/textures/earth/metallic.png";
-        texture.id = LoadTexture(texture.path);
-        textures.push_back(texture);
-
-
-        texture.type = "roughnessMap";
-        texture.path = "models/textures/earth/roughness.png";
-        texture.id = LoadTexture(texture.path);
-        textures.push_back(texture);
-
-        texture.type = "aoMap";
-        texture.path = "models/textures/earth/ao.png";
-        texture.id = LoadTexture(texture.path);
-        textures.push_back(texture);
+    void Material::ChangeTexture(unsigned int j, std::string& new_path) {
+        
+        unsigned int textureID = this->textures[j].id;
+        glDeleteTextures(1, &textureID);
+        
+        this->textures[j].id = LoadTexture(new_path);
     }
-
 
      unsigned int Material::LoadTexture(std::string& path) {
 

@@ -22,13 +22,15 @@ namespace Chotra {
 
     class Material {
     public:
-        Material(std::string path);
+        Material() = default;
+        Material(std::string mtl_path);
         std::string mtl_path;
         std::string name;
         std::vector<Texture> textures;
         
-        void SetupTextures();
-        unsigned int LoadTexture(std::string& mtl_path);
+       
+        unsigned int LoadTexture(std::string& path_path);
+        void ChangeTexture(unsigned int j, std::string& new_path);
     };
 } // namspace Chotra
 

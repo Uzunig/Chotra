@@ -6,8 +6,8 @@
 namespace Chotra {
 
 
-    Gui::Gui(Window* p_mainWindow) 
-                : p_mainWindow(p_mainWindow) {
+    Gui::Gui(Window* p_mainWindow)
+        : p_mainWindow(p_mainWindow) {
 
         Init();
 
@@ -25,12 +25,12 @@ namespace Chotra {
         if (no_background)      window_flags |= ImGuiWindowFlags_NoBackground;
         if (no_bring_to_front)  window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
         if (no_close)           p_open = NULL; // Don't pass our bool* to Begin
-               
+
     }
 
     void Gui::Update() {
 
-        
+
         if (no_titlebar)        window_flags |= ImGuiWindowFlags_NoTitleBar;
         if (no_scrollbar)       window_flags |= ImGuiWindowFlags_NoScrollbar;
         if (!no_menu)           window_flags |= ImGuiWindowFlags_MenuBar;
@@ -41,7 +41,7 @@ namespace Chotra {
         if (no_background)      window_flags |= ImGuiWindowFlags_NoBackground;
         if (no_bring_to_front)  window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
         if (no_close)           p_open = NULL; // Don't pass our bool* to Begin
-       
+
     }
 
     void Gui::Show() {
@@ -75,13 +75,10 @@ namespace Chotra {
 
         ImGui::Begin("Chotra Engine GUI", p_open, window_flags);
 
-        ImGui::Text("Logo");
-        ImGui::SameLine();
-
         // Menu Bar
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("File")) {
-                
+
                 if (ImGui::BeginMenu("New")) {
                     if (ImGui::MenuItem("Project")) {
 
@@ -114,12 +111,12 @@ namespace Chotra {
                 }
 
                 if (ImGui::MenuItem("Quit", NULL)) {}
-                
+
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
         }
-               
+
         ImGui::End();
     }
 
@@ -129,7 +126,7 @@ namespace Chotra {
         ImGui::SetNextWindowSize(ImVec2(350, 500));
 
         ImGui::Begin("Scene configuration");
- 
+
         if (ImGui::TreeNode("Scene collection")) {
 
             if (ImGui::TreeNode("Scene objects"))
@@ -244,14 +241,18 @@ namespace Chotra {
             ImGui::Separator();
             ImGui::Text("Textures:");
             for (int j = 0; j < p_mainWindow->scene->materials[i].textures.size(); ++j) {
-                if (ImGui::Button("T"))
+                if (ImGui::Button(("T" + std::to_string(j)).c_str()))
                 {
-                    FileDialogs::OpenFile("");
+                    std::string s = FileDialogs::OpenFile("");
+                    if ((s != "") && (s != p_mainWindow->scene->materials[i].textures[j].path)) {
+                        p_mainWindow->scene->materials[i].ChangeTexture(j, s);
+                    }
                 }
                 ImGui::SameLine();
                 char str0[128];
                 strcpy(str0, p_mainWindow->scene->materials[i].textures[j].path.c_str());
                 ImGui::InputText(p_mainWindow->scene->materials[i].textures[j].type.c_str(), str0, IM_ARRAYSIZE(str0));
+
             }
         }
         ImGui::End();
@@ -266,7 +267,7 @@ namespace Chotra {
         ImGui::Begin("Score");
 
         ImGui::Text(("fps = " + std::to_string(p_mainWindow->fps)).c_str());
-        
+
         ImGui::End();
     }
 
@@ -306,6 +307,17 @@ namespace Chotra {
                         ImGui::Text(" ");
                         ImGui::SameLine();
                     }
+
+                    // Always center this window when appearing
+                    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+                    if (ImGui::Button("Add material..")) {
+
+                        ImGui::OpenPopup("Add material");
+                        AddMaterialModal();
+                    }
+
                 }
                 ImGui::EndTabItem();
             }
@@ -315,13 +327,98 @@ namespace Chotra {
 
         ImGui::End();
     }
-    
+
     void Gui::Render() {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
-    
+    void Gui::AddMaterialModal() {
+        if (ImGui::BeginPopupModal("Add material", NULL, ImGuiWindowFlags_MenuBar))
+        {
+            /*Material material;
+            std::string name;
+            char str0[128];
+            strcpy(str0, name.c_str());
+            ImGui::Text("Name");
+            ImGui::InputText(name.c_str(), str0, IM_ARRAYSIZE(str0));
+
+            ImGui::Text("MTL file");
+            ImGui::Spacing();
+            if (ImGui::Button("Open MTL"))
+            {
+                std::string s = FileDialogs::OpenFile("");
+                if (s != "") {
+                    Material material1(s);
+                    material = material1;
+                }
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Text("Textures:");
+            if (material.textures.size() != 0) {
+                for (int j = 0; j < material.textures.size(); ++j) {
+                    if (ImGui::Button(("T" + std::to_string(j)).c_str()))
+                    {
+                        std::string s = FileDialogs::OpenFile("");
+                        if ((s != "") && (s != material.textures[j].path)) {
+                            material.ChangeTexture(j, s);
+                        }
+                    }
+                    ImGui::SameLine();
+                    char str0[128];
+                    strcpy(str0, material.textures[j].path.c_str());
+                    ImGui::InputText(material.textures[j].type.c_str(), str0, IM_ARRAYSIZE(str0));
+                }
+            }
+            else {
+                Texture albedoMap;
+                Texture normalMap;
+                Texture metallicMap;
+                Texture roughnessMap;
+                Texture aoMap;
+                if (ImGui::Button(("T" + std::to_string(0)).c_str()))
+                {
+                    std::string s = FileDialogs::OpenFile("");
+                    if (s != "") {
+                        albedoMap.id = material.LoadTexture(s);
+                        albedoMap.type = "albedoMap";
+                        albedoMap.path = s;
+                    }
+                }
+                ImGui::SameLine();
+                char str0[128];
+                strcpy(str0, albedoMap.path.c_str());
+                ImGui::InputText(albedoMap.type.c_str(), str0, IM_ARRAYSIZE(str0));
+
+                if (ImGui::Button(("T" + std::to_string(1)).c_str()))
+                {
+                    std::string s = FileDialogs::OpenFile("");
+                    if (s != "") {
+                        normalMap.id = material.LoadTexture(s);
+                        normalMap.type = "normalMap";
+                        normalMap.path = s;
+                    }
+                }
+                ImGui::SameLine();
+                strcpy(str0, normalMap.path.c_str());
+                ImGui::InputText(normalMap.type.c_str(), str0, IM_ARRAYSIZE(str0));
+
+            }*/
+
+
+            if (ImGui::Button("Add", ImVec2(120, 0))) {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SetItemDefaultFocus();
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+    }
 
 } // namspace Chotra
 
