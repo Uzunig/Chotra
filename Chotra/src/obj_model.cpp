@@ -7,6 +7,7 @@ namespace Chotra {
 
         LoadModel(path);
         SetupMesh();
+        std::cout << "Create geometry" << std::endl;
     }
     /*
     void ObjModel::Draw(Shader& shader) {

@@ -286,7 +286,7 @@ namespace Chotra {
             {
                 if (!p_mainWindow->scene->objModels.empty()) {
                     for (int i = 0; i < p_mainWindow->scene->objModels.size(); ++i) {
-                        if (ImGui::Selectable(("Model " + std::to_string(i)).c_str(), selected == 200 + i, 0, ImVec2(100, 100))) {
+                        if (ImGui::Selectable(p_mainWindow->scene->objModels[i].name.c_str(), selected == 200 + i, 0, ImVec2(100, 100))) {
                             selected = 200 + i;
                         }
                         ImGui::SameLine();
@@ -314,7 +314,7 @@ namespace Chotra {
             {
                 if (!p_mainWindow->scene->materials.empty()) {
                     for (int i = 0; i < p_mainWindow->scene->materials.size(); ++i) {
-                        if (ImGui::Selectable(("Material " + std::to_string(i)).c_str(), selected == 300 + i, 0, ImVec2(100, 100))) {
+                        if (ImGui::Selectable(p_mainWindow->scene->materials[i].name.c_str(), selected == 300 + i, 0, ImVec2(100, 100))) {
                             selected = 300 + i;
                         }
                         ImGui::SameLine();
@@ -350,13 +350,13 @@ namespace Chotra {
     }
 
     void Gui::AddMaterialModal() {
-
+        /*
         std::string name = "material_" + std::to_string(p_mainWindow->scene->materials.size());
         char str0[128];
         strcpy(str0, name.c_str());
         ImGui::Text("Name");
         ImGui::InputText(name.c_str(), str0, IM_ARRAYSIZE(str0));
-        /*
+        
         ImGui::Text("MTL file");
         ImGui::Spacing();
         if (ImGui::Button("Load from MTL"))
@@ -419,11 +419,10 @@ namespace Chotra {
         }
           */      
         if (ImGui::Button("Add", ImVec2(120, 0))) {
-            ImGui::CloseCurrentPopup();
-            //defaultMaterial.name = name;
-            //p_mainWindow->scene->materials.push_back(defaultMaterial);
-            //std::cout << "push_back new material" << std::endl;
 
+            p_mainWindow->scene->AddMaterial("models/default.mtl");
+            std::cout << "adding material" << std::endl;
+            ImGui::CloseCurrentPopup();
         }
         ImGui::SetItemDefaultFocus();
         ImGui::SameLine();
@@ -435,18 +434,17 @@ namespace Chotra {
     }
 
     void Gui::AddGeometryModal() {
-
-        std::string name = "geometry_" + std::to_string(p_mainWindow->scene->materials.size());
+        /*
+        std::string name = "geometry_" + std::to_string(p_mainWindow->scene->objModels.size());
         char str0[128];
         strcpy(str0, name.c_str());
         ImGui::Text("Name");
         ImGui::InputText(name.c_str(), str0, IM_ARRAYSIZE(str0));
-       
+       */
         if (ImGui::Button("Add", ImVec2(120, 0))) {
-            ObjModel defaultGeometry("models/default.obj");
-            defaultGeometry.name = name;
-            p_mainWindow->scene->objModels.push_back(defaultGeometry);
-            //std::cout << "push_back new geometry" << std::endl;
+            
+            p_mainWindow->scene->AddGeometry("models/default.obj", false);
+            std::cout << "adding geometry" << std::endl;
             ImGui::CloseCurrentPopup();
         }
         ImGui::SetItemDefaultFocus();

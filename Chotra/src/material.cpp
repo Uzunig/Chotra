@@ -2,11 +2,7 @@
 #include "stb_image.h"
 
 namespace Chotra {
-
-    Material::Material() : Material("models/default.mtl") {
-                
-    }
-
+        
     Material::Material(std::string mtl_path) {
 
         std::cout << "MTL path: " << mtl_path << std::endl;
@@ -68,6 +64,7 @@ namespace Chotra {
                 }
             }
         }
+        std::cout << "Create material" << std::endl;
     }
 
     void Material::ChangeTexture(unsigned int j, std::string& new_path) {

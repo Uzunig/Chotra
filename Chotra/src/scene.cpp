@@ -6,7 +6,7 @@ namespace Chotra {
         : environment("hdr/Sky.hdr") {
 
         LoadSceneFromFile("level1.lv");
-        
+
     }
 
     Scene::~Scene() {
@@ -14,6 +14,20 @@ namespace Chotra {
     }
 
     
+    void Scene::AddGeometry(std::string const& path, bool add_material) {
+
+        ObjModel obj = ObjModel(path);
+        objModels.push_back(obj);
+
+        if (add_material) {
+            AddMaterial(obj.mtl_path);
+        }
+    }
+    void Scene::AddMaterial(std::string const& path) {
+        Material mtl = Material(path);
+        materials.push_back(mtl);
+    }
+
     void Scene::Update(float deltaTime) {
         float dt = deltaTime * 50.0f;
         if (!sceneObjects.empty()) {
@@ -35,7 +49,7 @@ namespace Chotra {
             }
         }
     }
-        
+
     void Scene::DrawSceneObjects(Shader& shader) {
         if (!sceneObjects.empty()) {
             for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
@@ -63,7 +77,8 @@ namespace Chotra {
         std::ifstream level_file(path);
         if (!level_file) {
             std::cout << "The level file could not open for writing!" << std::endl;
-        } else {
+        }
+        else {
             while (level_file) {
                 std::string s;
                 level_file >> s;
@@ -71,18 +86,16 @@ namespace Chotra {
                 if (s == "ObjModel") {
                     std::string model_path;
                     level_file >> model_path;
-                    ObjModel obj = ObjModel(model_path);
-                    Material mtl = Material(obj.mtl_path);
-                    objModels.push_back(obj);
-                    materials.push_back(mtl);
-
-                } else if (s == "SceneObject") {
+                    AddGeometry(model_path, true);
+                    
+                }
+                else if (s == "SceneObject") {
                     std::string name;
                     level_file >> name;
 
                     std::string meshType;
                     level_file >> meshType;
-                  
+
                     unsigned int i;
                     level_file >> i;
 
@@ -103,16 +116,17 @@ namespace Chotra {
 
                     int visible;
                     level_file >> visible;
-                   
+
                     if (meshType == "OBJModel") {
                         sceneObjects.push_back(SceneObject(objModels[i], materials[i], name, position, angle, // TO DO: materials 
                             scale, velocity, rVelocity, visible));
-                    } 
+                    }
 
-                } else if (s == "SceneLight") {
+                }
+                else if (s == "SceneLight") {
                     std::string name;
                     level_file >> name;
-                    
+
                     std::string meshType;
                     level_file >> meshType;
 
@@ -136,7 +150,7 @@ namespace Chotra {
 
                     int visible;
                     level_file >> visible;
-                    
+
                     glm::vec3 color;
                     level_file >> color.x >> color.y >> color.z;
 
@@ -146,7 +160,7 @@ namespace Chotra {
                     if (meshType == "OBJModel") {
                         sceneLights.push_back(SceneLight(objModels[i], materials[i], name, position, angle,
                             scale, velocity, rVelocity, visible, color, intensity));
-                    } 
+                    }
                 }
             }
         }

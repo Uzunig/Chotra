@@ -54,6 +54,8 @@ namespace Chotra {
         // Инициализация начального состояния игры (загрузка всех шейдеров, текстур, уровней)
         
         void LoadSceneFromFile(std::string const& path);
+        void AddGeometry(std::string const& path, bool add_material);
+        void AddMaterial(std::string const& path);
 
        
         void Update(float dt);
