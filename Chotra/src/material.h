@@ -22,7 +22,7 @@ namespace Chotra {
 
     class Material {
     public:
-        Material() = default;
+        Material();
         Material(std::string mtl_path);
         std::string mtl_path;
         std::string name;

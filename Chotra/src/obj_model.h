@@ -9,6 +9,7 @@ namespace Chotra {
 
     class ObjModel : public Mesh {
     public:
+        ObjModel() = delete;
         ObjModel(std::string const& path);
         //virtual void Draw(Shader& shader);
        

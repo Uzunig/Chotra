@@ -5,6 +5,9 @@
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 
+#include "material.h"
+#include "obj_model.h"
+
 //#include "window.h"
 
 namespace Chotra {
@@ -31,7 +34,8 @@ namespace Chotra {
 
 
         int selected = -1;
-        
+        //Material defaultMaterial;
+        //ObjModel defaultGeometry;
 
         Gui(Window* p_mainWindow);
         void Init();
@@ -45,8 +49,8 @@ namespace Chotra {
         void Render();
 
         void AddMaterialModal();
+        void AddGeometryModal();
 
-        
     };
 
 } // namspace Chotra

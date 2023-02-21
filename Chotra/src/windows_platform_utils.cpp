@@ -6,6 +6,8 @@
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 
+#include "Chotra/application.h"
+
 namespace Chotra {
 
     std::string FileDialogs::OpenFile(const char* filter) {
@@ -41,8 +43,11 @@ namespace Chotra {
         //ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::Get().GetWindow().GetNativeWindow());
         ofn.lpstrFile = szFile;
         ofn.nMaxFile = sizeof(szFile);
+
+        if(SetCurrentDirectory(Application::GetMainDir().c_str()));
         if (GetCurrentDirectoryA(256, currentDir))
             ofn.lpstrInitialDir = currentDir;
+            
         ofn.lpstrFilter = filter;
         ofn.nFilterIndex = 1;
         ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;

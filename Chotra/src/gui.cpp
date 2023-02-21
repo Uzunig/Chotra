@@ -2,6 +2,7 @@
 #include "gui.h"
 #include "window.h"
 #include "platform_utils.h"
+#include "Chotra/application.h"
 
 namespace Chotra {
 
@@ -292,6 +293,19 @@ namespace Chotra {
                         ImGui::Text(" ");
                         ImGui::SameLine();
                     }
+
+                    // Always center this window when appearing
+                    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+                    if (ImGui::Button("Add geometry..")) {
+
+                        ImGui::OpenPopup("Add geometry");
+                    }
+                    if (ImGui::BeginPopupModal("Add geometry", NULL, ImGuiWindowFlags_MenuBar))
+                    {
+                        AddGeometryModal();
+                    }
                 }
                 ImGui::EndTabItem();
             }
@@ -315,9 +329,11 @@ namespace Chotra {
                     if (ImGui::Button("Add material..")) {
 
                         ImGui::OpenPopup("Add material");
+                    }
+                    if (ImGui::BeginPopupModal("Add material", NULL, ImGuiWindowFlags_MenuBar))
+                    {
                         AddMaterialModal();
                     }
-
                 }
                 ImGui::EndTabItem();
             }
@@ -334,91 +350,114 @@ namespace Chotra {
     }
 
     void Gui::AddMaterialModal() {
-        if (ImGui::BeginPopupModal("Add material", NULL, ImGuiWindowFlags_MenuBar))
+
+        std::string name = "material_" + std::to_string(p_mainWindow->scene->materials.size());
+        char str0[128];
+        strcpy(str0, name.c_str());
+        ImGui::Text("Name");
+        ImGui::InputText(name.c_str(), str0, IM_ARRAYSIZE(str0));
+        /*
+        ImGui::Text("MTL file");
+        ImGui::Spacing();
+        if (ImGui::Button("Load from MTL"))
         {
-            /*Material material;
-            std::string name;
-            char str0[128];
-            strcpy(str0, name.c_str());
-            ImGui::Text("Name");
-            ImGui::InputText(name.c_str(), str0, IM_ARRAYSIZE(str0));
-
-            ImGui::Text("MTL file");
-            ImGui::Spacing();
-            if (ImGui::Button("Open MTL"))
-            {
-                std::string s = FileDialogs::OpenFile("");
-                if (s != "") {
-                    Material material1(s);
-                    material = material1;
-                }
-            }
-
-            ImGui::Spacing();
-            ImGui::Separator();
-            ImGui::Text("Textures:");
-            if (material.textures.size() != 0) {
-                for (int j = 0; j < material.textures.size(); ++j) {
-                    if (ImGui::Button(("T" + std::to_string(j)).c_str()))
-                    {
-                        std::string s = FileDialogs::OpenFile("");
-                        if ((s != "") && (s != material.textures[j].path)) {
-                            material.ChangeTexture(j, s);
+            std::string s = FileDialogs::OpenFile("");
+            if (s != "") {
+                
+                std::string mainDir = Application::GetMainDir();
+                std::size_t ind = s.find(mainDir); // Find the starting position of substring in the string
+                if (ind != std::string::npos) {
+                    s.erase(ind, mainDir.length() + 1); // erase function takes two parameter, the starting index in the string from where you want to erase characters and total no of characters you want to erase.
+                    for (int i = 0; i < s.length(); ++i) {
+                        if (s[i] == '\\') {
+                            s[i] = '/'; //TO DO using std::replace()
                         }
                     }
-                    ImGui::SameLine();
-                    char str0[128];
-                    strcpy(str0, material.textures[j].path.c_str());
-                    ImGui::InputText(material.textures[j].type.c_str(), str0, IM_ARRAYSIZE(str0));
                 }
-            }
-            else {
-                Texture albedoMap;
-                Texture normalMap;
-                Texture metallicMap;
-                Texture roughnessMap;
-                Texture aoMap;
-                if (ImGui::Button(("T" + std::to_string(0)).c_str()))
-                {
-                    std::string s = FileDialogs::OpenFile("");
-                    if (s != "") {
-                        albedoMap.id = material.LoadTexture(s);
-                        albedoMap.type = "albedoMap";
-                        albedoMap.path = s;
-                    }
+                else {
+                    std::cout << "Substring does not exist in the string\n";
                 }
-                ImGui::SameLine();
-                char str0[128];
-                strcpy(str0, albedoMap.path.c_str());
-                ImGui::InputText(albedoMap.type.c_str(), str0, IM_ARRAYSIZE(str0));
-
-                if (ImGui::Button(("T" + std::to_string(1)).c_str()))
-                {
-                    std::string s = FileDialogs::OpenFile("");
-                    if (s != "") {
-                        normalMap.id = material.LoadTexture(s);
-                        normalMap.type = "normalMap";
-                        normalMap.path = s;
-                    }
-                }
-                ImGui::SameLine();
-                strcpy(str0, normalMap.path.c_str());
-                ImGui::InputText(normalMap.type.c_str(), str0, IM_ARRAYSIZE(str0));
-
-            }*/
-
-
-            if (ImGui::Button("Add", ImVec2(120, 0))) {
-                ImGui::CloseCurrentPopup();
+                newMaterial = Material(s);
             }
-            ImGui::SetItemDefaultFocus();
-            ImGui::SameLine();
-            if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::EndPopup();
         }
+        
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Text("Textures:");
+
+        // Always center this window when appearing
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+               
+
+        for (int j = 0; j < newMaterial.textures.size(); ++j) {
+            if (ImGui::Button(("T" + std::to_string(j)).c_str()))
+            {
+                std::string s = FileDialogs::OpenFile("");
+                if ((s != "") && (s != newMaterial.textures[j].path)) {
+
+                    std::string mainDir = Application::GetMainDir();
+                    std::size_t ind = s.find(mainDir); // Find the starting position of substring in the string
+                    if (ind != std::string::npos) {
+                        s.erase(ind, mainDir.length() + 1); // erase function takes two parameter, the starting index in the string from where you want to erase characters and total no of characters you want to erase.
+                        for (int i = 0; i < s.length(); ++i) {
+                            if (s[i] == '\\') {
+                                s[i] = '/'; //TO DO using std::replace()
+                            }
+                        }
+                    }
+                    else {
+                        std::cout << "Substring does not exist in the string\n";
+                    }
+                    newMaterial.ChangeTexture(j, s);
+                }
+            }
+            ImGui::SameLine();
+            char str0[128];
+            strcpy(str0, newMaterial.textures[j].path.c_str());
+            ImGui::InputText(newMaterial.textures[j].type.c_str(), str0, IM_ARRAYSIZE(str0));
+        }
+          */      
+        if (ImGui::Button("Add", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup();
+            //defaultMaterial.name = name;
+            //p_mainWindow->scene->materials.push_back(defaultMaterial);
+            //std::cout << "push_back new material" << std::endl;
+
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+
     }
+
+    void Gui::AddGeometryModal() {
+
+        std::string name = "geometry_" + std::to_string(p_mainWindow->scene->materials.size());
+        char str0[128];
+        strcpy(str0, name.c_str());
+        ImGui::Text("Name");
+        ImGui::InputText(name.c_str(), str0, IM_ARRAYSIZE(str0));
+       
+        if (ImGui::Button("Add", ImVec2(120, 0))) {
+            ObjModel defaultGeometry("models/default.obj");
+            defaultGeometry.name = name;
+            p_mainWindow->scene->objModels.push_back(defaultGeometry);
+            //std::cout << "push_back new geometry" << std::endl;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+
+    }
+
 
 } // namspace Chotra
 

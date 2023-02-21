@@ -2,6 +2,7 @@
 
 namespace Chotra {
 
+    
     ObjModel::ObjModel(std::string const& path) {
 
         LoadModel(path);

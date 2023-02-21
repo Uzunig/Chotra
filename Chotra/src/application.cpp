@@ -17,7 +17,13 @@ namespace Chotra {
 
     }
 
+    std::string Application::GetMainDir() {
+        return mainDir;
+    }
+
     int Application::Start() {
+
+        if (GetCurrentDirectoryA(256, mainDir)) {}
 
         mainWindow = std::make_unique<Window>("Chotra Engine", 1920, 1080); //1920 1080
 

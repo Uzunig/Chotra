@@ -3,8 +3,13 @@
 
 namespace Chotra {
 
+    Material::Material() : Material("models/default.mtl") {
+                
+    }
+
     Material::Material(std::string mtl_path) {
 
+        std::cout << "MTL path: " << mtl_path << std::endl;
         std::string directory = mtl_path.substr(0, mtl_path.find_last_of('/')) + '/';
         std::ifstream mtl_file(mtl_path);
         if (!mtl_file) {
@@ -12,6 +17,7 @@ namespace Chotra {
 
         }
         else {
+
             name = mtl_path.substr(mtl_path.find_last_of('/') + 1, mtl_path.length());
             this->mtl_path = mtl_path;
 
@@ -63,16 +69,17 @@ namespace Chotra {
             }
         }
     }
+
     void Material::ChangeTexture(unsigned int j, std::string& new_path) {
-        
+
         unsigned int textureID = this->textures[j].id;
         glDeleteTextures(1, &textureID);
-        
+
         this->textures[j].id = LoadTexture(new_path);
     }
 
-     unsigned int Material::LoadTexture(std::string& path) {
-
+    unsigned int Material::LoadTexture(std::string& path) {
+        
         unsigned int textureID;
         glGenTextures(1, &textureID);
 
