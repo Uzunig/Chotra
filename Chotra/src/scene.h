@@ -26,13 +26,13 @@
 #include "environment.h"
 
 
+
 namespace Chotra {
         
     class Scene {
     public:
                
-              
-
+       
         std::vector<ObjModel> objModels;
         std::vector<Material> materials;
  
@@ -54,7 +54,8 @@ namespace Chotra {
         // Инициализация начального состояния игры (загрузка всех шейдеров, текстур, уровней)
         
         void LoadSceneFromFile(std::string const& path);
-        void AddGeometry(std::string const& path, bool add_material);
+        
+        void AddGeometry(std::string const& path, bool add_material = false, std::string nameNumber = "");
         void AddMaterial(std::string const& path);
 
        

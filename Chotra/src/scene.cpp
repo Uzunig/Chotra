@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "renderer.h"
 
 namespace Chotra {
 
@@ -14,18 +15,22 @@ namespace Chotra {
     }
 
     
-    void Scene::AddGeometry(std::string const& path, bool add_material) {
-
-        ObjModel obj = ObjModel(path);
+    void Scene::AddGeometry(std::string const& path, bool add_material, std::string nameNumber) {
+        
+        ObjModel obj = ObjModel(path, nameNumber);
         objModels.push_back(obj);
-
+        std::cout << "Geometry added" << std::endl;
         if (add_material) {
             AddMaterial(obj.mtl_path);
         }
+        
     }
     void Scene::AddMaterial(std::string const& path) {
+        
         Material mtl = Material(path);
         materials.push_back(mtl);
+        std::cout << "Material added" << std::endl;
+        
     }
 
     void Scene::Update(float deltaTime) {
@@ -73,7 +78,7 @@ namespace Chotra {
     }
 
     void Scene::LoadSceneFromFile(std::string const& path) {
-
+        
         std::ifstream level_file(path);
         if (!level_file) {
             std::cout << "The level file could not open for writing!" << std::endl;
@@ -164,6 +169,7 @@ namespace Chotra {
                 }
             }
         }
+       
     }
 } // namspace Chotra
 

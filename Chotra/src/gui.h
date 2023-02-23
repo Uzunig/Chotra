@@ -34,9 +34,7 @@ namespace Chotra {
 
 
         int selected = -1;
-        //Material defaultMaterial;
-        //ObjModel defaultGeometry;
-
+        
         Gui(Window* p_mainWindow);
         void Init();
         void Update();

@@ -299,11 +299,12 @@ namespace Chotra {
                     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
                     if (ImGui::Button("Add geometry..")) {
-
+                        p_mainWindow->renderer->passiveMode = true;
                         ImGui::OpenPopup("Add geometry");
                     }
                     if (ImGui::BeginPopupModal("Add geometry", NULL, ImGuiWindowFlags_MenuBar))
                     {
+                        
                         AddGeometryModal();
                     }
                 }
@@ -327,7 +328,7 @@ namespace Chotra {
                     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
                     if (ImGui::Button("Add material..")) {
-
+                        p_mainWindow->renderer->passiveMode = true;
                         ImGui::OpenPopup("Add material");
                     }
                     if (ImGui::BeginPopupModal("Add material", NULL, ImGuiWindowFlags_MenuBar))
@@ -349,7 +350,35 @@ namespace Chotra {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
+    void Gui::AddGeometryModal() {
+
+        /*
+        std::string name = "geometry_" + std::to_string(p_mainWindow->scene->objModels.size());
+        char str0[128];
+        strcpy(str0, name.c_str());
+        ImGui::Text("Name");
+        ImGui::InputText(name.c_str(), str0, IM_ARRAYSIZE(str0));
+       */
+        std::string nameNumber = std::to_string(p_mainWindow->scene->objModels.size() + 1);
+        if (ImGui::Button("Add", ImVec2(120, 0))) {
+            std::cout << "adding geometry click" << std::endl;
+            p_mainWindow->scene->AddGeometry("models/default.obj", false, nameNumber);
+            ImGui::CloseCurrentPopup();
+            p_mainWindow->renderer->passiveMode = false;
+
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup();
+            p_mainWindow->renderer->passiveMode = false;
+        }
+        ImGui::EndPopup();
+
+    }
+
     void Gui::AddMaterialModal() {
+        
         /*
         std::string name = "material_" + std::to_string(p_mainWindow->scene->materials.size());
         char str0[128];
@@ -418,44 +447,25 @@ namespace Chotra {
             ImGui::InputText(newMaterial.textures[j].type.c_str(), str0, IM_ARRAYSIZE(str0));
         }
           */      
-        if (ImGui::Button("Add", ImVec2(120, 0))) {
 
+        if (ImGui::Button("Add", ImVec2(120, 0))) {
+            
             p_mainWindow->scene->AddMaterial("models/default.mtl");
             std::cout << "adding material" << std::endl;
             ImGui::CloseCurrentPopup();
+            p_mainWindow->renderer->passiveMode = false;
         }
         ImGui::SetItemDefaultFocus();
         ImGui::SameLine();
         if (ImGui::Button("Cancel", ImVec2(120, 0))) {
             ImGui::CloseCurrentPopup();
+            p_mainWindow->renderer->passiveMode = false;
         }
         ImGui::EndPopup();
-
+        
     }
 
-    void Gui::AddGeometryModal() {
-        /*
-        std::string name = "geometry_" + std::to_string(p_mainWindow->scene->objModels.size());
-        char str0[128];
-        strcpy(str0, name.c_str());
-        ImGui::Text("Name");
-        ImGui::InputText(name.c_str(), str0, IM_ARRAYSIZE(str0));
-       */
-        if (ImGui::Button("Add", ImVec2(120, 0))) {
-            
-            p_mainWindow->scene->AddGeometry("models/default.obj", false);
-            std::cout << "adding geometry" << std::endl;
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::SetItemDefaultFocus();
-        ImGui::SameLine();
-        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
-
-    }
-
+    
 
 } // namspace Chotra
 

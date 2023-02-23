@@ -64,7 +64,7 @@ namespace Chotra {
                 }
             }
         }
-        std::cout << "Create material" << std::endl;
+        std::cout << "Material created" << std::endl;
     }
 
     void Material::ChangeTexture(unsigned int j, std::string& new_path) {

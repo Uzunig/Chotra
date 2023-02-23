@@ -114,13 +114,24 @@ namespace Chotra {
 
     void Renderer::Render() {
 
-        if (renderingMode == 0) {
-            ForwardRender();
+        if (!passiveMode) {
+            if (renderingMode == 0) {
+                ForwardRender();
 
-        } else if (renderingMode == 1) {
-            DeferredRender();
+            }
+            else if (renderingMode == 1) {
+                DeferredRender();
 
+            }
         }
+        else {
+            PassiveRender();
+        }
+    }
+
+    void Renderer::PassiveRender() {
+
+        RenderOnScreen();
     }
 
     void Renderer::ForwardRender() {

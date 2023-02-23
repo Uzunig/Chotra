@@ -8,6 +8,7 @@
 
 #include "platform_utils.h"
 #include "gui.h"
+#include "scene.h"
 
 namespace Chotra {
 

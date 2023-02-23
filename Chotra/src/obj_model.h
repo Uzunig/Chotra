@@ -10,7 +10,7 @@ namespace Chotra {
     class ObjModel : public Mesh {
     public:
         ObjModel() = delete;
-        ObjModel(std::string const& path);
+        ObjModel(std::string const& path, std::string nameNumber = "");
         //virtual void Draw(Shader& shader);
        
         std::string name;
@@ -19,6 +19,7 @@ namespace Chotra {
     private:
         unsigned int VBO, EBO;
         
+       
         void LoadModel(std::string const& obj_path);
         void SetupMesh();
     };

@@ -59,6 +59,7 @@ namespace Chotra {
 
              
         int renderingMode = 1;
+        bool passiveMode = false;
 
         bool enableMSAA = true;
         int samplesNumber = 16;
@@ -148,6 +149,7 @@ namespace Chotra {
         void Render();
         void ForwardRender();
         void DeferredRender();
+        void PassiveRender();
 
         void DrawDebuggingQuads();
 
