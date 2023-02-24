@@ -14,7 +14,7 @@ namespace Chotra {
         }
         else {
 
-            name = mtl_path.substr(mtl_path.find_last_of('/') + 1, mtl_path.length());
+            
             this->mtl_path = mtl_path;
 
             while (mtl_file) {
@@ -64,6 +64,7 @@ namespace Chotra {
                 }
             }
         }
+        name = mtl_path.substr(mtl_path.find_last_of('/') + 1, mtl_path.length());
         std::cout << "Material created" << std::endl;
     }
 

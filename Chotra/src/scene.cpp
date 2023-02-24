@@ -20,6 +20,7 @@ namespace Chotra {
         ObjModel obj = ObjModel(path, nameNumber);
         objModels.push_back(obj);
         std::cout << "Geometry added" << std::endl;
+
         if (add_material) {
             AddMaterial(obj.mtl_path);
         }
@@ -35,6 +36,7 @@ namespace Chotra {
 
     void Scene::Update(float deltaTime) {
         float dt = deltaTime * 50.0f;
+       
         if (!sceneObjects.empty()) {
             for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
                 if (sceneObjects[i].visible) {

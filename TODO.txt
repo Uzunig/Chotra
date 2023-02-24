@@ -1,4 +1,5 @@
 To create suitable architecture for engine!
+class objModel inheritanse
 
 To pass to JSON format and to make loader for collection files 
 To change vector objModels to vector geometry that containes all types og geometry

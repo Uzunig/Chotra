@@ -449,9 +449,8 @@ namespace Chotra {
           */      
 
         if (ImGui::Button("Add", ImVec2(120, 0))) {
-            
-            p_mainWindow->scene->AddMaterial("models/default.mtl");
             std::cout << "adding material" << std::endl;
+            p_mainWindow->scene->AddMaterial("models/default.mtl");
             ImGui::CloseCurrentPopup();
             p_mainWindow->renderer->passiveMode = false;
         }
