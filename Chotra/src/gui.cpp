@@ -55,10 +55,11 @@ namespace Chotra {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::ShowDemoWindow();
+        //ImGui::ShowDemoWindow();
 
         ShowTopBar();
         ShowCollectionBar();
+        ShowToolsBar();
         ShowAssetsBar();
         ShowPropertiesBar();
         ShowScoreBar();
@@ -119,6 +120,74 @@ namespace Chotra {
         }
 
         ImGui::End();
+    }
+
+    void Gui::ShowToolsBar() {
+
+        ImGui::SetNextWindowPos(ImVec2(p_mainWindow->GetWidth() - 700, 0));
+        ImGui::SetNextWindowSize(ImVec2(350, 0));
+
+        ImGui::Begin("Rendering options");
+        ImGui::RadioButton("Forward shading", &p_mainWindow->renderer->renderingMode, 0);
+        ImGui::RadioButton("Deferred shading", &p_mainWindow->renderer->renderingMode, 1);
+
+        if (ImGui::CollapsingHeader("Environment")) {
+            ImGui::ColorPicker4("Color", p_mainWindow->renderer->backgroundColor);
+            ImGui::Checkbox("Draw skybox", &p_mainWindow->renderer->drawSkybox);
+            ImGui::SliderFloat("Background exposure", &p_mainWindow->renderer->backgroundExposure, 0.0f, 10.0f);
+        }
+
+        if (ImGui::CollapsingHeader("Camera settings")) {
+            ImGui::SliderFloat("Speed", &p_mainWindow->camera->MovementSpeed, 3.0f, 30.0f);
+            ImGui::SliderFloat("Zoom", &p_mainWindow->camera->Zoom, 15.0f, 90.0f);
+            //ImGui::Checkbox("Perspective projection", &renderer->perspectiveProjection);
+
+        }
+
+
+        if (p_mainWindow->renderer->renderingMode == 0) {
+
+            if (ImGui::Checkbox("MSAA", &p_mainWindow->renderer->enableMSAA)) {
+                //add input samplesNumber
+            }
+        }
+
+        if (p_mainWindow->renderer->renderingMode == 1) {
+
+            if (ImGui::CollapsingHeader("SSAO")) {
+                ImGui::SliderInt("Kernel size", &p_mainWindow->renderer->kernelSizeSSAO, 0, 64);
+                ImGui::SliderFloat("radius SSAO", &p_mainWindow->renderer->radiusSSAO, 0.1f, 1.0f);
+                ImGui::SliderFloat("distanceBias", &p_mainWindow->renderer->biasSSAO, 0.001f, 1.0f);
+
+            }
+
+            if (ImGui::CollapsingHeader("SSR")) {
+                ImGui::SliderFloat("biasSSR", &p_mainWindow->renderer->biasSSR, 0.001f, 20.0f);
+                ImGui::SliderFloat("rayStep", &p_mainWindow->renderer->rayStep, 0.001f, 5.0f);
+                ImGui::SliderInt("iterationCount", &p_mainWindow->renderer->iterationCount, 0, 3000);
+                ImGui::SliderFloat("accuracy", &p_mainWindow->renderer->accuracySSR, 0.001f, 5.0f);
+
+            }
+        }
+
+        if (ImGui::CollapsingHeader("Post effects")) {
+            ImGui::SliderFloat("Exposure", &p_mainWindow->renderer->exposure, 0.0f, 10.0f);
+            ImGui::Checkbox("Bloom", &p_mainWindow->renderer->bloom);
+            ImGui::Checkbox("Gamma correction", &p_mainWindow->renderer->gammaCorrection);
+        }
+
+        if (ImGui::CollapsingHeader("Shadows")) {
+            ImGui::Checkbox("Show shadows", &p_mainWindow->renderer->showShadows);
+            if (p_mainWindow->renderer->showShadows) {
+
+                ImGui::SliderFloat("Bias min", &p_mainWindow->renderer->shadowBiasMin, 0.0f, 0.1f);
+                ImGui::SliderFloat("Bias max", &p_mainWindow->renderer->shadowBiasMax, 0.0f, 0.1f);
+
+            }
+
+        }
+        ImGui::End();
+
     }
 
     void Gui::ShowCollectionBar() {

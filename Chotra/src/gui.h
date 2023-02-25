@@ -40,6 +40,7 @@ namespace Chotra {
         void Update();
         void Show();
         void ShowTopBar();
+        void ShowToolsBar();
         void ShowCollectionBar();
         void ShowPropertiesBar();
         void ShowScoreBar();
