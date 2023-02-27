@@ -10,6 +10,7 @@ namespace Chotra {
 
     class FileDialogs {
     public:
+        static int wWinMain();
         static std::string OpenFile(const char* filter);
         static std::string SaveFile(const char* filetr);
 

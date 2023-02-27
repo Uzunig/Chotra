@@ -46,9 +46,7 @@ namespace Chotra {
 
         void SetFirstMouse(bool firstMouse);
         bool GetFirstMouse();
-
-        void ShowProperties(int selected);
-
+                
         std::unique_ptr<Camera> camera;
         std::unique_ptr<class Scene> scene;
         //std::unique_ptr<Background> background;

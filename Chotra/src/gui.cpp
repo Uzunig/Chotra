@@ -274,6 +274,7 @@ namespace Chotra {
 
             if (ImGui::Button("..."))
             {
+                FileDialogs::wWinMain();
                 std::string s = FileDialogs::OpenFile("");
                 if ((s != "") && (s != p_mainWindow->scene->objModels[i].obj_path)) {
                     // TO DO: Check selectet object before any change.
