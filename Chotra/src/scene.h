@@ -19,7 +19,6 @@
 
 #include "sphere.h"
 #include "cylinder.h"
-#include "scene_object.h"
 #include "scene_light.h"
 #include "dashboard.h"
 #include "obj_model.h"

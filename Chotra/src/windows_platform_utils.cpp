@@ -1,12 +1,15 @@
 #include "platform_utils.h"
 
+#include <iostream>
 #include <Windows.h>
-
+#include <commdlg.h>
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 
 #include "Chotra/application.h"
+
+#define GLFEW_EXPOSE_NATIVE_WIN32
 
 namespace Chotra {
 
@@ -44,17 +47,18 @@ namespace Chotra {
         ofn.lpstrFile = szFile;
         ofn.nMaxFile = sizeof(szFile);
 
-        if(SetCurrentDirectory(Application::GetMainDir().c_str()));
+        if (SetCurrentDirectory(Application::GetMainDir().c_str()));
         if (GetCurrentDirectoryA(256, currentDir))
             ofn.lpstrInitialDir = currentDir;
-            
+
         ofn.lpstrFilter = filter;
         ofn.nFilterIndex = 1;
         ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
-        if (GetOpenFileNameA(&ofn) == TRUE)
+        if (GetOpenFileNameA(&ofn) == TRUE) {
+            std::cout << "Open file dialog" << std::endl;
             return ofn.lpstrFile;
-
+        }
         return std::string();
 
     }

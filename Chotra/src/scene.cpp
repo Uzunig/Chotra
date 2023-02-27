@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "renderer.h"
+#include "scene_object.h"
 
 namespace Chotra {
 
@@ -125,8 +126,9 @@ namespace Chotra {
                     level_file >> visible;
 
                     if (meshType == "OBJModel") {
-                        sceneObjects.push_back(SceneObject(objModels[i], materials[i], name, position, angle, // TO DO: materials 
+                        sceneObjects.push_back(SceneObject(*this, i, i, name, position, angle, // TO DO: materials 
                             scale, velocity, rVelocity, visible));
+                        std::cout << "SceneObject added " << std::endl;
                     }
 
                 }
@@ -165,13 +167,13 @@ namespace Chotra {
                     level_file >> intensity;
 
                     if (meshType == "OBJModel") {
-                        sceneLights.push_back(SceneLight(objModels[i], materials[i], name, position, angle,
+                        sceneLights.push_back(SceneLight(*this, i, i, name, position, angle,
                             scale, velocity, rVelocity, visible, color, intensity));
+                        std::cout << "SceneLight added " << std::endl;
                     }
                 }
             }
         }
-       
     }
 } // namspace Chotra
 

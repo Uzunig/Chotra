@@ -14,8 +14,9 @@ namespace Chotra {
 
     class SceneObject {
     public:
-        Mesh& mesh;
-        Material& material;
+        class Scene& scene;
+        unsigned int meshIndex;
+        unsigned int materialIndex;
 
         std::string name;
        
@@ -29,7 +30,7 @@ namespace Chotra {
         int visible;
         
 
-        SceneObject(Mesh& mesh, Material& material, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, int visible);
+        SceneObject(Scene& scene, unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, int visible);
         void Draw(Shader& shader);
         void UpdateModelMatrix();
     };
