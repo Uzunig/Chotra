@@ -7,21 +7,21 @@ namespace Chotra {
 
     Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene)
         : width(width), height(height), camera(camera), scene(scene),
-        pbrShader("shaders/pbr_shader.vs", "shaders/pbr_shader.fs"),
-        simpleDepthShader("shaders/shadow_depth.vs", "shaders/shadow_depth.fs"),
-        lightsShader("shaders/pbr_shader.vs", "shaders/lights_shader.fs"),
-        screenShader("shaders/screen_shader.vs", "shaders/screen_shader.fs"),
-        downSamplingShader("shaders/screen_shader.vs", "shaders/downsampling.fs"),
-        combineShader("shaders/screen_shader.vs", "shaders/combine.fs"),
-        shaderBlur("shaders/screen_shader.vs", "shaders/blur.fs"),
-        shaderBloomFinal("shaders/screen_shader.vs", "shaders/bloom_final.fs"),
-        backgroundShader("shaders/background.vs", "shaders/background.fs"),
-        shaderSSAO("shaders/screen_shader.vs", "shaders/ssao.fs"),
-        shaderSSAOBlur("shaders/screen_shader.vs", "shaders/ssao_blur.fs"),
+        pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
+        simpleDepthShader("resources/shaders/shadow_depth.vs", "resources/shaders/shadow_depth.fs"),
+        lightsShader("resources/shaders/pbr_shader.vs", "resources/shaders/lights_shader.fs"),
+        screenShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_shader.fs"),
+        downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/downsampling.fs"),
+        combineShader("resources/shaders/screen_shader.vs", "resources/shaders/combine.fs"),
+        shaderBlur("resources/shaders/screen_shader.vs", "resources/shaders/blur.fs"),
+        shaderBloomFinal("resources/shaders/screen_shader.vs", "resources/shaders/bloom_final.fs"),
+        backgroundShader("resources/shaders/background.vs", "resources/shaders/background.fs"),
+        shaderSSAO("resources/shaders/screen_shader.vs", "resources/shaders/ssao.fs"),
+        shaderSSAOBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssao_blur.fs"),
         //shaderSSR("shaders/screen_shader.vs", "shaders/ssr.fs"),
-        shaderDeferredGeometryPass("shaders/deferred_geometry_pass.vs", "shaders/deferred_geometry_pass.fs"),
-        shaderDeferredLightingPass("shaders/deferred_lighting_pass.vs", "shaders/deferred_lighting_pass.fs"),
-        shaderRenderOnScreen("shaders/screen_shader.vs", "shaders/render_on_screen.fs") {
+        shaderDeferredGeometryPass("resources/shaders/deferred_geometry_pass.vs", "resources/shaders/deferred_geometry_pass.fs"),
+        shaderDeferredLightingPass("resources/shaders/deferred_lighting_pass.vs", "resources/shaders/deferred_lighting_pass.fs"),
+        shaderRenderOnScreen("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") {
 
 
         GenerateScreenTexture();

@@ -6,13 +6,21 @@
 
 namespace Chotra {
 
-    SceneObject::SceneObject(Scene& scene, unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
-        glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, int visible)
-        : scene(scene), meshIndex(meshIndex), materialIndex(materialIndex), name(name), position(position), angle(angle),
+    SceneObject::SceneObject(Scene& scene, unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
+        glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible)
+        : scene(scene), geometryIndex(geometryIndex), materialIndex(materialIndex), name(name), position(position), angle(angle),
         scale(scale), velocity(velocity), rVelocity(rVelocity), visible(visible) {
 
         UpdateModelMatrix();
         std::cout << "SceneObject created " << std::endl;
+    }
+
+    void SceneObject::ChangeGeometryIndex(int geometryIndex) {
+        this->geometryIndex = geometryIndex;
+    }
+
+    void SceneObject::ChangeMaterialIndex(int materialIndex) {
+        this->materialIndex = materialIndex;
     }
 
     void SceneObject::Draw(Shader& shader) {
@@ -33,8 +41,8 @@ namespace Chotra {
    
 
         // Отрисовываем меш
-        glBindVertexArray(scene.objModels[meshIndex].VAO);
-        glDrawArrays(GL_TRIANGLES, 0, scene.objModels[meshIndex].vertices.size());
+        glBindVertexArray(scene.objModels[geometryIndex].VAO);
+        glDrawArrays(GL_TRIANGLES, 0, scene.objModels[geometryIndex].vertices.size());
         //glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
         glBindVertexArray(0);
 

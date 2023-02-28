@@ -32,8 +32,9 @@ namespace Chotra {
 
         ImGuiWindowFlags window_flags = 0;
 
-
+        char str0[128];
         int selected = -1;
+        int chosed = -1;
         
         Gui(Window* p_mainWindow);
         void Init();
@@ -47,8 +48,12 @@ namespace Chotra {
         void ShowAssetsBar();
         void Render();
 
-        void AddMaterialModal();
         void AddGeometryModal();
+        void AddMaterialModal();
+        void AddSceneObjectModal();
+        void ChangeGeometryIndexModal(int sceneObjectIndex);
+        void ChangeMaterialIndexModal(int sceneObjectIndex);
+        
 
     };
 

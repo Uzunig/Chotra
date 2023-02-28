@@ -15,22 +15,25 @@ namespace Chotra {
     class SceneObject {
     public:
         class Scene& scene;
-        unsigned int meshIndex;
+        int geometryIndex;
         unsigned int materialIndex;
 
         std::string name;
        
         glm::vec3 position;
         glm::vec3 angle;
-        glm::vec3 pivot;
         glm::vec3 scale;
+        //glm::vec3 pivot;
         glm::mat4 modelMatrix;
         glm::vec3 velocity;
         glm::vec3 rVelocity;
-        int visible;
+        bool visible;
         
 
-        SceneObject(Scene& scene, unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, int visible);
+        SceneObject(Scene& scene, unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position = glm::vec3(0.0f), glm::vec3 angle = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 rVelocity = glm::vec3(0.0f), bool visible = true);
+        
+        void ChangeGeometryIndex(int geometryIndex);
+        void ChangeMaterialIndex(int materialIndex);
         void Draw(Shader& shader);
         void UpdateModelMatrix();
     };

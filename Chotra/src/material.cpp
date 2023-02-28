@@ -3,7 +3,7 @@
 
 namespace Chotra {
         
-    Material::Material(std::string mtl_path) {
+    Material::Material(std::string mtl_path, std::string nameNumber) {
 
         std::cout << "MTL path: " << mtl_path << std::endl;
         std::string directory = mtl_path.substr(0, mtl_path.find_last_of('/')) + '/';
@@ -64,16 +64,30 @@ namespace Chotra {
                 }
             }
         }
-        name = mtl_path.substr(mtl_path.find_last_of('/') + 1, mtl_path.length());
+        name = mtl_path.substr(mtl_path.find_last_of('/') + 1, mtl_path.length()) + nameNumber;
         std::cout << "Material created" << std::endl;
     }
 
     void Material::ChangeTexture(unsigned int j, std::string& new_path) {
 
-        unsigned int textureID = this->textures[j].id;
+        unsigned int textureID = textures[j].id;
         glDeleteTextures(1, &textureID);
 
-        this->textures[j].id = LoadTexture(new_path);
+        textures[j].id = LoadTexture(new_path);
+        textures[j].path = new_path;
+    }
+
+    void Material::DeleteTexture(unsigned int j) {
+
+        glDeleteTextures(1, &textures[j].id);
+    }
+
+    void Material::DeleteAllTextures() {
+
+        for (unsigned int j = 0; j < textures.size(); ++j) {
+            glDeleteTextures(1, &textures[j].id);
+        }
+        textures.clear();
     }
 
     unsigned int Material::LoadTexture(std::string& path) {
@@ -116,6 +130,7 @@ namespace Chotra {
 
         return textureID;
     }
+     
 
 } // namspace Chotra
 

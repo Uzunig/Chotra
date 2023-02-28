@@ -116,7 +116,7 @@ namespace Chotra {
         }
         else {
             mtl_file.close();
-            mtl_path = directory + mtl_filename;
+           
             /*while (mtl_file) {
                 std::string s;
                 mtl_file >> s;
@@ -189,6 +189,14 @@ namespace Chotra {
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
 
         glBindVertexArray(0);
+    }
+
+    void ObjModel::DeleteBuffers() {
+
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
+        glDeleteBuffers(1, &EBO);
+
     }
 } // namspace Chotra
 

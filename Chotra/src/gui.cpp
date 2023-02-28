@@ -55,7 +55,7 @@ namespace Chotra {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        //ImGui::ShowDemoWindow();
+        ImGui::ShowDemoWindow();
 
         ShowTopBar();
         ShowCollectionBar();
@@ -199,12 +199,23 @@ namespace Chotra {
 
         if (ImGui::TreeNode("Scene collection")) {
 
+            if (ImGui::Button("Add scene object..")) {
+                p_mainWindow->renderer->passiveMode = true;
+                ImGui::OpenPopup("Add scene object");
+            }
+            if (ImGui::BeginPopupModal("Add scene object", NULL, ImGuiWindowFlags_MenuBar))
+            {
+
+                AddSceneObjectModal();
+            }
+
             if (ImGui::TreeNode("Scene objects"))
             {
                 if (!p_mainWindow->scene->objModels.empty()) {
                     for (int i = 0; i < p_mainWindow->scene->sceneObjects.size(); ++i) {
-                        if (ImGui::Selectable(("Objects " + std::to_string(i)).c_str(), selected == i)) {
+                        if (ImGui::Selectable(p_mainWindow->scene->sceneObjects[i].name.c_str(), selected == i)) {
                             selected = i;
+                            strcpy(str0, p_mainWindow->scene->sceneObjects[i].name.c_str());
                         }
                     }
                 }
@@ -247,10 +258,72 @@ namespace Chotra {
             ImGui::Text("Scene object:");
             ImGui::SameLine();
             ImGui::Text(p_mainWindow->scene->sceneObjects[i].name.c_str());
-            ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
 
+
+
+            ImGui::Text("Name");
+            ImGui::InputText(p_mainWindow->scene->sceneObjects[i].name.c_str(), str0, IM_ARRAYSIZE(str0));
+            if (ImGui::Button("Apply")) {
+                p_mainWindow->scene->sceneObjects[i].name = str0;
+                std::cout << "InputText true " << std::endl;
+            }
+
+
+            ImGui::Checkbox(("visible " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].visible);
+
+            ImGui::Text("Geometry: ");
+            ImGui::SameLine();
+            if (ImGui::Button(p_mainWindow->scene->objModels[p_mainWindow->scene->sceneObjects[i].geometryIndex].name.c_str())) {
+                p_mainWindow->renderer->passiveMode = true;
+                ImGui::OpenPopup("Geometry");
+            }
+            if (ImGui::BeginPopupModal("Geometry", NULL, ImGuiWindowFlags_MenuBar))
+            {
+                chosed = -1;
+                ChangeGeometryIndexModal(i);
+            }
+
+            ImGui::Text("Material: ");
+            ImGui::SameLine();
+            if (ImGui::Button(p_mainWindow->scene->materials[p_mainWindow->scene->sceneObjects[i].materialIndex].name.c_str())) {
+                p_mainWindow->renderer->passiveMode = true;
+                ImGui::OpenPopup("Materials");
+            }
+            if (ImGui::BeginPopupModal("Materials", NULL, ImGuiWindowFlags_MenuBar))
+            {
+                chosed = -1;
+                ChangeMaterialIndexModal(i);
+            }
+
+
+            if (ImGui::CollapsingHeader("Position")) {
+                ImGui::InputFloat(("xP " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
+                ImGui::InputFloat(("yP " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
+                ImGui::InputFloat(("zP " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
+            }
+            if (ImGui::CollapsingHeader("Angle")) {
+                ImGui::InputFloat(("xA " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].angle.x, 0.1f, 180.0f, "%0.1f");
+                ImGui::InputFloat(("yA " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].angle.y, 0.1f, 180.0f, "%0.1f");
+                ImGui::InputFloat(("zA " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].angle.z, 0.1f, 180.0f, "%0.1f");
+            }
+
+            if (ImGui::CollapsingHeader("Scale")) {
+                ImGui::InputFloat(("xS " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].scale.x, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("yS " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].scale.y, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("zS " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].scale.z, 0.1f, 10.0f, "%.1f");
+            }
+
+            if (ImGui::CollapsingHeader("Velocity")) {
+                ImGui::InputFloat(("xV " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].velocity.x, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("yV " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].velocity.y, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("zV " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].velocity.z, 0.1f, 10.0f, "%.1f");
+            }
+
+            if (ImGui::CollapsingHeader("Rotation velocity")) {
+                ImGui::InputFloat(("xR " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].rVelocity.x, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("yR " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].rVelocity.y, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("zR " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].rVelocity.z, 0.1f, 10.0f, "%.1f");
+            }
         }
         else if ((selected >= 100) && (selected < 200)) {
             int i = selected - 100;
@@ -275,10 +348,11 @@ namespace Chotra {
             if (ImGui::Button("..."))
             {
                 //FileDialogs::wWinMain();
-                std::string s = FileDialogs::OpenFile("");
+                std::string s = FileDialogs::OpenFile("OBJ Files\0*.obj\0All Files\0*.*\0");
                 if ((s != "") && (s != p_mainWindow->scene->objModels[i].obj_path)) {
                     // TO DO: Check selectet object before any change.
-                    p_mainWindow->scene->objModels[i].obj_path = s;
+                    p_mainWindow->scene->ChangeGeometrySource(i, s);
+                    //p_mainWindow->scene->objModels[i].obj_path = s;
                 }
             }
             ImGui::SameLine();
@@ -300,7 +374,28 @@ namespace Chotra {
             ImGui::Spacing();
             if (ImGui::Button("..."))
             {
-                FileDialogs::OpenFile("");
+                std::string s = FileDialogs::OpenFile("MTL Files\0 * .mtl\0All Files\0 * .*\0");
+                if ((s != "") && (s != p_mainWindow->scene->materials[i].mtl_path)) {
+
+                    std::string mainDir = Application::GetMainDir();
+                    std::size_t ind = s.find(mainDir); // Find the starting position of substring in the string
+                    if (ind != std::string::npos) {
+                        s.erase(ind, mainDir.length() + 1); // erase function takes two parameter, the starting index in the string from where you want to erase characters and total no of characters you want to erase.
+                        for (int i = 0; i < s.length(); ++i) {
+                            if (s[i] == '\\') {
+                                s[i] = '/'; //TO DO using std::replace()
+                            }
+                        }
+                    }
+                    else {
+                        std::cout << "Substring does not exist in the string\n";
+                    }
+
+
+                    // TO DO: Check selectet object before any change.
+                    p_mainWindow->scene->ChangeMaterialSource(i, s);
+                    //p_mainWindow->scene->objModels[i].obj_path = s;
+                }
             }
             ImGui::SameLine();
             {
@@ -314,8 +409,22 @@ namespace Chotra {
             for (int j = 0; j < p_mainWindow->scene->materials[i].textures.size(); ++j) {
                 if (ImGui::Button(("T" + std::to_string(j)).c_str()))
                 {
-                    std::string s = FileDialogs::OpenFile("");
+                    std::string s = FileDialogs::OpenFile("Image Files\0*.png;*.jpg;*.jpeg\0All Files\0*.*\0");
                     if ((s != "") && (s != p_mainWindow->scene->materials[i].textures[j].path)) {
+
+                        std::string mainDir = Application::GetMainDir();
+                        std::size_t ind = s.find(mainDir); // Find the starting position of substring in the string
+                        if (ind != std::string::npos) {
+                            s.erase(ind, mainDir.length() + 1); // erase function takes two parameter, the starting index in the string from where you want to erase characters and total no of characters you want to erase.
+                            for (int i = 0; i < s.length(); ++i) {
+                                if (s[i] == '\\') {
+                                    s[i] = '/'; //TO DO using std::replace()
+                                }
+                            }
+                        }
+                        else {
+                            std::cout << "Substring does not exist in the string\n";
+                        }
                         p_mainWindow->scene->materials[i].ChangeTexture(j, s);
                     }
                 }
@@ -344,8 +453,8 @@ namespace Chotra {
 
     void Gui::ShowAssetsBar() {
 
-        ImGui::SetNextWindowPos(ImVec2(0, p_mainWindow->GetHeight() - 220));
-        ImGui::SetNextWindowSize(ImVec2(p_mainWindow->GetWidth() - 350, 220));
+        ImGui::SetNextWindowPos(ImVec2(0, p_mainWindow->GetHeight() - 250));
+        ImGui::SetNextWindowSize(ImVec2(p_mainWindow->GetWidth() - 350, 250));
 
         ImGui::Begin("Assets");
 
@@ -354,13 +463,33 @@ namespace Chotra {
         {
             if (ImGui::BeginTabItem("Geometry"))
             {
+                ImGuiIO& io = ImGui::GetIO();
+                ImTextureID my_tex_id = io.Fonts->TexID;
+                float my_tex_w = (float)io.Fonts->TexWidth;
+                float my_tex_h = (float)io.Fonts->TexHeight;
+
                 if (!p_mainWindow->scene->objModels.empty()) {
                     for (int i = 0; i < p_mainWindow->scene->objModels.size(); ++i) {
-                        if (ImGui::Selectable(p_mainWindow->scene->objModels[i].name.c_str(), selected == 200 + i, 0, ImVec2(100, 100))) {
+
+                        if (ImGui::Selectable(p_mainWindow->scene->objModels[i].name.c_str(), selected == 200 + i, 0, ImVec2(88, 10))) {
                             selected = 200 + i;
                         }
                         ImGui::SameLine();
-                        ImGui::Text(" ");
+
+                    }
+                    ImGui::NewLine();
+
+                    for (int i = 0; i < p_mainWindow->scene->objModels.size(); ++i) {
+                        ImGui::PushID(i);
+                        ImVec2 size = ImVec2(80.0f, 80.0f);                         // Size of the image we want to make visible
+                        ImVec2 uv0 = ImVec2(0.0f, 0.0f);                            // UV coordinates for lower-left
+                        ImVec2 uv1 = ImVec2(32.0f / my_tex_w, 32.0f / my_tex_h);    // UV coordinates for (32,32) in our texture
+                        ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
+                        ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
+                        if (ImGui::ImageButton(p_mainWindow->scene->objModels[i].name.c_str(), my_tex_id, size, uv0, uv1, bg_col, tint_col)) {
+                            selected = 200 + i;
+                        }
+                        ImGui::PopID();
                         ImGui::SameLine();
                     }
 
@@ -374,7 +503,6 @@ namespace Chotra {
                     }
                     if (ImGui::BeginPopupModal("Add geometry", NULL, ImGuiWindowFlags_MenuBar))
                     {
-                        
                         AddGeometryModal();
                     }
                 }
@@ -422,17 +550,10 @@ namespace Chotra {
 
     void Gui::AddGeometryModal() {
 
-        /*
-        std::string name = "geometry_" + std::to_string(p_mainWindow->scene->objModels.size());
-        char str0[128];
-        strcpy(str0, name.c_str());
-        ImGui::Text("Name");
-        ImGui::InputText(name.c_str(), str0, IM_ARRAYSIZE(str0));
-       */
         std::string nameNumber = std::to_string(p_mainWindow->scene->objModels.size() + 1);
         if (ImGui::Button("Add", ImVec2(120, 0))) {
             std::cout << "adding geometry click" << std::endl;
-            p_mainWindow->scene->AddGeometry("models/default.obj", false, nameNumber);
+            p_mainWindow->scene->AddGeometry("resources/models/default.obj", nameNumber);
             ImGui::CloseCurrentPopup();
             p_mainWindow->renderer->passiveMode = false;
 
@@ -446,81 +567,14 @@ namespace Chotra {
         ImGui::EndPopup();
 
     }
+
 
     void Gui::AddMaterialModal() {
-        
-        /*
-        std::string name = "material_" + std::to_string(p_mainWindow->scene->materials.size());
-        char str0[128];
-        strcpy(str0, name.c_str());
-        ImGui::Text("Name");
-        ImGui::InputText(name.c_str(), str0, IM_ARRAYSIZE(str0));
-        
-        ImGui::Text("MTL file");
-        ImGui::Spacing();
-        if (ImGui::Button("Load from MTL"))
-        {
-            std::string s = FileDialogs::OpenFile("");
-            if (s != "") {
-                
-                std::string mainDir = Application::GetMainDir();
-                std::size_t ind = s.find(mainDir); // Find the starting position of substring in the string
-                if (ind != std::string::npos) {
-                    s.erase(ind, mainDir.length() + 1); // erase function takes two parameter, the starting index in the string from where you want to erase characters and total no of characters you want to erase.
-                    for (int i = 0; i < s.length(); ++i) {
-                        if (s[i] == '\\') {
-                            s[i] = '/'; //TO DO using std::replace()
-                        }
-                    }
-                }
-                else {
-                    std::cout << "Substring does not exist in the string\n";
-                }
-                newMaterial = Material(s);
-            }
-        }
-        
-        ImGui::Spacing();
-        ImGui::Separator();
-        ImGui::Text("Textures:");
 
-        // Always center this window when appearing
-        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-               
-
-        for (int j = 0; j < newMaterial.textures.size(); ++j) {
-            if (ImGui::Button(("T" + std::to_string(j)).c_str()))
-            {
-                std::string s = FileDialogs::OpenFile("");
-                if ((s != "") && (s != newMaterial.textures[j].path)) {
-
-                    std::string mainDir = Application::GetMainDir();
-                    std::size_t ind = s.find(mainDir); // Find the starting position of substring in the string
-                    if (ind != std::string::npos) {
-                        s.erase(ind, mainDir.length() + 1); // erase function takes two parameter, the starting index in the string from where you want to erase characters and total no of characters you want to erase.
-                        for (int i = 0; i < s.length(); ++i) {
-                            if (s[i] == '\\') {
-                                s[i] = '/'; //TO DO using std::replace()
-                            }
-                        }
-                    }
-                    else {
-                        std::cout << "Substring does not exist in the string\n";
-                    }
-                    newMaterial.ChangeTexture(j, s);
-                }
-            }
-            ImGui::SameLine();
-            char str0[128];
-            strcpy(str0, newMaterial.textures[j].path.c_str());
-            ImGui::InputText(newMaterial.textures[j].type.c_str(), str0, IM_ARRAYSIZE(str0));
-        }
-          */      
-
+        std::string nameNumber = std::to_string(p_mainWindow->scene->materials.size() + 1);
         if (ImGui::Button("Add", ImVec2(120, 0))) {
             std::cout << "adding material" << std::endl;
-            p_mainWindow->scene->AddMaterial("models/default.mtl");
+            p_mainWindow->scene->AddMaterial("resources/models/default.mtl", nameNumber);
             ImGui::CloseCurrentPopup();
             p_mainWindow->renderer->passiveMode = false;
         }
@@ -531,10 +585,81 @@ namespace Chotra {
             p_mainWindow->renderer->passiveMode = false;
         }
         ImGui::EndPopup();
-        
+
     }
 
-    
+    void Gui::AddSceneObjectModal() {
+
+
+        std::string nameNumber = std::to_string(p_mainWindow->scene->sceneObjects.size() + 1);
+        if (ImGui::Button("Add", ImVec2(120, 0))) {
+            std::cout << "adding scene object click" << std::endl;
+            p_mainWindow->scene->AddSceneObject(*p_mainWindow->scene, 0, 0, "sceneObject");
+            ImGui::CloseCurrentPopup();
+            p_mainWindow->renderer->passiveMode = false;
+
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup();
+            p_mainWindow->renderer->passiveMode = false;
+        }
+        ImGui::EndPopup();
+
+    }
+
+    void Gui::ChangeGeometryIndexModal(int sceneObjectIndex) {
+
+        for (int i = 0; i < p_mainWindow->scene->objModels.size(); ++i) {
+            if (ImGui::Selectable(p_mainWindow->scene->objModels[i].name.c_str(), chosed == i, 0, ImVec2(100, 100))) {
+                chosed = i;
+                p_mainWindow->scene->sceneObjects[sceneObjectIndex].ChangeGeometryIndex(chosed);
+                ImGui::CloseCurrentPopup();
+                p_mainWindow->renderer->passiveMode = false;
+            }
+
+            ImGui::SameLine();
+            ImGui::Text(" ");
+            ImGui::SameLine();
+        }
+
+        ImGui::SetItemDefaultFocus();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup();
+            p_mainWindow->renderer->passiveMode = false;
+        }
+
+        ImGui::EndPopup();
+
+    }
+
+    void Gui::ChangeMaterialIndexModal(int sceneObjectIndex) {
+
+        for (int i = 0; i < p_mainWindow->scene->materials.size(); ++i) {
+            if (ImGui::Selectable(p_mainWindow->scene->materials[i].name.c_str(), chosed == i, 0, ImVec2(100, 100))) {
+                chosed = i;
+                p_mainWindow->scene->sceneObjects[sceneObjectIndex].ChangeMaterialIndex(chosed);
+                ImGui::CloseCurrentPopup();
+                p_mainWindow->renderer->passiveMode = false;
+            }
+
+            ImGui::SameLine();
+            ImGui::Text(" ");
+            ImGui::SameLine();
+        }
+
+        ImGui::SetItemDefaultFocus();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup();
+            p_mainWindow->renderer->passiveMode = false;
+        }
+
+        ImGui::EndPopup();
+
+    }
+
+
 
 } // namspace Chotra
 
