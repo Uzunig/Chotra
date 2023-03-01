@@ -179,6 +179,8 @@ namespace Chotra {
 
         void RenderOnScreen();
 
+        unsigned int CreateGeometryIcon(unsigned int i);
+
     };
 
 } // namespace Chotra

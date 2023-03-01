@@ -1015,6 +1015,9 @@ namespace Chotra {
 
     }
 
+    unsigned int Renderer::CreateGeometryIcon(unsigned int i) {
+        return 0;
+    }
    
 
 } // namespace Chotra

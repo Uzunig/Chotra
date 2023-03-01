@@ -49,7 +49,7 @@ namespace Chotra {
                 
         std::unique_ptr<Camera> camera;
         std::unique_ptr<class Scene> scene;
-        //std::unique_ptr<Background> background;
+    
         std::unique_ptr<Renderer> renderer;
         std::unique_ptr<class Gui> gui;
 

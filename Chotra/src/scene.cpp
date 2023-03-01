@@ -20,16 +20,12 @@ namespace Chotra {
         
         ObjModel obj = ObjModel(path, nameNumber);
         objModels.push_back(obj);
-        std::cout << "Geometry added" << std::endl;
-
     }
 
     void Scene::AddMaterial(std::string const& path, std::string nameNumber) {
 
         Material mtl = Material(path, nameNumber);
         materials.push_back(mtl);
-        std::cout << "Material added" << std::endl;
-
     }
 
     void Scene::AddSceneObject(Scene& scene, unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,

@@ -16,6 +16,7 @@ namespace Chotra {
        
         std::string name;
         std::string obj_path;
+        unsigned int icon = 0;
        
         void DeleteBuffers();
 
