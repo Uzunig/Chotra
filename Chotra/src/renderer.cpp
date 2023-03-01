@@ -1,5 +1,14 @@
 #include "renderer.h"
 
+#include "environment.h"
+#include "camera.h"
+
+#include "scene.h"
+
+
+#include "scene_object.h"
+#include "scene_light.h"
+
 
 
 

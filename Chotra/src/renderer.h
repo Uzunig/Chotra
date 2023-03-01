@@ -11,10 +11,7 @@
 #include <vector>
 #include <random>
 
-#include "environment.h"
-#include "camera.h"
 #include "shader.h"
-#include "scene.h"
 #include "quad.h"
 
 namespace Chotra {
@@ -27,8 +24,8 @@ namespace Chotra {
         glm::mat4 projection;
         glm::mat4 view;
 
-        Camera& camera;
-        Scene& scene;
+        class Camera& camera;
+        class Scene& scene;
                                        
         unsigned int& width;
         unsigned int& height;

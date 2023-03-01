@@ -5,16 +5,17 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "mesh.h"
-#include "material.h"
-#include "environment.h"
+#include <string>
 
+#include "shader.h"
 
 namespace Chotra {
 
     class SceneObject {
     public:
+
         class Scene& scene;
+
         int geometryIndex;
         unsigned int materialIndex;
 

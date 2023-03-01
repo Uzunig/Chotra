@@ -1,6 +1,10 @@
 #include "scene.h"
-#include "renderer.h"
+
+#include "obj_model.h"
+#include "material.h"
 #include "scene_object.h"
+#include "scene_light.h"
+#include "renderer.h"
 
 namespace Chotra {
 
@@ -35,8 +39,6 @@ namespace Chotra {
             scale, velocity, rVelocity, visible);
 
         sceneObjects.push_back(sObj);
-        std::cout << "SceneObject added " << std::endl;
-
     }
 
     void Scene::AddSceneLight(Scene& scene, unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
@@ -46,8 +48,6 @@ namespace Chotra {
             scale, velocity, rVelocity, visible, color, brightness);
 
         sceneLights.push_back(sLight);
-        std::cout << "SceneObject added " << std::endl;
-
     }
 
     void Scene::ChangeGeometrySource(unsigned int i, std::string const& path, std::string nameNumber) {
@@ -217,6 +217,7 @@ namespace Chotra {
             }
         }
     }
+
 } // namspace Chotra
 
 

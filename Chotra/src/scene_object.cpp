@@ -2,6 +2,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "obj_model.h"
+#include "material.h"
+#include "environment.h"
 #include "scene.h"
 
 namespace Chotra {

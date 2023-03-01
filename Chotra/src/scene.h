@@ -14,33 +14,18 @@
 #include <vector>
 
 #include "stb_image.h"
-
-
-
-#include "sphere.h"
-#include "cylinder.h"
-#include "scene_light.h"
-#include "dashboard.h"
-#include "obj_model.h"
 #include "environment.h"
 
-
-
 namespace Chotra {
-        
+    
     class Scene {
     public:
-               
-       
-        std::vector<ObjModel> objModels;
-        std::vector<Material> materials;
+                       
+        std::vector<class ObjModel> objModels;
+        std::vector<class Material> materials;
  
-        std::vector<SceneObject> sceneObjects;
-        std::vector<SceneObject> cylinders;
-        std::vector<SceneObject> spheres;
-
-        std::vector<SceneLight> sceneLights;
-
+        std::vector<class SceneObject> sceneObjects;
+        std::vector<class SceneLight> sceneLights;
                 
         Environment environment;
 

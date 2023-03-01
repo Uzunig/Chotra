@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WINDOW_H
+#define WINDOW_H
 
 #include <iostream>
 #include <string>
@@ -7,15 +8,16 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
-#include <imgui/backends/imgui_impl_glfw.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Chotra/Events/event.h"
 
 #include "camera.h"
-//#include "scene.h"
+#include "scene.h"
 #include "renderer.h"
+
 
  
 
@@ -47,8 +49,8 @@ namespace Chotra {
         void SetFirstMouse(bool firstMouse);
         bool GetFirstMouse();
                 
-        std::unique_ptr<Camera> camera;
-        std::unique_ptr<class Scene> scene;
+        Camera camera;
+        Scene scene;
     
         std::unique_ptr<Renderer> renderer;
         std::unique_ptr<class Gui> gui;
@@ -80,3 +82,5 @@ namespace Chotra {
                                          
     };
 } // namspace Chotra
+
+#endif

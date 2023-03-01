@@ -49,13 +49,13 @@ namespace Chotra {
 
                 if (mainWindow->GetPlayerMode()) {
                     if (event.key == GLFW_KEY_W) {
-                        mainWindow->camera->movementDirection.z += 1.0f;
+                        mainWindow->camera.movementDirection.z += 1.0f;
                     } else if (event.key == GLFW_KEY_S) {
-                        mainWindow->camera->movementDirection.z -= 1.0f;
+                        mainWindow->camera.movementDirection.z -= 1.0f;
                     } else if (event.key == GLFW_KEY_A) {
-                        mainWindow->camera->movementDirection.x -= 1.0f;
+                        mainWindow->camera.movementDirection.x -= 1.0f;
                     } else if (event.key == GLFW_KEY_D) {
-                        mainWindow->camera->movementDirection.x += 1.0f;
+                        mainWindow->camera.movementDirection.x += 1.0f;
                     }
                 }
             });
@@ -66,16 +66,16 @@ namespace Chotra {
                 //std::cout << "Key released:  " << (char)event.key << std::endl;
                 if (mainWindow->GetPlayerMode()) {
                     if (event.key == GLFW_KEY_W) {
-                        mainWindow->camera->movementDirection.z -= 1.0f;
+                        mainWindow->camera.movementDirection.z -= 1.0f;
 
                     } else if (event.key == GLFW_KEY_S) {
-                        mainWindow->camera->movementDirection.z += 1.0f;
+                        mainWindow->camera.movementDirection.z += 1.0f;
 
                     } else if (event.key == GLFW_KEY_A) {
-                        mainWindow->camera->movementDirection.x += 1.0f;
+                        mainWindow->camera.movementDirection.x += 1.0f;
 
                     } else if (event.key == GLFW_KEY_D) {
-                        mainWindow->camera->movementDirection.x -= 1.0f;
+                        mainWindow->camera.movementDirection.x -= 1.0f;
                     }
                 }
             });
@@ -92,10 +92,10 @@ namespace Chotra {
                 //std::cout << "Mouse right button released:  " << std::endl;
                 mainWindow->SetPlayerMode(false);
                 mainWindow->SetFirstMouse(true);
-                mainWindow->camera->movementDirection.z = 0.0f;
-                mainWindow->camera->movementDirection.z = 0.0f;
-                mainWindow->camera->movementDirection.x = 0.0f;
-                mainWindow->camera->movementDirection.x = 0.0f;
+                mainWindow->camera.movementDirection.z = 0.0f;
+                mainWindow->camera.movementDirection.z = 0.0f;
+                mainWindow->camera.movementDirection.x = 0.0f;
+                mainWindow->camera.movementDirection.x = 0.0f;
 
             });
 
@@ -117,7 +117,7 @@ namespace Chotra {
                     mainWindow->lastMousePosition.x = event.x;
                     mainWindow->lastMousePosition.y = event.y;
 
-                    mainWindow->camera->ProcessMouseMovement(xoffset, yoffset);
+                    mainWindow->camera.ProcessMouseMovement(xoffset, yoffset);
                 }
 
             });

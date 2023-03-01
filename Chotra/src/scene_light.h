@@ -5,7 +5,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "mesh.h"
 #include "scene_object.h"
 
 namespace Chotra {
@@ -20,6 +19,7 @@ namespace Chotra {
             int visible = true, glm::vec3 color = glm::vec3(1.0f), int brightness = 100, float deformation = 0.0f, int deformatioVector = 0);
 
     };
+
 } // namspace Chotra
 
 #endif
