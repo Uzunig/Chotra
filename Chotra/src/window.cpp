@@ -135,9 +135,9 @@ namespace Chotra {
         //glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         camera = Camera(glm::vec3(0.0f, 5.0f, 25.0f));
-        scene = Scene();
+        scene = std::make_unique<Scene>();
         //background = std::make_unique<Background>(*scene);
-        renderer = std::make_unique<Renderer>(windowData.width, windowData.height, camera, scene);
+        renderer = std::make_unique<Renderer>(windowData.width, windowData.height, camera, *scene);
         renderer->Init();
         gui = std::make_unique<Gui>(this);
 
@@ -158,7 +158,7 @@ namespace Chotra {
         fps = 1 / deltaTime;
         camera.ProcessKeyboard(deltaTime);
         //scene->DemoUpdate(deltaTime);
-        scene.Update(deltaTime);
+        scene->Update(deltaTime);
         renderer->Render();
 
         gui->Show();
