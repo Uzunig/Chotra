@@ -2,11 +2,15 @@
 
 namespace Chotra {
 
-    ObjModel::ObjModel(std::string const& path) {
+        
+    ObjModel::ObjModel(std::string const& path, std::string nameNumber) {
 
         LoadModel(path);
         SetupMesh();
+        name = obj_path.substr(obj_path.find_last_of('/') + 1, obj_path.length()) + nameNumber;
+        std::cout << "Geometry created" << std::endl;
     }
+
     /*
     void ObjModel::Draw(Shader& shader) {
 
@@ -48,7 +52,8 @@ namespace Chotra {
 
         }
         else {
-            name = obj_path.substr(obj_path.find_last_of('/') + 1, obj_path.length());
+                        
+            this->obj_path = obj_path;
 
             glm::vec3 vertice;
             glm::vec3 normal;
@@ -110,8 +115,8 @@ namespace Chotra {
             std::cout << "The MTL file could not open for writing!" << std::endl;
         }
         else {
-
-            mtl_path = directory + mtl_filename;
+            mtl_file.close();
+           
             /*while (mtl_file) {
                 std::string s;
                 mtl_file >> s;
@@ -184,6 +189,14 @@ namespace Chotra {
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
 
         glBindVertexArray(0);
+    }
+
+    void ObjModel::DeleteBuffers() {
+
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
+        glDeleteBuffers(1, &EBO);
+
     }
 } // namspace Chotra
 

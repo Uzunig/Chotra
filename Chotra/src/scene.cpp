@@ -1,12 +1,18 @@
 #include "scene.h"
 
+#include "obj_model.h"
+#include "material.h"
+#include "scene_object.h"
+#include "scene_light.h"
+#include "renderer.h"
+
 namespace Chotra {
 
     Scene::Scene()
-        : environment("hdr/Sky.hdr") {
+        : environment("resources/hdr/Sky.hdr") {
 
-        LoadSceneFromFile("level1.lv");
-        
+        LoadSceneFromFile("resources/level1.lv");
+
     }
 
     Scene::~Scene() {
@@ -14,8 +20,57 @@ namespace Chotra {
     }
 
     
+    void Scene::AddGeometry(std::string const& path, std::string nameNumber) {
+        
+        ObjModel obj = ObjModel(path, nameNumber);
+        objModels.push_back(obj);
+    }
+
+    void Scene::AddMaterial(std::string const& path, std::string nameNumber) {
+
+        Material mtl = Material(path, nameNumber);
+        materials.push_back(mtl);
+    }
+
+    void Scene::AddSceneObject(Scene& scene, unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
+        glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible) {
+
+        SceneObject sObj = SceneObject(*this, geometryIndex, materialIndex, name, position, angle, // TO DO: materials 
+            scale, velocity, rVelocity, visible);
+
+        sceneObjects.push_back(sObj);
+    }
+
+    void Scene::AddSceneLight(Scene& scene, unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
+        int visible, glm::vec3 color, int brightness) {
+
+        SceneLight sLight = SceneLight(*this, geometryIndex, materialIndex, name, position, angle,
+            scale, velocity, rVelocity, visible, color, brightness);
+
+        sceneLights.push_back(sLight);
+    }
+
+    void Scene::ChangeGeometrySource(unsigned int i, std::string const& path, std::string nameNumber) {
+
+        objModels[i].DeleteBuffers();
+        ObjModel obj = ObjModel(path, nameNumber);
+        objModels[i] = obj;
+        std::cout << "Geometry source changed" << std::endl;
+
+    }
+
+    void Scene::ChangeMaterialSource(unsigned int i, std::string const& path, std::string nameNumber) {
+
+        materials[i].DeleteAllTextures();
+        Material mtl = Material(path);
+        materials[i] = mtl;
+        std::cout << "Material source changed" << std::endl;
+
+    }
+
     void Scene::Update(float deltaTime) {
         float dt = deltaTime * 50.0f;
+       
         if (!sceneObjects.empty()) {
             for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
                 if (sceneObjects[i].visible) {
@@ -35,7 +90,7 @@ namespace Chotra {
             }
         }
     }
-        
+
     void Scene::DrawSceneObjects(Shader& shader) {
         if (!sceneObjects.empty()) {
             for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
@@ -59,11 +114,12 @@ namespace Chotra {
     }
 
     void Scene::LoadSceneFromFile(std::string const& path) {
-
+        
         std::ifstream level_file(path);
         if (!level_file) {
             std::cout << "The level file could not open for writing!" << std::endl;
-        } else {
+        }
+        else {
             while (level_file) {
                 std::string s;
                 level_file >> s;
@@ -71,20 +127,26 @@ namespace Chotra {
                 if (s == "ObjModel") {
                     std::string model_path;
                     level_file >> model_path;
-                    ObjModel obj = ObjModel(model_path);
-                    Material mtl = Material(obj.mtl_path);
-                    objModels.push_back(obj);
-                    materials.push_back(mtl);
+                    AddGeometry(model_path);
+                    
+                } else if (s == "Material") {
+                    std::string material_path;
+                    level_file >> material_path;
+                    AddMaterial(material_path);
 
-                } else if (s == "SceneObject") {
+                }
+                else if (s == "SceneObject") {
                     std::string name;
                     level_file >> name;
 
                     std::string meshType;
                     level_file >> meshType;
-                  
-                    unsigned int i;
-                    level_file >> i;
+
+                    unsigned int geometryIndex;
+                    level_file >> geometryIndex;
+
+                    unsigned int materialIndex;
+                    level_file >> materialIndex;
 
                     glm::vec3 position;
                     level_file >> position.x >> position.y >> position.z;
@@ -103,21 +165,25 @@ namespace Chotra {
 
                     int visible;
                     level_file >> visible;
-                   
+
                     if (meshType == "OBJModel") {
-                        sceneObjects.push_back(SceneObject(objModels[i], materials[i], name, position, angle, // TO DO: materials 
-                            scale, velocity, rVelocity, visible));
-                    } 
+                        AddSceneObject(*this, geometryIndex, materialIndex, name, position, angle, // TO DO: materials 
+                            scale, velocity, rVelocity, visible);
+                    }
 
-                } else if (s == "SceneLight") {
+                }
+                else if (s == "SceneLight") {
                     std::string name;
                     level_file >> name;
-                    
+
                     std::string meshType;
                     level_file >> meshType;
 
-                    unsigned int i;
-                    level_file >> i;
+                    unsigned int geometryIndex;
+                    level_file >> geometryIndex;
+
+                    unsigned int materialIndex;
+                    level_file >> materialIndex;
 
                     glm::vec3 position;
                     level_file >> position.x >> position.y >> position.z;
@@ -136,7 +202,7 @@ namespace Chotra {
 
                     int visible;
                     level_file >> visible;
-                    
+
                     glm::vec3 color;
                     level_file >> color.x >> color.y >> color.z;
 
@@ -144,13 +210,14 @@ namespace Chotra {
                     level_file >> intensity;
 
                     if (meshType == "OBJModel") {
-                        sceneLights.push_back(SceneLight(objModels[i], materials[i], name, position, angle,
-                            scale, velocity, rVelocity, visible, color, intensity));
-                    } 
+                        AddSceneLight(*this, geometryIndex, materialIndex, name, position, angle,
+                            scale, velocity, rVelocity, visible, color, intensity);
+                    }
                 }
             }
         }
     }
+
 } // namspace Chotra
 
 

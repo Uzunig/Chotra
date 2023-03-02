@@ -1,5 +1,14 @@
 #include "renderer.h"
 
+#include "environment.h"
+#include "camera.h"
+
+#include "scene.h"
+
+
+#include "scene_object.h"
+#include "scene_light.h"
+
 
 
 
@@ -7,21 +16,21 @@ namespace Chotra {
 
     Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene)
         : width(width), height(height), camera(camera), scene(scene),
-        pbrShader("shaders/pbr_shader.vs", "shaders/pbr_shader.fs"),
-        simpleDepthShader("shaders/shadow_depth.vs", "shaders/shadow_depth.fs"),
-        lightsShader("shaders/pbr_shader.vs", "shaders/lights_shader.fs"),
-        screenShader("shaders/screen_shader.vs", "shaders/screen_shader.fs"),
-        downSamplingShader("shaders/screen_shader.vs", "shaders/downsampling.fs"),
-        combineShader("shaders/screen_shader.vs", "shaders/combine.fs"),
-        shaderBlur("shaders/screen_shader.vs", "shaders/blur.fs"),
-        shaderBloomFinal("shaders/screen_shader.vs", "shaders/bloom_final.fs"),
-        backgroundShader("shaders/background.vs", "shaders/background.fs"),
-        shaderSSAO("shaders/screen_shader.vs", "shaders/ssao.fs"),
-        shaderSSAOBlur("shaders/screen_shader.vs", "shaders/ssao_blur.fs"),
+        pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
+        simpleDepthShader("resources/shaders/shadow_depth.vs", "resources/shaders/shadow_depth.fs"),
+        lightsShader("resources/shaders/pbr_shader.vs", "resources/shaders/lights_shader.fs"),
+        screenShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_shader.fs"),
+        downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/downsampling.fs"),
+        combineShader("resources/shaders/screen_shader.vs", "resources/shaders/combine.fs"),
+        shaderBlur("resources/shaders/screen_shader.vs", "resources/shaders/blur.fs"),
+        shaderBloomFinal("resources/shaders/screen_shader.vs", "resources/shaders/bloom_final.fs"),
+        backgroundShader("resources/shaders/background.vs", "resources/shaders/background.fs"),
+        shaderSSAO("resources/shaders/screen_shader.vs", "resources/shaders/ssao.fs"),
+        shaderSSAOBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssao_blur.fs"),
         //shaderSSR("shaders/screen_shader.vs", "shaders/ssr.fs"),
-        shaderDeferredGeometryPass("shaders/deferred_geometry_pass.vs", "shaders/deferred_geometry_pass.fs"),
-        shaderDeferredLightingPass("shaders/deferred_lighting_pass.vs", "shaders/deferred_lighting_pass.fs"),
-        shaderRenderOnScreen("shaders/screen_shader.vs", "shaders/render_on_screen.fs") {
+        shaderDeferredGeometryPass("resources/shaders/deferred_geometry_pass.vs", "resources/shaders/deferred_geometry_pass.fs"),
+        shaderDeferredLightingPass("resources/shaders/deferred_lighting_pass.vs", "resources/shaders/deferred_lighting_pass.fs"),
+        shaderRenderOnScreen("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") {
 
 
         GenerateScreenTexture();
@@ -56,7 +65,7 @@ namespace Chotra {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
-    void Renderer::Init(GLFWwindow* window) {
+    void Renderer::Init() {
           {
             //Create debugging quads
             Quad quad1 = Quad(0, 0);
@@ -114,13 +123,24 @@ namespace Chotra {
 
     void Renderer::Render() {
 
-        if (renderingMode == 0) {
-            ForwardRender();
+        if (!passiveMode) {
+            if (renderingMode == 0) {
+                ForwardRender();
 
-        } else if (renderingMode == 1) {
-            DeferredRender();
+            }
+            else if (renderingMode == 1) {
+                DeferredRender();
 
+            }
         }
+        else {
+            PassiveRender();
+        }
+    }
+
+    void Renderer::PassiveRender() {
+
+        RenderOnScreen();
     }
 
     void Renderer::ForwardRender() {
@@ -155,19 +175,19 @@ namespace Chotra {
     }
 
     void Renderer::DrawDebuggingQuads() {
-
+        /*
         //Draw debugging quads
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, gViewPosition);
         quads[0].RenderQuad();
 
-        glBindTexture(GL_TEXTURE_2D, gViewNormal);
+        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious);
         quads[1].RenderQuad();
         
         glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
         quads[2].RenderQuad();
-        /*
+        
         glBindTexture(GL_TEXTURE_2D, gRoughnessMap);
         quads[3].RenderQuad();
 
@@ -272,8 +292,14 @@ namespace Chotra {
         glGenFramebuffers(1, &framebufferPrevious);
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferPrevious);
 
+        glBindTexture(GL_TEXTURE_2D, screenTexture);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
+
         glBindTexture(GL_TEXTURE_2D, screenTexturePrevious);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexturePrevious, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, screenTexturePrevious, 0);
+
+        unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+        glDrawBuffers(2, attachments);
 
         // Создаем рендербуфер для прикрепляемых объектов глубины трафарета
         glGenRenderbuffers(1, &rboPrevious);
@@ -298,7 +324,7 @@ namespace Chotra {
         glEnable(GL_DEPTH_TEST);
 
         if (perspectiveProjection) {
-            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
+            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 500.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
@@ -370,7 +396,7 @@ namespace Chotra {
         glEnable(GL_DEPTH_TEST);
 
         if (perspectiveProjection) {
-            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 100.0f);
+            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 500.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
@@ -755,7 +781,7 @@ namespace Chotra {
         // 2. Генерируем текстуру для SSAO
         glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
         glClear(GL_COLOR_BUFFER_BIT);
-        shaderSSAO.Use();
+        shaderSSAO.Use(); 
 
         // Посылаем ядро + поворот 
         for (unsigned int i = 0; i < 64; ++i) {
@@ -881,7 +907,7 @@ namespace Chotra {
         glEnable(GL_DEPTH_TEST);
 
         if (perspectiveProjection) {
-            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.01f, 50.0f);
+            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.01f, 500.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
@@ -910,7 +936,7 @@ namespace Chotra {
 
     void Renderer::RenderLightingPass() {
 
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPrevious);
 
         // 2. Проход освещения: вычисление освещение, перебирая попиксельно экранный прямоугольник, используя содержимое g-буфера
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -981,21 +1007,7 @@ namespace Chotra {
 
 
     void Renderer::RenderOnScreen() {
-
-        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPrevious);
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shaderRenderOnScreen.Use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, screenTexture);
-        shaderRenderOnScreen.SetFloat("gamma", gammaCorrection ? 1.0f : 1.0f);
-
-        glViewport(0, 0, width, height);
-
-        // Рендерим прямоугольник
-        RenderQuad();
-
-
+      
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -1012,6 +1024,9 @@ namespace Chotra {
 
     }
 
+    unsigned int Renderer::CreateGeometryIcon(unsigned int i) {
+        return 0;
+    }
    
 
 } // namespace Chotra

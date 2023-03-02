@@ -20,6 +20,9 @@ add_library(Chotra STATIC
 	src/environment.cpp
 	src/environment.h
 
+      src/gui.cpp
+	src/gui.h
+
       src/material.cpp
 	src/material.h
 
@@ -28,6 +31,9 @@ add_library(Chotra STATIC
 
 	src/obj_model.cpp
 	src/obj_model.h
+
+      src/windows_platform_utils.cpp
+	src/platform_utils.h
 
 	src/renderer.cpp
 	src/renderer.h

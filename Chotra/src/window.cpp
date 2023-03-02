@@ -1,9 +1,13 @@
 
 #include "window.h"
 
-//#include <commdlg.h>
-#include <Windows.h>
 #include <GLFW/glfw3native.h>
+
+
+#include "platform_utils.h"
+#include "gui.h"
+
+
 
 namespace Chotra {
 
@@ -14,7 +18,7 @@ namespace Chotra {
         : windowData({ title, width, height }) {
 
         int resultCode = Init();
-        
+
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui_ImplOpenGL3_Init();
@@ -130,11 +134,12 @@ namespace Chotra {
         // tell GLFW to captur our mouse
         //glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-        camera = std::make_unique<Camera>(glm::vec3(0.0f, 5.0f, 25.0f));
+        camera = Camera(glm::vec3(0.0f, 5.0f, 25.0f));
         scene = std::make_unique<Scene>();
         //background = std::make_unique<Background>(*scene);
-        renderer = std::make_unique<Renderer>(windowData.width, windowData.height, *camera, *scene);
-        renderer->Init(glfwWindow);
+        renderer = std::make_unique<Renderer>(windowData.width, windowData.height, camera, *scene);
+        renderer->Init();
+        gui = std::make_unique<Gui>(this);
 
         lastMousePosition = glm::vec2(GetWidth() / 2, GetHeight() / 2);
 
@@ -146,255 +151,19 @@ namespace Chotra {
         glfwDestroyWindow(glfwWindow);
         glfwTerminate();
     }
-    /*
-    void ShowOpenFileDialog()
-    {
-        char fileName[MAX_PATH];
-        fileName[0] = '\0';
 
-        OPENFILENAME ofn;
-        ZeroMemory(&ofn, sizeof(ofn));
-        ofn.lStructSize = sizeof(ofn);
-        ofn.hwndOwner = NULL;
-        ofn.lpstrFile = fileName;
-        ofn.nMaxFile = MAX_PATH;
-        ofn.lpstrFilter = "All\0*.*\0Text\0*.TXT\0";
-        ofn.nFilterIndex = 1;
-        ofn.lpstrFileTitle = NULL;
-        ofn.nMaxFileTitle = 0;
-        ofn.lpstrInitialDir = NULL;
-        ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-        
-        if (GetOpenFileNameA(&ofn))
-        {
-            ImGui::Begin("Open File Dialog Example");
-            ImGui::Text("Selected file: %s", fileName);
-            ImGui::End();
-        }
-    }*/
-
-    void Window::ShowProperties(int selected) {
-        if (selected == -1) {
-            return;
-
-        }
-        else if (selected < 100) {
-            int i = selected;
-            ImGui::Text(scene->sceneObjects[i].name.c_str());
-            ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
-
-        }
-        else if ((selected >= 100) && (selected < 200)) {
-            int i = selected - 100;
-            ImGui::Text(scene->sceneLights[i].name.c_str());
-            ImGui::InputFloat(("x " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("y " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("z " + std::to_string(i)).c_str(), &scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
-            ImGui::SliderFloat(("r " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.r, 0.005f, 1.0f);
-            ImGui::SliderFloat(("g " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.g, 0.005f, 1.0f);
-            ImGui::SliderFloat(("b " + std::to_string(i)).c_str(), &scene->sceneLights[i].color.b, 0.005f, 1.0f);
-            ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &scene->sceneLights[i].brightness, 0, 10000);
-        }
-        else if ((selected >= 200) && (selected < 300)) {
-            int i = selected - 200;
-            ImGui::Text(scene->objModels[i].name.c_str());
-                        
-        }
-        else if ((selected >= 300) && (selected < 400)) {
-            int i = selected - 300;
-            ImGui::Text(scene->materials[i].name.c_str());
-            
-            for (int j = 0; j < scene->materials[i].textures.size(); ++j) {
-                ImGui::Text(scene->materials[i].textures[j].type.c_str());
-
-                //char str0[128] str0 = scene->materials[i].textures[j].path.c_str();
-                //ImGui::InputText("input text", str0, IM_ARRAYSIZE(str0));
-                //ImGui::SameLine();
-                if (ImGui::Button("Open"))
-                {
-                   // ShowOpenFileDialog();
-                }
-                //ImGui::Text(scene->materials[i].textures[j].path.c_str());
-            }
-        }
-    }
 
     void Window::OnUpdate(float deltaTime) {
 
-        camera->ProcessKeyboard(deltaTime);
+        fps = 1 / deltaTime;
+        camera.ProcessKeyboard(deltaTime);
         //scene->DemoUpdate(deltaTime);
         scene->Update(deltaTime);
         renderer->Render();
 
-        ImGuiIO& io = ImGui::GetIO();
-        io.DisplaySize.x = static_cast<float>(GetWidth());
-        io.DisplaySize.y = static_cast<float>(GetHeight());
-        
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        gui->Show();
+        gui->Render();
 
-        ImGui::ShowDemoWindow();
-
-        ImGui::SetNextWindowPos(ImVec2(GetWidth() - 350, 0));
-        ImGui::SetNextWindowSize(ImVec2(350, 500));
-
-        ImGui::Begin("Scene configuration");
-                       
-        if (ImGui::TreeNode("Scene collection")) {
-            
-            if (ImGui::TreeNode("Scene objects"))
-            {
-                if (!scene->objModels.empty()) {
-                    for (int i = 0; i < scene->sceneObjects.size(); ++i) {
-                        if (ImGui::Selectable(("Objects " + std::to_string(i)).c_str(), selected == i)) {
-                            selected = i;
-                        }
-                    }
-                }
-                ImGui::TreePop();
-            }
-            
-            if (ImGui::TreeNode("Lights"))
-            {
-                if (!scene->objModels.empty()) {
-                    for (int i = 0; i < scene->sceneLights.size(); ++i) {
-                        if (ImGui::Selectable(("Light " + std::to_string(i)).c_str(), selected == 100 + i)) {
-                            selected = 100 + i;
-                        }
-                    }
-                }
-                ImGui::TreePop();
-            }
-            
-            ImGui::TreePop();
-        }
-        ImGui::End();
-
-
-
-        ImGui::SetNextWindowPos(ImVec2(GetWidth() - 350, 500));
-        ImGui::SetNextWindowSize(ImVec2(350, GetHeight() - 500));
-
-        ImGui::Begin("Properties");
-        ShowProperties(selected);
-
-        ImGui::End();
-
-        ImGui::SetNextWindowPos(ImVec2(GetWidth() - 700, 0));
-        ImGui::SetNextWindowSize(ImVec2(350, 0));
-
-        ImGui::Begin("Rendering options");
-        ImGui::RadioButton("Forward shading", &renderer->renderingMode, 0);
-        ImGui::RadioButton("Deferred shading", &renderer->renderingMode, 1);
-
-        if (ImGui::CollapsingHeader("Environment")) {
-            ImGui::ColorPicker4("Color", renderer->backgroundColor);
-            ImGui::Checkbox("Draw skybox", &renderer->drawSkybox);
-            ImGui::SliderFloat("Background exposure", &renderer->backgroundExposure, 0.0f, 10.0f);
-        }
-
-        if (ImGui::CollapsingHeader("Camera settings")) {
-            ImGui::SliderFloat("Speed", &camera->MovementSpeed, 3.0f, 30.0f);
-            ImGui::SliderFloat("Zoom", &camera->Zoom, 15.0f, 90.0f);
-            //ImGui::Checkbox("Perspective projection", &renderer->perspectiveProjection);
-
-        }
-
-
-        if (renderer->renderingMode == 0) {
-
-            if (ImGui::Checkbox("MSAA", &renderer->enableMSAA)) {
-                //add input samplesNumber
-            }
-        }
-
-        if (renderer->renderingMode == 1) {
-
-            if (ImGui::CollapsingHeader("SSAO")) {
-                ImGui::SliderInt("Kernel size", &renderer->kernelSizeSSAO, 0, 64);
-                ImGui::SliderFloat("radius SSAO", &renderer->radiusSSAO, 0.1f, 1.0f);
-                ImGui::SliderFloat("distanceBias", &renderer->biasSSAO, 0.001f, 1.0f);
-
-            }
-
-            if (ImGui::CollapsingHeader("SSR")) {
-                ImGui::SliderFloat("biasSSR", &renderer->biasSSR, 0.001f, 20.0f);
-                ImGui::SliderFloat("rayStep", &renderer->rayStep, 0.001f, 5.0f);
-                ImGui::SliderInt("iterationCount", &renderer->iterationCount, 0, 3000);
-                ImGui::SliderFloat("accuracy", &renderer->accuracySSR, 0.001f, 5.0f);
-
-            }
-        }
-
-        if (ImGui::CollapsingHeader("Post effects")) {
-            ImGui::SliderFloat("Exposure", &renderer->exposure, 0.0f, 10.0f);
-            ImGui::Checkbox("Bloom", &renderer->bloom);
-            ImGui::Checkbox("Gamma correction", &renderer->gammaCorrection);
-        }
-
-        if (ImGui::CollapsingHeader("Shadows")) {
-            ImGui::Checkbox("Show shadows", &renderer->showShadows);
-            if (renderer->showShadows) {
-
-                ImGui::SliderFloat("Bias min", &renderer->shadowBiasMin, 0.0f, 0.1f);
-                ImGui::SliderFloat("Bias max", &renderer->shadowBiasMax, 0.0f, 0.1f);
-
-            }
-
-        }
-        ImGui::End();
-
-
-        ImGui::SetNextWindowPos(ImVec2(0, GetHeight() - 220));
-        ImGui::SetNextWindowSize(ImVec2(GetWidth() - 350, 220));
-
-        ImGui::Begin("Assets");
-
-        ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-        if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
-        {
-            if (ImGui::BeginTabItem("Geometry"))
-            {
-                if (!scene->objModels.empty()) {
-                    for (int i = 0; i < scene->objModels.size(); ++i) {
-                        if (ImGui::Selectable(("Model " + std::to_string(i)).c_str(), selected == 200 + i, 0, ImVec2(100, 100))) {
-                            selected = 200 + i;
-                        }
-                        ImGui::SameLine();
-                        ImGui::Text(" ");
-                        ImGui::SameLine();
-                    }
-                }
-                ImGui::EndTabItem();
-            }
-
-            if (ImGui::BeginTabItem("Materials"))
-            {
-                if (!scene->materials.empty()) {
-                    for (int i = 0; i < scene->materials.size(); ++i) {
-                        if (ImGui::Selectable(("Material " + std::to_string(i)).c_str(), selected == 300 + i, 0, ImVec2(100, 100))) {
-                            selected = 300 + i;
-                        }
-                        ImGui::SameLine();
-                        ImGui::Text(" ");
-                        ImGui::SameLine();
-                    }
-                }
-                ImGui::EndTabItem();
-            }
-            ImGui::EndTabBar();
-
-        }
-
-        ImGui::End();
-
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        
         glfwSwapBuffers(glfwWindow);
         glfwPollEvents();
     }

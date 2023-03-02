@@ -1,4 +1,8 @@
-fix normal maps into deferred rendering
+To create suitable architecture for engine!
+class objModel inheritanse
+
+To pass to JSON format and to make loader for collection files 
+To change vector objModels to vector geometry that containes all types og geometry
 
 prefilterMap: make GUI for SANPLE_COUNT
-fix coordinate spaces in lighting pass of deferred rendering
+Is it necessary to make a colletcion of environments?

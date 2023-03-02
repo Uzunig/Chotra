@@ -5,7 +5,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "mesh.h"
 #include "scene_object.h"
 
 namespace Chotra {
@@ -16,10 +15,11 @@ namespace Chotra {
         glm::vec3 color;
         int brightness;
 
-        SceneLight(Mesh& mesh, Material& material, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, 
-            int visible, glm::vec3 color, int brightness, float deformation = 0.0f, int deformatioVector = 0);
+        SceneLight(Scene& scene, unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position = glm::vec3(0.0f), glm::vec3 angle = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 rVelocity = glm::vec3(0.0f),
+            int visible = true, glm::vec3 color = glm::vec3(1.0f), int brightness = 100, float deformation = 0.0f, int deformatioVector = 0);
 
     };
+
 } // namspace Chotra
 
 #endif

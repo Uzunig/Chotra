@@ -9,16 +9,24 @@ namespace Chotra {
 
     class ObjModel : public Mesh {
     public:
-        ObjModel(std::string const& path);
+        ObjModel() = delete;
+        ObjModel(std::string const& path, std::string nameNumber = "");
+       
         //virtual void Draw(Shader& shader);
        
         std::string name;
-        std::string mtl_path;
+        std::string obj_path;
+        unsigned int icon = 0;
+       
+        void DeleteBuffers();
+
     private:
         unsigned int VBO, EBO;
         
+       
         void LoadModel(std::string const& obj_path);
         void SetupMesh();
+        
     };
 } // namspace Chotra
 

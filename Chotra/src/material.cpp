@@ -2,9 +2,10 @@
 #include "stb_image.h"
 
 namespace Chotra {
+        
+    Material::Material(std::string mtl_path, std::string nameNumber) {
 
-    Material::Material(std::string mtl_path) {
-
+        std::cout << "MTL path: " << mtl_path << std::endl;
         std::string directory = mtl_path.substr(0, mtl_path.find_last_of('/')) + '/';
         std::ifstream mtl_file(mtl_path);
         if (!mtl_file) {
@@ -12,7 +13,9 @@ namespace Chotra {
 
         }
         else {
-            name = mtl_path.substr(mtl_path.find_last_of('/') + 1, mtl_path.length());
+
+            
+            this->mtl_path = mtl_path;
 
             while (mtl_file) {
                 std::string s;
@@ -61,42 +64,34 @@ namespace Chotra {
                 }
             }
         }
+        name = mtl_path.substr(mtl_path.find_last_of('/') + 1, mtl_path.length()) + nameNumber;
+        std::cout << "Material created" << std::endl;
     }
 
-    void Material::SetupTextures() {
+    void Material::ChangeTexture(unsigned int j, std::string& new_path) {
 
-        Texture texture;
+        unsigned int textureID = textures[j].id;
+        glDeleteTextures(1, &textureID);
 
-        texture.type = "albedoMap";
-        texture.path = "models/textures/earth/albedo.png";
-        texture.id = LoadTexture(texture.path);
-        textures.push_back(texture);
-
-        texture.type = "normalMap";
-        texture.path = "models/textures/earth/normal.png";
-        texture.id = LoadTexture(texture.path);
-        textures.push_back(texture);
-
-        texture.type = "metallicMap";
-        texture.path = "models/textures/earth/metallic.png";
-        texture.id = LoadTexture(texture.path);
-        textures.push_back(texture);
-
-
-        texture.type = "roughnessMap";
-        texture.path = "models/textures/earth/roughness.png";
-        texture.id = LoadTexture(texture.path);
-        textures.push_back(texture);
-
-        texture.type = "aoMap";
-        texture.path = "models/textures/earth/ao.png";
-        texture.id = LoadTexture(texture.path);
-        textures.push_back(texture);
+        textures[j].id = LoadTexture(new_path);
+        textures[j].path = new_path;
     }
 
+    void Material::DeleteTexture(unsigned int j) {
 
-     unsigned int Material::LoadTexture(std::string& path) {
+        glDeleteTextures(1, &textures[j].id);
+    }
 
+    void Material::DeleteAllTextures() {
+
+        for (unsigned int j = 0; j < textures.size(); ++j) {
+            glDeleteTextures(1, &textures[j].id);
+        }
+        textures.clear();
+    }
+
+    unsigned int Material::LoadTexture(std::string& path) {
+        
         unsigned int textureID;
         glGenTextures(1, &textureID);
 
@@ -135,6 +130,7 @@ namespace Chotra {
 
         return textureID;
     }
+     
 
 } // namspace Chotra
 
