@@ -19,7 +19,6 @@ namespace Chotra {
 
     }
 
-    
     void Scene::AddGeometry(std::string const& path, std::string nameNumber) {
         
         ObjModel obj = ObjModel(path, nameNumber);

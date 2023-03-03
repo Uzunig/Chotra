@@ -19,26 +19,22 @@ namespace Chotra {
         glm::vec2 TexCoords;
         glm::vec3 Normal;
     };
-/*
-    struct Texture {
-        unsigned int id;
-        std::string type;
-        std::string path;
-    };
-    */
+
     class Mesh {
     public:
-        std::vector<Vertex> vertices;
-        std::vector<unsigned int> indices;
-        //std::vector<Texture> textures;
+
+        std::string name;
+
+        std::string path;
+        unsigned int icon = 0;
+                
         unsigned int VAO;
         unsigned int VBO;
-        unsigned int EBO;
+       
+        std::vector<Vertex> vertices;
 
-        //void SetupTextures();
         void SetupMesh();
-        //virtual void Draw(Shader& shader);
-        //unsigned int LoadTexture(std::string& path);
+        void DeleteBuffers();
     };
 } // namspace Chotra
 

@@ -21,7 +21,7 @@ namespace Chotra {
     class Scene {
     public:
                        
-        std::vector<class ObjModel> objModels;
+        std::vector<class Mesh> objModels;
         std::vector<class Material> materials;
  
         std::vector<class SceneObject> sceneObjects;

@@ -364,7 +364,7 @@ namespace Chotra {
             if (ImGui::Button("..."))
             {
                 std::string s = FileDialogs::OpenFile("OBJ Files\0*.obj\0All Files\0*.*\0");
-                if ((s != "") && (s != p_mainWindow->scene->objModels[i].obj_path)) {
+                if ((s != "") && (s != p_mainWindow->scene->objModels[i].path)) {
 
                     s = PathToRelative(s);
                     std::string nameNumber = "_" + std::to_string(i);
@@ -375,10 +375,10 @@ namespace Chotra {
             }
             ImGui::SameLine();
             char str0[128];
-            strcpy(str0, p_mainWindow->scene->objModels[i].obj_path.c_str());
+            strcpy(str0, p_mainWindow->scene->objModels[i].path.c_str());
             ImGui::InputText(p_mainWindow->scene->objModels[i].name.c_str(), str0, IM_ARRAYSIZE(str0));
-            if (str0 != p_mainWindow->scene->objModels[i].obj_path.c_str()) {
-                p_mainWindow->scene->objModels[i].obj_path = str0;
+            if (str0 != p_mainWindow->scene->objModels[i].path.c_str()) {
+                p_mainWindow->scene->objModels[i].path = str0;
             }
             ImGui::Spacing();
             ImGui::Separator();

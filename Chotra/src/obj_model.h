@@ -14,18 +14,16 @@ namespace Chotra {
        
         //virtual void Draw(Shader& shader);
        
-        std::string name;
+        /*
         std::string obj_path;
         unsigned int icon = 0;
-       
-        void DeleteBuffers();
+       */
+       // void DeleteBuffers();
 
     private:
-        unsigned int VBO, EBO;
-        
-       
+
+
         void LoadModel(std::string const& obj_path);
-        void SetupMesh();
         
     };
 } // namspace Chotra
