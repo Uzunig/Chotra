@@ -35,6 +35,9 @@ add_library(Chotra STATIC
 	src/renderer.cpp
 	src/renderer.h
 
+      src/resource_manager.cpp
+	src/resource_manager.h
+
 	src/scene.cpp
 	src/scene.h
 
