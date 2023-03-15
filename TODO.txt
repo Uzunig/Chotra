@@ -1,9 +1,6 @@
-To create mesh from vecotr of vertices without save vertices in vector (only in GPU)
-
-To create suitable architecture for engine!
 
 To pass to JSON format and to make loader for collection files 
-To change vector objModels to vector geometry that containes all types og geometry
+To change vector objModels to vector geometry that containes all types of geometry
 
 prefilterMap: make GUI for SANPLE_COUNT
 Is it necessary to make a colletcion of environments?
