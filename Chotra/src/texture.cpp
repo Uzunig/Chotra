@@ -1,7 +1,5 @@
 #include "texture.h"
 
-#include <glad/glad.h>
-
 
 namespace Chotra {
         
@@ -10,7 +8,7 @@ namespace Chotra {
     }
 
     Texture::~Texture() {
-        DeleteTexture();
+        //DeleteTexture(); 
     }
 
     void Texture::DeleteTexture() {
@@ -21,6 +19,14 @@ namespace Chotra {
 
     unsigned int Texture::GetId() {
         return id;
+    }
+
+    int Texture::GetWidth() {
+        return width;
+    }
+
+    int Texture::GetHeight() {
+        return height;
     }
         
 

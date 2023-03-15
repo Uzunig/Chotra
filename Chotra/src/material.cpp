@@ -5,6 +5,7 @@
 #include "stb_image.h"
 
 #include "shader.h"
+#include "material_texture.h"
 
 namespace Chotra {
         
@@ -26,46 +27,26 @@ namespace Chotra {
                 std::string s;
                 mtl_file >> s;
                 std::string texture_filename;
-                MaterialTexture texture;
-
+               
                 if (s == "map_Kd") {
                     mtl_file >> texture_filename;
-                    texture.type = "albedoMap";
-                    texture.path = directory + texture_filename;
-                    texture.id = LoadTexture(texture.path);
-                    textures.push_back(texture);
-
+                    textures.push_back(std::make_shared<MaterialTexture>(directory + texture_filename, "albedoMap"));
                 }
                 else if (s == "map_Bump") {
                     mtl_file >> texture_filename;
-                    texture.type = "normalMap";
-                    texture.path = directory + texture_filename;
-                    texture.id = LoadTexture(texture.path);
-                    textures.push_back(texture);
-
+                    textures.push_back(std::make_shared<MaterialTexture>(directory + texture_filename, "normalMap"));
                 }
                 else if (s == "map_Pm") {
                     mtl_file >> texture_filename;
-                    texture.type = "metallicMap";
-                    texture.path = directory + texture_filename;
-                    texture.id = LoadTexture(texture.path);
-                    textures.push_back(texture);
-
+                    textures.push_back(std::make_shared<MaterialTexture>(directory + texture_filename, "metallicMap"));
                 }
                 else if (s == "map_Pr") {
                     mtl_file >> texture_filename;
-                    texture.type = "roughnessMap";
-                    texture.path = directory + texture_filename;
-                    texture.id = LoadTexture(texture.path);
-                    textures.push_back(texture);
-
+                    textures.push_back(std::make_shared<MaterialTexture>(directory + texture_filename, "roughnessMap"));
                 }
                 else if (s == "map_AO") {
                     mtl_file >> texture_filename;
-                    texture.type = "aoMap";
-                    texture.path = directory + texture_filename;
-                    texture.id = LoadTexture(texture.path);
-                    textures.push_back(texture);
+                    textures.push_back(std::make_shared<MaterialTexture>(directory + texture_filename, "aoMap"));
                 }
             }
         }
@@ -74,68 +55,29 @@ namespace Chotra {
     }
 
     void Material::ChangeTexture(unsigned int j, std::string& new_path) {
-
+/*
         unsigned int textureID = textures[j].id;
         glDeleteTextures(1, &textureID);
 
         textures[j].id = LoadTexture(new_path);
         textures[j].path = new_path;
+        */
     }
 
     void Material::DeleteTexture(unsigned int j) {
-
+        /*
         glDeleteTextures(1, &textures[j].id);
+        */
     }
 
     void Material::DeleteAllTextures() {
-
+        /*
         for (unsigned int j = 0; j < textures.size(); ++j) {
             glDeleteTextures(1, &textures[j].id);
         }
         textures.clear();
+        */
     }
-
-    unsigned int Material::LoadTexture(std::string& path) {
-        
-        unsigned int textureID;
-        glGenTextures(1, &textureID);
-
-        int width, height, nrComponents;
-        stbi_set_flip_vertically_on_load(true);
-        unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
-
-        if (data) {
-            GLenum format;
-
-            if (nrComponents == 1)
-                format = GL_RED;
-
-            else if (nrComponents == 3)
-                format = GL_RGB;
-
-            else if (nrComponents == 4)
-                format = GL_RGBA;
-
-            glBindTexture(GL_TEXTURE_2D, textureID);
-            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-            stbi_image_free(data);
-
-        }
-        else {
-            std::cout << "Texture failed to load at path: " << path << std::endl;
-            stbi_image_free(data);
-        }
-
-        return textureID;
-    }
-     
 
 } // namspace Chotra
 

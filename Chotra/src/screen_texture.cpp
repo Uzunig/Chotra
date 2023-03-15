@@ -6,9 +6,12 @@
 
 namespace Chotra {
 
-    ScreenTexture::ScreenTexture(unsigned int width, unsigned int height) 
-                    : width(width), height(height) {
+    ScreenTexture::ScreenTexture(unsigned int width, unsigned int height) {
 
+        this->width = width;
+        this->height = height;
+        format = GL_RGBA16F;
+        
         GenerateTexture();
     }
         
@@ -16,7 +19,7 @@ namespace Chotra {
 
         glGenTextures(1, &id);
         glBindTexture(GL_TEXTURE_2D, id);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }

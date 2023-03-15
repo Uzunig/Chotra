@@ -5,6 +5,7 @@
 #include "environment.h"
 #include "scene.h"
 #include "shader.h"
+#include "material_texture.h"
 
 namespace Chotra {
 
@@ -36,9 +37,9 @@ namespace Chotra {
 
                 // Теперь устанавливаем сэмплер на нужный текстурный юнит
                 shader.Use();
-                glUniform1i(glGetUniformLocation(shader.ID, (scene.materials[materialIndex].textures[i].type).c_str()), i);
+                glUniform1i(glGetUniformLocation(shader.ID, (scene.materials[materialIndex].textures[i]->type).c_str()), i);
                 // и связываем текстуру
-                glBindTexture(GL_TEXTURE_2D, scene.materials[materialIndex].textures[i].id);
+                glBindTexture(GL_TEXTURE_2D, scene.materials[materialIndex].textures[i]->GetId());
             }
    
 

@@ -10,9 +10,7 @@ namespace Chotra {
         ScreenTexture(unsigned int width, unsigned int height);
 
     protected:
-        unsigned int width;
-        unsigned int height;
-
+        
         virtual void GenerateTexture() override;
 
     };

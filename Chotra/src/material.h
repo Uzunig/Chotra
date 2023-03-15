@@ -4,14 +4,18 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace Chotra {
+    class MaterialTexture;
 
-    struct MaterialTexture {
+    struct MaterialTexture1 {
         unsigned int id;
         std::string type;
         std::string path;
     };
+
+    class MaterialTexture;
 
     class Material {
     public:
@@ -19,10 +23,10 @@ namespace Chotra {
         Material(std::string mtl_path, std::string nameNumber = "");
         std::string mtl_path;
         std::string name;
-        std::vector<MaterialTexture> textures;
+        std::vector<std::shared_ptr<MaterialTexture>> textures;
         
                
-        unsigned int LoadTexture(std::string& path_path);
+       // unsigned int LoadTexture(std::string& path_path);
         void ChangeTexture(unsigned int j, std::string& new_path);
         void DeleteTexture(unsigned int j);
         void DeleteAllTextures();

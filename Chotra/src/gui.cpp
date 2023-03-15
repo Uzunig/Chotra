@@ -11,6 +11,7 @@
 #include "scene.h"
 #include "renderer.h"
 #include "camera.h"
+#include "material_texture.h"
 
 namespace Chotra {
 
@@ -420,7 +421,7 @@ namespace Chotra {
                 if (ImGui::Button(("T" + std::to_string(j)).c_str()))
                 {
                     std::string s = FileDialogs::OpenFile("Image Files\0*.png;*.jpg;*.jpeg\0All Files\0*.*\0");
-                    if ((s != "") && (s != p_mainWindow->scene->materials[i].textures[j].path)) {
+                    if ((s != "") && (s != p_mainWindow->scene->materials[i].textures[j]->path)) {
 
                         s = PathToRelative(s);
                         p_mainWindow->scene->materials[i].ChangeTexture(j, s);
@@ -428,8 +429,8 @@ namespace Chotra {
                 }
                 ImGui::SameLine();
                 char str0[128];
-                strcpy(str0, p_mainWindow->scene->materials[i].textures[j].path.c_str());
-                ImGui::InputText(p_mainWindow->scene->materials[i].textures[j].type.c_str(), str0, IM_ARRAYSIZE(str0));
+                strcpy(str0, p_mainWindow->scene->materials[i].textures[j]->path.c_str());
+                ImGui::InputText(p_mainWindow->scene->materials[i].textures[j]->type.c_str(), str0, IM_ARRAYSIZE(str0));
 
             }
         }
@@ -473,7 +474,7 @@ namespace Chotra {
                     ImGui::SetCursorPos(ImVec2(100 * i + 10, 68));
 
                     ImGui::PushID(i);
-                    ImTextureID my_tex_id = (void*)p_mainWindow->scene->materials[0].textures[0].id;
+                    ImTextureID my_tex_id = (void*)p_mainWindow->scene->materials[0].textures[0]->GetId();
                     ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
 
 
@@ -507,7 +508,7 @@ namespace Chotra {
                     ImGui::SetCursorPos(ImVec2(100 * i + 10, 70));
 
                     ImGui::PushID(i);
-                    ImTextureID my_tex_id = (void*)p_mainWindow->scene->materials[i].textures[0].id;
+                    ImTextureID my_tex_id = (void*)p_mainWindow->scene->materials[i].textures[0]->GetId();
                     ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
 
 
@@ -577,7 +578,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(100 * i + 10, 60));
 
             ImGui::PushID(i);
-            ImTextureID my_tex_id = (void*)p_mainWindow->scene->materials[0].textures[0].id;
+            ImTextureID my_tex_id = (void*)p_mainWindow->scene->materials[0].textures[0]->GetId();
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
 
 
@@ -613,7 +614,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(100 * i + 10, 60));
 
             ImGui::PushID(i);
-            ImTextureID my_tex_id = (void*)p_mainWindow->scene->materials[i].textures[0].id;
+            ImTextureID my_tex_id = (void*)p_mainWindow->scene->materials[i].textures[0]->GetId();
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
 
 
