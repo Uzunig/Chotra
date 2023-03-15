@@ -1,10 +1,16 @@
 
 #include "gui.h"
+
 #include "window.h"
 #include "platform_utils.h"
 #include "Chotra/application.h"
 #include "scene_object.h"
 #include "scene_light.h"
+#include "material.h"
+#include "obj_model.h"
+#include "scene.h"
+#include "renderer.h"
+#include "camera.h"
 
 namespace Chotra {
 

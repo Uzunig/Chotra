@@ -6,7 +6,11 @@
 
 #include "platform_utils.h"
 #include "gui.h"
+#include "camera.h"
+#include "scene.h"
+#include "renderer.h"
 
+#include "Chotra/Events/event.h"
 
 
 namespace Chotra {

@@ -1,11 +1,10 @@
 #include "scene_object.h"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include "obj_model.h"
 #include "material.h"
 #include "environment.h"
 #include "scene.h"
+#include "shader.h"
 
 namespace Chotra {
 

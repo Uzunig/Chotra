@@ -11,9 +11,6 @@ add_library(Chotra STATIC
 	src/camera.cpp
 	src/camera.h
 	
-	src/dashboard.cpp
-	src/dashboard.h
-
 	src/environment.cpp
 	src/environment.h
 
@@ -49,6 +46,9 @@ add_library(Chotra STATIC
 
 	src/shader.cpp
 	src/shader.h
+	
+	src/shadow_map.cpp
+	src/shadow_map.h
 	
 	src/stb_image.cpp
 	src/stb_image.h

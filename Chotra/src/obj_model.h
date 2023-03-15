@@ -1,7 +1,6 @@
 #ifndef OBJ_MODEL_H
 #define OBJ_MODEL_H
 
-#include <sstream>
 
 #include "mesh.h"
 

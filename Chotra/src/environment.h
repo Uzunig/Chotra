@@ -8,10 +8,7 @@
 
 #include <iostream>
 #include <string>
-#include"stb_image.h"
 
-
-#include "shader.h"
 namespace Chotra {
 
     class CaptureSettings {

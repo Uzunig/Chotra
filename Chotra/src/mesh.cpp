@@ -1,5 +1,8 @@
 #include "mesh.h"
+
 #include "stb_image.h"
+
+#include "shader.h"
 
 namespace Chotra {
   

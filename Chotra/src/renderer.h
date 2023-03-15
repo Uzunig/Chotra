@@ -13,11 +13,15 @@
 
 #include "shader.h"
 #include "quad.h"
+#include "shadow_map.h"
 
 namespace Chotra {
 
+    
     class Renderer {
     public:
+
+        ShadowMap shadowMap;
 
         std::vector<Quad> quads;
 
@@ -33,7 +37,7 @@ namespace Chotra {
         Shader pbrShader;
         Shader lightsShader;
         
-        Shader simpleDepthShader;
+        //Shader simpleDepthShader;
 
         Shader screenShader;
         Shader downSamplingShader;
@@ -67,6 +71,7 @@ namespace Chotra {
         float exposure = 1.0f;
         float backgroundExposure = 2.0f;
         bool gammaCorrection = true;
+
         bool showShadows = true;
         float shadowBiasMin = 0.00f;
         float shadowBiasMax = 0.0f;
@@ -119,10 +124,10 @@ namespace Chotra {
         unsigned int upFBO[16];
         unsigned int upColorbuffers[16];
 
-        unsigned int depthMapFBO;
-        unsigned int shadowMapSize = 1024;
-        unsigned int depthMap;
-        glm::mat4 lightSpaceMatrix;
+        //unsigned int depthMapFBO;
+        //unsigned int shadowMapSize = 1024;
+        //unsigned int depthMap;
+        //glm::mat4 lightSpaceMatrix;
 
         unsigned int ssaoFBO;
         unsigned int ssaoBlurFBO;
@@ -162,8 +167,8 @@ namespace Chotra {
         void ConfigureBloom();
         void RenderBloom();
 
-        void ConfigureShadowMap();
-        void GenerateShadowMap();
+        //void ConfigureShadowMap();
+        //void GenerateShadowMap();
         
         void ConfigureSSAO();
         void GenerateSSAOMap();

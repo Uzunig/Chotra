@@ -13,19 +13,24 @@
 #include <string>
 #include <vector>
 
-#include "stb_image.h"
 #include "environment.h"
 
 namespace Chotra {
     
+    class Shader;
+    class Mesh;
+    class Material;
+    class SceneLight;
+    class SceneObject;
+
     class Scene {
     public:
                        
-        std::vector<class Mesh> objModels;
-        std::vector<class Material> materials;
+        std::vector<Mesh> objModels;
+        std::vector<Material> materials;
  
-        std::vector<class SceneObject> sceneObjects;
-        std::vector<class SceneLight> sceneLights;
+        std::vector<SceneObject> sceneObjects;
+        std::vector<SceneLight> sceneLights;
                 
         Environment environment;
 

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef EVENT_H
+#define EVENT_H
 
 #include <functional>
 #include <array>
@@ -178,3 +179,5 @@ namespace Chotra {
         }
     };
 } // namspace Chotra
+
+#endif

@@ -1,23 +1,20 @@
 #include "renderer.h"
 
+#include "shader.h"
 #include "environment.h"
 #include "camera.h"
-
 #include "scene.h"
-
-
-#include "scene_object.h"
 #include "scene_light.h"
-
-
+#include "scene_object.h"
+#include "quad.h"
 
 
 namespace Chotra {
 
     Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene)
-        : width(width), height(height), camera(camera), scene(scene),
+        : width(width), height(height), camera(camera), scene(scene), 
         pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
-        simpleDepthShader("resources/shaders/shadow_depth.vs", "resources/shaders/shadow_depth.fs"),
+        //simpleDepthShader("resources/shaders/shadow_depth.vs", "resources/shaders/shadow_depth.fs"),
         lightsShader("resources/shaders/pbr_shader.vs", "resources/shaders/lights_shader.fs"),
         screenShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_shader.fs"),
         downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/downsampling.fs"),
@@ -35,7 +32,8 @@ namespace Chotra {
 
         GenerateScreenTexture();
         SetupQuad();
-        ConfigureShadowMap();
+        //ConfigureShadowMap();
+        shadowMap.ConfigureShadowMap(width, height);
         ConfigureFramebuffer();
         ConfigureFramebufferMSAA();
 
@@ -145,7 +143,8 @@ namespace Chotra {
 
     void Renderer::ForwardRender() {
 
-        GenerateShadowMap();
+        //GenerateShadowMap();
+        shadowMap.GenerateShadowMap(scene);
 
         if (enableMSAA) {
             RenderWithMSAA();
@@ -162,7 +161,8 @@ namespace Chotra {
 
     void Renderer::DeferredRender() {
 
-        GenerateShadowMap();
+        //GenerateShadowMap();
+        shadowMap.GenerateShadowMap(scene);
         RenderGeometryPass();
         GenerateSSAOMap();
         RenderLightingPass();
@@ -335,7 +335,7 @@ namespace Chotra {
         pbrShader.SetMat4("projection", projection);
         pbrShader.SetMat4("view", view);
         pbrShader.SetVec3("camPos", camera.Position);
-        pbrShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+        pbrShader.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         pbrShader.SetFloat("shadowBiasMin", shadowBiasMin);
         pbrShader.SetFloat("shadowBiasMax", shadowBiasMax);
 
@@ -352,7 +352,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, scene.environment.brdfLUTTexture);
         glActiveTexture(GL_TEXTURE8);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
 
         glActiveTexture(GL_TEXTURE0);
 
@@ -407,7 +407,7 @@ namespace Chotra {
         pbrShader.SetMat4("projection", projection);
         pbrShader.SetMat4("view", view);
         pbrShader.SetVec3("camPos", camera.Position);
-        pbrShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+        pbrShader.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         pbrShader.SetFloat("shadowBiasMin", shadowBiasMin);
         pbrShader.SetFloat("shadowBiasMax", shadowBiasMax);
 
@@ -419,7 +419,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, scene.environment.brdfLUTTexture);
         glActiveTexture(GL_TEXTURE8);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
 
         glActiveTexture(GL_TEXTURE0);
 
@@ -627,7 +627,7 @@ namespace Chotra {
 
         
     }
-
+/*
     void Renderer::ConfigureShadowMap() {
 
         glGenFramebuffers(1, &depthMapFBO);
@@ -679,7 +679,7 @@ namespace Chotra {
         glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
-
+    */
     float lerp(float a, float b, float f)
     {
         return a + f * (b - a);
@@ -958,7 +958,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, scene.environment.brdfLUTTexture);
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, ssaoMap);
         glActiveTexture(GL_TEXTURE9);
@@ -973,7 +973,7 @@ namespace Chotra {
         }
  
         shaderDeferredLightingPass.SetVec3("camPos", camera.Position);
-        shaderDeferredLightingPass.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+        shaderDeferredLightingPass.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         shaderDeferredLightingPass.SetFloat("shadowBiasMin", shadowBiasMin);
         shaderDeferredLightingPass.SetFloat("shadowBiasMax", shadowBiasMax);
 
