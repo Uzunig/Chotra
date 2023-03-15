@@ -26,7 +26,7 @@ namespace Chotra {
                 std::string s;
                 mtl_file >> s;
                 std::string texture_filename;
-                Texture texture;
+                MaterialTexture texture;
 
                 if (s == "map_Kd") {
                     mtl_file >> texture_filename;

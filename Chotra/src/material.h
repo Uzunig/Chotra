@@ -7,7 +7,7 @@
 
 namespace Chotra {
 
-    struct Texture {
+    struct MaterialTexture {
         unsigned int id;
         std::string type;
         std::string path;
@@ -19,7 +19,7 @@ namespace Chotra {
         Material(std::string mtl_path, std::string nameNumber = "");
         std::string mtl_path;
         std::string name;
-        std::vector<Texture> textures;
+        std::vector<MaterialTexture> textures;
         
                
         unsigned int LoadTexture(std::string& path_path);

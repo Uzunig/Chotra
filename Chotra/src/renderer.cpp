@@ -13,8 +13,8 @@ namespace Chotra {
 
     Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene)
         : width(width), height(height), camera(camera), scene(scene), 
+        screenTexture(width, height), screenTexturePrevious(width, height),
         pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
-        //simpleDepthShader("resources/shaders/shadow_depth.vs", "resources/shaders/shadow_depth.fs"),
         lightsShader("resources/shaders/pbr_shader.vs", "resources/shaders/lights_shader.fs"),
         screenShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_shader.fs"),
         downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/downsampling.fs"),
@@ -24,15 +24,12 @@ namespace Chotra {
         backgroundShader("resources/shaders/background.vs", "resources/shaders/background.fs"),
         shaderSSAO("resources/shaders/screen_shader.vs", "resources/shaders/ssao.fs"),
         shaderSSAOBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssao_blur.fs"),
-        //shaderSSR("shaders/screen_shader.vs", "shaders/ssr.fs"),
         shaderDeferredGeometryPass("resources/shaders/deferred_geometry_pass.vs", "resources/shaders/deferred_geometry_pass.fs"),
         shaderDeferredLightingPass("resources/shaders/deferred_lighting_pass.vs", "resources/shaders/deferred_lighting_pass.fs"),
         shaderRenderOnScreen("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") {
 
-
-        GenerateScreenTexture();
+                
         SetupQuad();
-        //ConfigureShadowMap();
         shadowMap.ConfigureShadowMap(width, height);
         ConfigureFramebuffer();
         ConfigureFramebufferMSAA();
@@ -45,24 +42,7 @@ namespace Chotra {
         ConfigureBloom();
         
     }
-
-    void Renderer::GenerateScreenTexture() {
-
-        glGenTextures(1, &screenTexture);
-
-        glBindTexture(GL_TEXTURE_2D, screenTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        glGenTextures(1, &screenTexturePrevious);
-
-        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    }
-
+    
     void Renderer::Init() {
           {
             //Create debugging quads
@@ -161,7 +141,6 @@ namespace Chotra {
 
     void Renderer::DeferredRender() {
 
-        //GenerateShadowMap();
         shadowMap.GenerateShadowMap(scene);
         RenderGeometryPass();
         GenerateSSAOMap();
@@ -260,8 +239,8 @@ namespace Chotra {
 
         // Создаем цветовую прикрепляемую текстуру
 
-        glBindTexture(GL_TEXTURE_2D, screenTexture);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	// нам нужен только цветовой буфер
+        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture.GetId(), 0);	// нам нужен только цветовой буфер
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
@@ -274,8 +253,8 @@ namespace Chotra {
         glGenFramebuffers(1, &framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-        glBindTexture(GL_TEXTURE_2D, screenTexture);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
+        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture.GetId(), 0);
                 
         // Создаем рендербуфер для прикрепляемых объектов глубины трафарета
         glGenRenderbuffers(1, &rbo);
@@ -292,11 +271,11 @@ namespace Chotra {
         glGenFramebuffers(1, &framebufferPrevious);
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferPrevious);
 
-        glBindTexture(GL_TEXTURE_2D, screenTexture);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
+        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture.GetId(), 0);
 
-        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, screenTexturePrevious, 0);
+        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, screenTexturePrevious.GetId(), 0);
 
         unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
         glDrawBuffers(2, attachments);
@@ -555,7 +534,7 @@ namespace Chotra {
 
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, screenTexture); // теперь в качестве текстуры прямоугольника используем преобразованный прикрепленный цветовой объект 
+        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId()); // теперь в качестве текстуры прямоугольника используем преобразованный прикрепленный цветовой объект 
         // Отрисовываем прямоугольник сцены
         RenderQuad();
 
@@ -627,59 +606,7 @@ namespace Chotra {
 
         
     }
-/*
-    void Renderer::ConfigureShadowMap() {
 
-        glGenFramebuffers(1, &depthMapFBO);
-
-        glGenTextures(1, &depthMap);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-
-        //Make shaddow map
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-        glDrawBuffer(GL_NONE);
-        glReadBuffer(GL_NONE);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-
-    void Renderer::GenerateShadowMap() {
-        // Scene rendering from light position
-        glm::mat4 lightProjection, lightView;
-
-
-        float near_plane = 1.0f, far_plane = 100.0f;
-        //lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)shadowMapSize / (GLfloat)shadowMapSize, near_plane, far_plane); // обратите внимание, что если вы используете матрицу перспективной проекции, то вам придется изменить положение света, так как текущего положения света недостаточно для отображения всей сцены
-        lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-        lightView = glm::lookAt(scene.sceneLights[0].position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-        lightSpaceMatrix = lightProjection * lightView;
-
-        simpleDepthShader.Use();
-        simpleDepthShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-        glViewport(0, 0, width, height);
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
-
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-
-        if (showShadows) {  // if false, getting the empty depthmap withaut rendering      TODO::optimize 
-            scene.DrawSceneObjects(simpleDepthShader);
-        }
-        glCullFace(GL_BACK);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-    */
     float lerp(float a, float b, float f)
     {
         return a + f * (b - a);
@@ -806,7 +733,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, noiseTexture);
         glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious); // screen texture from the previous frame (I'm not sure it is correct or not)
+        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious.GetId()); // screen texture from the previous frame (I'm not sure it is correct or not)
                 
         RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1013,7 +940,7 @@ namespace Chotra {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shaderRenderOnScreen.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, screenTexture);
+        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
         shaderRenderOnScreen.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
         
         glViewport(0, 0, width, height);
