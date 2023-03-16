@@ -42,7 +42,7 @@ namespace Chotra {
                 glBindTexture(GL_TEXTURE_2D, scene.materials[materialIndex].textures[i]->GetId());
             }
    
-
+            
         // Отрисовываем меш
         glBindVertexArray(scene.objModels[geometryIndex].VAO);
         glDrawArrays(GL_TRIANGLES, 0, scene.objModels[geometryIndex].vertices.size());

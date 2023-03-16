@@ -8,7 +8,7 @@
 
 namespace Chotra {
     class MaterialTexture;
-
+    
     struct MaterialTexture1 {
         unsigned int id;
         std::string type;
@@ -23,7 +23,7 @@ namespace Chotra {
         Material(std::string mtl_path, std::string nameNumber = "");
         std::string mtl_path;
         std::string name;
-        std::vector<std::shared_ptr<MaterialTexture>> textures;
+        std::vector<std::shared_ptr<MaterialTexture>> textures; //TO DO: class Texture with polimorphism using
         
                
        // unsigned int LoadTexture(std::string& path_path);

@@ -10,7 +10,7 @@ namespace Chotra {
     public:
         ObjModel() = delete;
         ObjModel(std::string const& path, std::string nameNumber = "");
-       
+        
         //virtual void Draw(Shader& shader);
        
         /*
