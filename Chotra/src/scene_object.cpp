@@ -6,6 +6,7 @@
 #include "scene.h"
 #include "shader.h"
 #include "material_texture.h"
+#include "resource_manager.h"
 
 namespace Chotra {
 
@@ -31,18 +32,20 @@ namespace Chotra {
         shader.Use();
         shader.SetMat4("model", modelMatrix);
         //mesh.Draw(shader);
-        
-            for (unsigned int i = 0; i < scene.materials[materialIndex].textures.size(); i++) {
-                glActiveTexture(GL_TEXTURE0 + i); // перед связыванием активируем нужный текстурный юнит
+        std::map<std::string, unsigned int>::iterator it;
+        unsigned int j = 0;
+        for (std::map<std::string, unsigned int>::iterator it = scene.materials[materialIndex].components.begin(); it != scene.materials[materialIndex].components.end(); ++it) {
+            glActiveTexture(GL_TEXTURE0 + j); // перед связыванием активируем нужный текстурный юнит
 
-                // Теперь устанавливаем сэмплер на нужный текстурный юнит
-                shader.Use();
-                glUniform1i(glGetUniformLocation(shader.ID, (scene.materials[materialIndex].textures[i]->type).c_str()), i);
-                // и связываем текстуру
-                glBindTexture(GL_TEXTURE_2D, scene.materials[materialIndex].textures[i]->GetId());
-            }
-   
-            
+            // Теперь устанавливаем сэмплер на нужный текстурный юнит
+            shader.Use();
+            glUniform1i(glGetUniformLocation(shader.ID, (it->first).c_str()), j);
+            // и связываем текстуру
+            glBindTexture(GL_TEXTURE_2D, ResourceManager::GetTexturesId(it->second));
+            ++j;
+        }
+
+
         // Отрисовываем меш
         glBindVertexArray(scene.objModels[geometryIndex].VAO);
         glDrawArrays(GL_TRIANGLES, 0, scene.objModels[geometryIndex].vertices.size());

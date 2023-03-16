@@ -8,8 +8,8 @@
 
 namespace Chotra {
 
-    MaterialTexture::MaterialTexture(std::string path, std::string type) 
-                        : path(path), type(type) {
+    MaterialTexture::MaterialTexture(std::string path) 
+                        : path(path) {
 
         GenerateTexture();
        

@@ -6,6 +6,7 @@
 
 #include "shader.h"
 #include "material_texture.h"
+#include "resource_manager.h"
 
 namespace Chotra {
         
@@ -30,28 +31,28 @@ namespace Chotra {
                
                 if (s == "map_Kd") {
                     mtl_file >> texture_filename;
-                    textures.push_back(std::make_shared<MaterialTexture>(directory + texture_filename, "albedoMap"));
+                    components["albedoMap"] = ResourceManager::AddTexture(directory + texture_filename);
                 }
                 else if (s == "map_Bump") {
                     mtl_file >> texture_filename;
-                    textures.push_back(std::make_shared<MaterialTexture>(directory + texture_filename, "normalMap"));
+                    components["normalMap"] = ResourceManager::AddTexture(directory + texture_filename);
                 }
                 else if (s == "map_Pm") {
                     mtl_file >> texture_filename;
-                    textures.push_back(std::make_shared<MaterialTexture>(directory + texture_filename, "metallicMap"));
+                    components["metallicMap"] = ResourceManager::AddTexture(directory + texture_filename);
                 }
                 else if (s == "map_Pr") {
                     mtl_file >> texture_filename;
-                    textures.push_back(std::make_shared<MaterialTexture>(directory + texture_filename, "roughnessMap"));
+                    components["roughnessMapIndex"] = ResourceManager::AddTexture(directory + texture_filename);
                 }
                 else if (s == "map_AO") {
                     mtl_file >> texture_filename;
-                    textures.push_back(std::make_shared<MaterialTexture>(directory + texture_filename, "aoMap"));
+                    components["aoMapIndex"] = ResourceManager::AddTexture(directory + texture_filename);
                 }
             }
         }
         name = mtl_path.substr(mtl_path.find_last_of('/') + 1, mtl_path.length()) + nameNumber;
-        std::cout << "Material created" << std::endl;
+        
     }
 
     void Material::ChangeTexture(unsigned int j, std::string& new_path) {

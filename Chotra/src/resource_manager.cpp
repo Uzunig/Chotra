@@ -1,31 +1,28 @@
 #include "resource_manager.h"
 
-#include "mesh.h"
-#include "material.h"
+#include "material_texture.h"
 
 namespace Chotra {
 
-    unsigned int ResourceManager::AddMeshFromFile(std::string const& path) {
-        std::vector<Vertex> vertices;
-        LoadMeshFromFile(path, vertices);
-        return 0;
-       
+    std::vector<std::shared_ptr<MaterialTexture>> ResourceManager::textures;
+
+    unsigned int ResourceManager::AddTexture(std::string path) {
+
+        textures.push_back(std::make_shared<MaterialTexture>(path));
+        return textures.size() - 1;
     }
 
-    void ResourceManager::LoadMeshFromFile(std::string const& path, std::vector<Vertex>& vertices) {
-
+    unsigned int ResourceManager::GetTexturesId(unsigned int i) {
+        return textures[i]->GetId();
     }
 
-    unsigned int ResourceManager::AddMaterialFromFile(std::string const& path) {
-        return 0;
-    }
+    unsigned int ResourceManager::GetTexturesCount() {
 
-    Mesh* ResourceManager::GetMesh(unsigned int i) {
-        return nullptr;
+        return textures.size();
     }
-
-    Material* ResourceManager::GetMaterial(unsigned int i) {
-        return nullptr;
+    
+    std::string ResourceManager::GetTexturesPath(unsigned int i) {
+        return textures[i]->path;
     }
 
 

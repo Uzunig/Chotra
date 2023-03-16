@@ -3,23 +3,23 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 
 namespace Chotra {
 
+    class MaterialTexture;
+
     class ResourceManager {
     public:
-        unsigned int AddMeshFromFile(std::string const& path);
-        unsigned int AddMaterialFromFile(std::string const& path);
-
-        class Mesh* GetMesh(unsigned int i);
-        class Material* GetMaterial(unsigned int i);
+        static unsigned int AddTexture(std::string path);
+        static unsigned int GetTexturesId(unsigned int i);
+        static unsigned int GetTexturesCount();
+        static std::string GetTexturesPath(unsigned int i);
 
     private:
-        std::vector<class Mesh*> geometries;
-        std::vector<class Material*> materials;
-
-        void LoadMeshFromFile(std::string const& path, std::vector<class Vertex>& vertices);
+        static std::vector<std::shared_ptr<MaterialTexture>> textures;
+       
     };
 
 } // namespace Chotra

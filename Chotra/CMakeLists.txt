@@ -61,10 +61,7 @@ add_library(Chotra STATIC
 
 	src/texture.cpp
 	src/texture.h
-
-	src/texture_storage.cpp
-	src/texture_storage.h
-	
+		
 	src/quad.cpp
 	src/quad.h
 

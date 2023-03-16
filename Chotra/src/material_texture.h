@@ -9,10 +9,8 @@ namespace Chotra {
 
     class MaterialTexture : public Texture {
     public:
-        std::string type;
         std::string path;
-
-        MaterialTexture(std::string path, std::string type);
+        MaterialTexture(std::string path);
 
     protected:
         
