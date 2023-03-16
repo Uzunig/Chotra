@@ -13,6 +13,7 @@ namespace Chotra {
     class ResourceManager {
     public:
         static unsigned int AddTexture(std::string path);
+        static void ChangeTexture(unsigned int i, std::string path);
         static unsigned int GetTexturesId(unsigned int i);
         static unsigned int GetTexturesCount();
         static std::string GetTexturesPath(unsigned int i);

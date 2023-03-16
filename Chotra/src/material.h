@@ -19,7 +19,6 @@ namespace Chotra {
         //std::vector<std::shared_ptr<MaterialTexture>> textures; //TO DO: class Texture with polimorphism using
         std::map<std::string, unsigned int> components;
                
-       // unsigned int LoadTexture(std::string& path_path);
         void ChangeTexture(unsigned int j, std::string& new_path);
         void DeleteTexture(unsigned int j);
         void DeleteAllTextures();

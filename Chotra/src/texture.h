@@ -9,6 +9,7 @@ namespace Chotra {
     public:
         Texture();
         virtual ~Texture();
+        void DeleteTexture();
         unsigned int GetId();
         int GetWidth();
         int GetHeight();
@@ -20,7 +21,7 @@ namespace Chotra {
         GLenum format;
 
         virtual void GenerateTexture() = 0;
-        void DeleteTexture();
+        
 
     };
 

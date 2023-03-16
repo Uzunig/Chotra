@@ -12,6 +12,13 @@ namespace Chotra {
         return textures.size() - 1;
     }
 
+    void ResourceManager::ChangeTexture(unsigned int i, std::string path) {
+
+        textures[i]->DeleteTexture();
+        MaterialTexture tex(path);
+        *textures[i] = tex;
+    }
+
     unsigned int ResourceManager::GetTexturesId(unsigned int i) {
         return textures[i]->GetId();
     }

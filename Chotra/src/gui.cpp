@@ -438,6 +438,58 @@ namespace Chotra {
                 ++j;
             }
         }
+        else if ((selected >= 400) && (selected < 600)) {
+            int i = selected - 400;
+            ImGui::Text("Texture:");
+
+            ImGui::SetCursorPos(ImVec2(10, 50));
+            if (ImGui::Selectable(("##" + ResourceManager::GetTexturesPath(i)).c_str(), selected == 400 + i, 0, ImVec2(80, 82))) {
+                selected = 400 + i;
+
+                std::string s = FileDialogs::OpenFile("Image Files\0*.png;*.jpg;*.jpeg\0All Files\0*.*\0");
+                if ((s != "") && (s != ResourceManager::GetTexturesPath(i))) {
+
+                    s = PathToRelative(s);
+                    // TO DO: Check selectet object before any change.
+                    ResourceManager::ChangeTexture(i, s);
+                }
+            }
+
+
+            ImGui::SetItemAllowOverlap();
+            ImGui::SetCursorPos(ImVec2(10, 50));
+
+            ImGui::PushID(i);
+            ImTextureID my_tex_id = (void*)ResourceManager::GetTexturesId(i);
+            ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
+            ImGui::PopID();
+
+            ImGui::SetCursorPos(ImVec2(100, 50));
+            ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + 230);
+           
+                ImGui::Text(ResourceManager::GetTexturesPath(i).c_str(), 230);
+           
+            ImGui::PopTextWrapPos();
+            /*
+            ImGui::Spacing();
+            if (ImGui::Button("..."))
+            {
+                std::string s = FileDialogs::OpenFile("Image Files\0*.png;*.jpg;*.jpeg\0All Files\0*.*\0");
+                if ((s != "") && (s != ResourceManager::GetTexturesPath(i))) {
+
+                    s = PathToRelative(s);
+                    // TO DO: Check selectet object before any change.
+                    ResourceManager::ChangeTexture(i, s);
+                }
+            }
+            ImGui::SameLine();
+            {
+                char str0[128];
+                strcpy(str0, ResourceManager::GetTexturesPath(i).c_str());
+                ImGui::InputText(ResourceManager::GetTexturesPath(i).c_str(), str0, IM_ARRAYSIZE(str0));
+            }
+            */
+        }
         ImGui::End();
     }
 
