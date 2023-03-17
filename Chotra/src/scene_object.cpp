@@ -1,29 +1,28 @@
 #include "scene_object.h"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include "obj_model.h"
 #include "material.h"
 #include "environment.h"
-#include "scene.h"
+#include "shader.h"
+#include "material_texture.h"
+#include "resource_manager.h"
 
 namespace Chotra {
 
-    SceneObject::SceneObject(Scene& scene, unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
+    SceneObject::SceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
         glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible)
-        : scene(scene), geometryIndex(geometryIndex), materialIndex(materialIndex), name(name), position(position), angle(angle),
+        : geometryIndex(geometryIndex), materialIndex(materialIndex), name(name), position(position), angle(angle),
         scale(scale), velocity(velocity), rVelocity(rVelocity), visible(visible) {
 
         UpdateModelMatrix();
-        std::cout << "SceneObject created " << std::endl;
     }
 
-    void SceneObject::ChangeGeometryIndex(int geometryIndex) {
-        this->geometryIndex = geometryIndex;
+    void SceneObject::ChangeGeometryIndex(unsigned int i) {
+        geometryIndex = i;
     }
 
-    void SceneObject::ChangeMaterialIndex(int materialIndex) {
-        this->materialIndex = materialIndex;
+    void SceneObject::ChangeMaterialIndex(unsigned int i) {
+       materialIndex = i;
     }
 
     void SceneObject::Draw(Shader& shader) {
@@ -32,20 +31,22 @@ namespace Chotra {
         shader.SetMat4("model", modelMatrix);
         //mesh.Draw(shader);
         
-            for (unsigned int i = 0; i < scene.materials[materialIndex].textures.size(); i++) {
-                glActiveTexture(GL_TEXTURE0 + i); // перед связыванием активируем нужный текстурный юнит
+        unsigned int j = 0;
+        for (std::map<std::string, unsigned int>::iterator it = ResourceManager::GetMaterial(materialIndex)->components.begin(); it != ResourceManager::GetMaterial(materialIndex)->components.end(); ++it) {
+            glActiveTexture(GL_TEXTURE0 + j); // перед связыванием активируем нужный текстурный юнит
 
-                // Теперь устанавливаем сэмплер на нужный текстурный юнит
-                shader.Use();
-                glUniform1i(glGetUniformLocation(shader.ID, (scene.materials[materialIndex].textures[i].type).c_str()), i);
-                // и связываем текстуру
-                glBindTexture(GL_TEXTURE_2D, scene.materials[materialIndex].textures[i].id);
-            }
-   
+            // Теперь устанавливаем сэмплер на нужный текстурный юнит
+            shader.Use();
+            glUniform1i(glGetUniformLocation(shader.ID, (it->first).c_str()), j);
+            // и связываем текстуру
+            glBindTexture(GL_TEXTURE_2D, ResourceManager::GetTextureId(it->second));
+            ++j;
+        }
+
 
         // Отрисовываем меш
-        glBindVertexArray(scene.objModels[geometryIndex].VAO);
-        glDrawArrays(GL_TRIANGLES, 0, scene.objModels[geometryIndex].vertices.size());
+        glBindVertexArray(ResourceManager::GetGeometryVAO(geometryIndex));
+        glDrawArrays(GL_TRIANGLES, 0, ResourceManager::GetGeometryVerticesCount(geometryIndex));
         //glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
         glBindVertexArray(0);
 

@@ -15,7 +15,7 @@ namespace Chotra {
         glm::vec3 color;
         int brightness;
 
-        SceneLight(Scene& scene, unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position = glm::vec3(0.0f), glm::vec3 angle = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 rVelocity = glm::vec3(0.0f),
+        SceneLight(unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position = glm::vec3(0.0f), glm::vec3 angle = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 rVelocity = glm::vec3(0.0f),
             int visible = true, glm::vec3 color = glm::vec3(1.0f), int brightness = 100, float deformation = 0.0f, int deformatioVector = 0);
 
     };

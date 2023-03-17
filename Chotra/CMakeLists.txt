@@ -10,13 +10,7 @@ add_library(Chotra STATIC
 	
 	src/camera.cpp
 	src/camera.h
-
-	src/cylinder.cpp
-	src/cylinder.h
-
-	src/dashboard.cpp
-	src/dashboard.h
-
+	
 	src/environment.cpp
 	src/environment.h
 
@@ -25,6 +19,9 @@ add_library(Chotra STATIC
 
       src/material.cpp
 	src/material.h
+
+	src/material_texture.cpp
+	src/material_texture.h
 
 	src/mesh.cpp
 	src/mesh.h
@@ -38,6 +35,9 @@ add_library(Chotra STATIC
 	src/renderer.cpp
 	src/renderer.h
 
+      src/resource_manager.cpp
+	src/resource_manager.h
+
 	src/scene.cpp
 	src/scene.h
 
@@ -47,15 +47,21 @@ add_library(Chotra STATIC
 	src/scene_light.cpp
 	src/scene_light.h
 
+	src/screen_texture.cpp
+	src/screen_texture.h
+
 	src/shader.cpp
 	src/shader.h
-
-	src/sphere.cpp
-	src/sphere.h
-
+	
+	src/shadow_map.cpp
+	src/shadow_map.h
+	
 	src/stb_image.cpp
 	src/stb_image.h
 
+	src/texture.cpp
+	src/texture.h
+		
 	src/quad.cpp
 	src/quad.h
 

@@ -12,17 +12,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Chotra/Events/event.h"
-
 #include "camera.h"
-#include "scene.h"
-#include "renderer.h"
 
-
- 
 
 namespace Chotra {
 
+    class Scene;
+    class Gui;
+    class Renderer;
+    struct Event;
 
     class Window {
     public:
@@ -51,7 +49,7 @@ namespace Chotra {
                 
         Camera camera;
         std::unique_ptr<Scene> scene;
-    
+                   
         std::unique_ptr<Renderer> renderer;
         std::unique_ptr<class Gui> gui;
 

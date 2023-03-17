@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "Chotra/application.h"
+
 #include "window.h"
 
 
@@ -26,7 +27,7 @@ namespace Chotra {
         if (GetCurrentDirectoryA(256, mainDir)) {}
 
         mainWindow = std::make_unique<Window>("Chotra Engine", 1920, 1080); //1920 1080
-
+        
         eventDispatcher.addEventListener<WindowResizeEvent>(
             [&](WindowResizeEvent& event) {
                 //std::cout << "Window resized to  " << event.width << " " << event.height << std::endl;

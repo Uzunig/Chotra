@@ -13,28 +13,33 @@
 
 #include "shader.h"
 #include "quad.h"
+#include "shadow_map.h"
+#include "screen_texture.h"
 
 namespace Chotra {
 
+    class Scene;
+    class Camera;
+            
     class Renderer {
     public:
+
+        ShadowMap shadowMap;
 
         std::vector<Quad> quads;
 
         glm::mat4 projection;
         glm::mat4 view;
 
-        class Camera& camera;
-        class Scene& scene;
+        Camera& camera;
+        Scene& scene;
                                        
         unsigned int& width;
         unsigned int& height;
 
         Shader pbrShader;
         Shader lightsShader;
-        
-        Shader simpleDepthShader;
-
+                
         Shader screenShader;
         Shader downSamplingShader;
         Shader combineShader;
@@ -46,9 +51,7 @@ namespace Chotra {
 
         Shader shaderSSAO;
         Shader shaderSSAOBlur;
-
-        //Shader shaderSSR;
-
+               
         Shader shaderDeferredGeometryPass;
         Shader shaderDeferredLightingPass;
 
@@ -67,6 +70,7 @@ namespace Chotra {
         float exposure = 1.0f;
         float backgroundExposure = 2.0f;
         bool gammaCorrection = true;
+
         bool showShadows = true;
         float shadowBiasMin = 0.00f;
         float shadowBiasMax = 0.0f;
@@ -80,7 +84,7 @@ namespace Chotra {
         int iterationCount = 1400; // 1400
         float accuracySSR = 0.05f; // 0.05f
                 
-        unsigned int screenTexture; 
+        ScreenTexture screenTexture; 
                 
         unsigned int gBuffer;           // G-Buffer
         unsigned int gPosition; //TExtures
@@ -99,7 +103,7 @@ namespace Chotra {
         // Framebuffer without MSAA
         unsigned int framebufferPrevious;
         unsigned int rboPrevious;
-        unsigned int screenTexturePrevious;
+        ScreenTexture screenTexturePrevious;
 
         // Framebuffer with MSAA
         unsigned int framebufferMSAA;
@@ -118,12 +122,7 @@ namespace Chotra {
 
         unsigned int upFBO[16];
         unsigned int upColorbuffers[16];
-
-        unsigned int depthMapFBO;
-        unsigned int shadowMapSize = 1024;
-        unsigned int depthMap;
-        glm::mat4 lightSpaceMatrix;
-
+                
         unsigned int ssaoFBO;
         unsigned int ssaoBlurFBO;
         unsigned int ssaoColorBuffer;
@@ -140,7 +139,7 @@ namespace Chotra {
         
         Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene);
 
-        void GenerateScreenTexture();
+        //void GenerateScreenTexture();
 
         void Init();
         void Render();
@@ -161,10 +160,7 @@ namespace Chotra {
 
         void ConfigureBloom();
         void RenderBloom();
-
-        void ConfigureShadowMap();
-        void GenerateShadowMap();
-        
+                        
         void ConfigureSSAO();
         void GenerateSSAOMap();
 

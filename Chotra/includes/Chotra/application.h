@@ -2,10 +2,11 @@
 
 #include <memory>
 #include <windows.h>
+
 #include "Chotra/Events/event.h"
 
 namespace Chotra {
-
+        
     static CHAR mainDir[256] = { 0 };
 
     class Application {

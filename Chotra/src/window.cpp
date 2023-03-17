@@ -6,7 +6,11 @@
 
 #include "platform_utils.h"
 #include "gui.h"
+#include "camera.h"
+#include "scene.h"
+#include "renderer.h"
 
+#include "Chotra/Events/event.h"
 
 
 namespace Chotra {
@@ -135,8 +139,8 @@ namespace Chotra {
         //glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         camera = Camera(glm::vec3(0.0f, 5.0f, 25.0f));
-        scene = std::make_unique<Scene>();
-        //background = std::make_unique<Background>(*scene);
+        scene = std::make_unique<Scene>();   
+        
         renderer = std::make_unique<Renderer>(windowData.width, windowData.height, camera, *scene);
         renderer->Init();
         gui = std::make_unique<Gui>(this);

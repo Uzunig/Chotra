@@ -1,5 +1,8 @@
 #include "platform_utils.h"
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include <iostream>
 #include <windows.h>
 #include <shobjidl.h> 
@@ -28,7 +31,7 @@ namespace Chotra {
         ofn.lpstrFile = szFile;
         ofn.nMaxFile = sizeof(szFile);
 
-        if (SetCurrentDirectory(Application::GetMainDir().c_str()));
+        SetCurrentDirectory(Application::GetMainDir().c_str());
         if (GetCurrentDirectoryA(256, currentDir))
             ofn.lpstrInitialDir = currentDir;
 
@@ -37,7 +40,7 @@ namespace Chotra {
         ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
         if (GetOpenFileNameA(&ofn) == TRUE) {
-            std::cout << "Open file dialog" << std::endl;
+ 
             return ofn.lpstrFile;
         }
         std::cout << "Open file dialog is not opening" << std::endl;

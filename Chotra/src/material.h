@@ -1,38 +1,25 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include <glad/glad.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include "shader.h"
-
 
 #include <string>
-#include <vector>
+#include <map>
+#include <memory>
+
 
 namespace Chotra {
-
-    struct Texture {
-        unsigned int id;
-        std::string type;
-        std::string path;
-    };
-
+    class MaterialTexture;
+         
     class Material {
     public:
         Material() = delete;
-        Material(std::string mtl_path, std::string nameNumber = "");
-        std::string mtl_path;
+        Material(std::string path, std::string suffix = "");
+        std::string path;
         std::string name;
-        std::vector<Texture> textures;
+        unsigned int icon = 0;
+
+        std::map<std::string, unsigned int> components;
         
-               
-        unsigned int LoadTexture(std::string& path_path);
-        void ChangeTexture(unsigned int j, std::string& new_path);
-        void DeleteTexture(unsigned int j);
-        void DeleteAllTextures();
     };
 } // namspace Chotra
 

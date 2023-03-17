@@ -2,9 +2,9 @@
 
 namespace Chotra {
 
-    SceneLight::SceneLight(Scene& scene, unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
+    SceneLight::SceneLight(unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
         int visible, glm::vec3 color, int brightness, float deformation, int deformatioVector) 
-        : SceneObject(scene, meshIndex, materialIndex, name, position, angle, scale, velocity, rVelocity, visible), color(color), brightness(brightness) {
+        : SceneObject(meshIndex, materialIndex, name, position, angle, scale, velocity, rVelocity, visible), color(color), brightness(brightness) {
 
     }
 
