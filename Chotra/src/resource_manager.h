@@ -16,17 +16,17 @@ namespace Chotra {
     public:
         static unsigned int AddTexture(std::string path);
         static void ChangeTexture(unsigned int i, std::string path);
-        static unsigned int GetTexturesId(unsigned int i);
+        static unsigned int GetTextureId(unsigned int i);
         static unsigned int GetTexturesCount();
-        static std::string GetTexturesPath(unsigned int i);
+        static std::string GetTexturePath(unsigned int i);
 
         static unsigned int AddMaterial(std::string path);
         static void ChangeMaterialSource(unsigned int i, std::string path);
-        static void ChangeComponentsIndex(unsigned int i, std::string componentsName, int chosed);
+        static void ChangeComponentIndex(unsigned int i, std::string componentsName, int chosed);
         static std::shared_ptr<Material> GetMaterial(unsigned int i);
         static unsigned int GetMaterialsCount();
-        static std::string GetMaterialsName(unsigned int i);
-        static std::string GetMaterialsPath(unsigned int i);
+        static std::string GetMaterialName(unsigned int i);
+        static std::string GetMaterialPath(unsigned int i);
 
         static unsigned int AddGeometry(std::string path);
         static void ChangeGeometrySource(unsigned int i, std::string path);

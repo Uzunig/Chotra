@@ -41,7 +41,7 @@ namespace Chotra {
             shader.Use();
             glUniform1i(glGetUniformLocation(shader.ID, (it->first).c_str()), j);
             // и связываем текстуру
-            glBindTexture(GL_TEXTURE_2D, ResourceManager::GetTexturesId(it->second));
+            glBindTexture(GL_TEXTURE_2D, ResourceManager::GetTextureId(it->second));
             ++j;
         }
 
