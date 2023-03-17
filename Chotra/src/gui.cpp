@@ -87,7 +87,6 @@ namespace Chotra {
 
         ImGui::Begin("Chotra Engine GUI", p_open, window_flags);
 
-        // Menu Bar
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("File")) {
 
@@ -110,7 +109,7 @@ namespace Chotra {
                 if (ImGui::BeginMenu("Open")) {
                     if (ImGui::MenuItem("Project")) {
                         std::string s = FileDialogs::OpenFile("");
-                        //loading and cofiguring the scene
+                        //loading and configuring the scene
                     }
                     ImGui::EndMenu();
                 }
@@ -425,27 +424,10 @@ namespace Chotra {
 
             ImGui::PopTextWrapPos();
 
-            /*
-            if (ImGui::Button("..."))
-            {
-                std::string s = FileDialogs::OpenFile("MTL Files\0 * .mtl\0All Files\0 * .*\0");
-                if ((s != "") && (s != ResourceManager::GetMaterialsPath(i))) {
-
-                    s = PathToRelative(s);
-                    ResourceManager::ChangeMaterialSource(i, s);
-                }
-            }
-            ImGui::SameLine();
-            {
-                char str0[128];
-                strcpy(str0, ResourceManager::GetMaterialsPath(i).c_str());
-                ImGui::InputText(ResourceManager::GetMaterialsName(i).c_str(), str0, IM_ARRAYSIZE(str0));
-            }*/
             ImGui::SetCursorPos(ImVec2(10, 140));
             ImGui::Spacing();
             ImGui::Separator();
             ImGui::Text("Components:");
-
 
             unsigned int j = 0;
             for (std::map<std::string, unsigned int>::iterator it = ResourceManager::GetMaterial(i)->components.begin(); it != ResourceManager::GetMaterial(i)->components.end(); ++it) {
