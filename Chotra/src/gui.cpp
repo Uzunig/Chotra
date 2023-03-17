@@ -385,7 +385,9 @@ namespace Chotra {
             ImGui::PopID();
 
             ImGui::SetCursorPos(ImVec2(100, 50));
-            ImGui::Text(ResourceManager::GetGeometryName(i).c_str());
+            std::string s = ResourceManager::GetGeometryName(i);
+            s = s.substr(0, s.find_first_of("##"));
+            ImGui::Text(s.c_str());
 
             ImGui::SetCursorPos(ImVec2(100, 70));
             ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + 230);
@@ -442,7 +444,9 @@ namespace Chotra {
             ImGui::PopID();
 
             ImGui::SetCursorPos(ImVec2(100, 50));
-            ImGui::Text(ResourceManager::GetMaterialsName(i).c_str());
+            std::string s = ResourceManager::GetMaterialsName(i);
+            s = s.substr(0, s.find_first_of("##"));
+            ImGui::Text(s.c_str());
 
             ImGui::SetCursorPos(ImVec2(100, 70));
             ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + 230);

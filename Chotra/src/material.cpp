@@ -14,6 +14,7 @@ namespace Chotra {
 
         std::cout << "MTL path: " << path << std::endl;
         std::string directory = path.substr(0, path.find_last_of('/')) + '/';
+        name = path.substr(path.find_last_of('/') + 1, path.length()) + "##" + suffix;
         std::ifstream mtl_file(path);
         if (!mtl_file) {
             std::cout << "The MTL file could not open for writing!" << std::endl;
@@ -50,9 +51,7 @@ namespace Chotra {
                     components["aoMap"] = ResourceManager::AddTexture(directory + texture_filename);
                 }
             }
-        }
-        name = path.substr(path.find_last_of('/') + 1, path.length()) + "_" + suffix;
-        
+        }        
     }
 
     void Material::ChangeTexture(unsigned int j, std::string& new_path) {
