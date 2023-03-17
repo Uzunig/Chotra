@@ -23,12 +23,12 @@ namespace Chotra {
     Scene::~Scene() {
 
     }
-
+    /*
     void Scene::AddGeometry(std::string const& path, std::string nameNumber) {
         
         ObjModel obj = ObjModel(path, nameNumber);
         objModels.push_back(obj);
-    }
+    }*/
 
     void Scene::AddSceneObject(Scene& scene, unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
         glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible) {
@@ -47,7 +47,7 @@ namespace Chotra {
 
         sceneLights.push_back(sLight);
     }
-
+    /*
     void Scene::ChangeGeometrySource(unsigned int i, std::string const& path, std::string nameNumber) {
 
         objModels[i].DeleteBuffers();
@@ -55,7 +55,7 @@ namespace Chotra {
         objModels[i] = obj;
         std::cout << "Geometry source changed" << std::endl;
 
-    }
+    }*/
 
     void Scene::Update(float deltaTime) {
         float dt = deltaTime * 50.0f;
@@ -116,7 +116,7 @@ namespace Chotra {
                 if (s == "ObjModel") {
                     std::string model_path;
                     level_file >> model_path;
-                    AddGeometry(model_path);
+                    ResourceManager::AddGeometry(model_path);
                     
                 } else if (s == "Material") {
                     std::string material_path;

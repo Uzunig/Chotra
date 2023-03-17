@@ -9,14 +9,12 @@ namespace Chotra {
     class ObjModel : public Mesh {
     public:
         ObjModel() = delete;
-        ObjModel(std::string const& path, std::string nameNumber = "");
-        
-        //virtual void Draw(Shader& shader);
-       
-        /*
-        std::string obj_path;
+        ObjModel(std::string const& path, std::string suffix = "");
+           
+        std::string name;
+        std::string path;
         unsigned int icon = 0;
-       */
+
        // void DeleteBuffers();
 
     private:

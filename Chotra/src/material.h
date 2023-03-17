@@ -13,9 +13,11 @@ namespace Chotra {
     class Material {
     public:
         Material() = delete;
-        Material(std::string mtl_path, std::string suffix = "");
+        Material(std::string path, std::string suffix = "");
         std::string path;
         std::string name;
+        unsigned int icon = 0;
+
         std::map<std::string, unsigned int> components;
                
         void ChangeTexture(unsigned int j, std::string& new_path);

@@ -10,6 +10,7 @@ namespace Chotra {
 
     class MaterialTexture;
     class Material;
+    class ObjModel;
 
     class ResourceManager {
     public:
@@ -27,10 +28,18 @@ namespace Chotra {
         static std::string GetMaterialsName(unsigned int i);
         static std::string GetMaterialsPath(unsigned int i);
 
+        static unsigned int AddGeometry(std::string path);
+        static void ChangeGeometrySource(unsigned int i, std::string path);
+        static std::string GetGeometryName(unsigned int i);
+        static std::string GetGeometryPath(unsigned int i);
+        static unsigned int GetGeometriesCount();
+        static unsigned int GetGeometryVerticesCount(unsigned int i);
+        static unsigned int GetGeometryVAO(unsigned int i);
+
     private:
         static std::vector<std::shared_ptr<MaterialTexture>> textures;
         static std::vector<std::shared_ptr<Material>> materials;
-       
+        static std::vector<std::shared_ptr<ObjModel>> geometries;
     };
 
 } // namespace Chotra

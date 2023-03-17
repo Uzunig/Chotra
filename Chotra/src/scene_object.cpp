@@ -47,8 +47,8 @@ namespace Chotra {
 
 
         // Отрисовываем меш
-        glBindVertexArray(scene.objModels[geometryIndex].VAO);
-        glDrawArrays(GL_TRIANGLES, 0, scene.objModels[geometryIndex].vertices.size());
+        glBindVertexArray(ResourceManager::GetGeometryVAO(geometryIndex));
+        glDrawArrays(GL_TRIANGLES, 0, ResourceManager::GetGeometryVerticesCount(geometryIndex));
         //glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
         glBindVertexArray(0);
 
