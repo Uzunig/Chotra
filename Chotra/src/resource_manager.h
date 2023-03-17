@@ -21,6 +21,7 @@ namespace Chotra {
 
         static unsigned int AddMaterial(std::string path);
         static void ChangeMaterialSource(unsigned int i, std::string path);
+        static void ChangeComponentsIndex(unsigned int i, std::string componentsName, int chosed);
         static std::shared_ptr<Material> GetMaterial(unsigned int i);
         static unsigned int GetMaterialsCount();
         static std::string GetMaterialsName(unsigned int i);

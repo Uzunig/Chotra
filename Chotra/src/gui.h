@@ -40,6 +40,8 @@ namespace Chotra {
                 
         char str0[128];
         int selected = -1;
+        int subSelected = -1;
+        std::string componentsName = "";
         int chosed = -1;
         
         Gui(Window* p_mainWindow);
@@ -60,6 +62,7 @@ namespace Chotra {
 
         void ChangeGeometryIndexModal(int sceneObjectIndex);
         void ChangeMaterialIndexModal(int sceneObjectIndex);
+        void ChangeComponentsIndexModal(int MaterialIndex, std::string componentsName);
 
         std::string PathToRelative(std::string);
         

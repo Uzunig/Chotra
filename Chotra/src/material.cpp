@@ -43,11 +43,11 @@ namespace Chotra {
                 }
                 else if (s == "map_Pr") {
                     mtl_file >> texture_filename;
-                    components["roughnessMapIndex"] = ResourceManager::AddTexture(directory + texture_filename);
+                    components["roughnessMap"] = ResourceManager::AddTexture(directory + texture_filename);
                 }
                 else if (s == "map_AO") {
                     mtl_file >> texture_filename;
-                    components["aoMapIndex"] = ResourceManager::AddTexture(directory + texture_filename);
+                    components["aoMap"] = ResourceManager::AddTexture(directory + texture_filename);
                 }
             }
         }

@@ -1,5 +1,7 @@
 #include "resource_manager.h"
 
+#include <iostream>
+
 #include "material_texture.h"
 #include "material.h"
 
@@ -47,6 +49,12 @@ namespace Chotra {
               
         Material mat(path, std::to_string(i));
         *materials[i] = mat;
+    }
+
+    void ResourceManager::ChangeComponentsIndex(unsigned int i, std::string componentsName, int chosed) {
+
+        materials[i]->components[componentsName] = chosed;
+        std::cout << componentsName << std::endl;
     }
 
     std::shared_ptr<Material> ResourceManager::GetMaterial(unsigned int i) {
