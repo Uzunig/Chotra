@@ -309,7 +309,7 @@ namespace Chotra {
 
             ImGui::Text("Material: ");
             ImGui::SameLine();
-            if (ImGui::Button(p_mainWindow->scene->materials[p_mainWindow->scene->sceneObjects[i].materialIndex].name.c_str())) {
+            if (ImGui::Button(ResourceManager::GetMaterialsName(p_mainWindow->scene->sceneObjects[i].materialIndex).c_str())) {
                 p_mainWindow->renderer->passiveMode = true;
                 ImGui::OpenPopup("Materials");
             }
@@ -396,24 +396,23 @@ namespace Chotra {
             int i = selected - 300;
             ImGui::Text("Material:");
             ImGui::SameLine();
-            ImGui::Text(p_mainWindow->scene->materials[i].name.c_str());
+            ImGui::Text(ResourceManager::GetMaterialsName(i).c_str());
             ImGui::Spacing();
             if (ImGui::Button("..."))
             {
                 std::string s = FileDialogs::OpenFile("MTL Files\0 * .mtl\0All Files\0 * .*\0");
-                if ((s != "") && (s != p_mainWindow->scene->materials[i].mtl_path)) {
+                if ((s != "") && (s != ResourceManager::GetMaterialsPath(i))) {
 
                     s = PathToRelative(s);
-                    std::string nameNumber = "_" + std::to_string(i);
                     // TO DO: Check selectet object before any change.
-                    p_mainWindow->scene->ChangeMaterialSource(i, s, nameNumber);
+                    ResourceManager::ChangeMaterialSource(i, s);
                 }
             }
             ImGui::SameLine();
             {
                 char str0[128];
-                strcpy(str0, p_mainWindow->scene->materials[i].mtl_path.c_str());
-                ImGui::InputText(p_mainWindow->scene->materials[i].name.c_str(), str0, IM_ARRAYSIZE(str0));
+                strcpy(str0, ResourceManager::GetMaterialsPath(i).c_str());
+                ImGui::InputText(ResourceManager::GetMaterialsName(i).c_str(), str0, IM_ARRAYSIZE(str0));
             }
             ImGui::Spacing();
             ImGui::Separator();
@@ -421,14 +420,14 @@ namespace Chotra {
 
             
             unsigned int j = 0;
-            for (std::map<std::string, unsigned int>::iterator it = p_mainWindow->scene->materials[i].components.begin(); it != p_mainWindow->scene->materials[i].components.end(); ++it) {
+            for (std::map<std::string, unsigned int>::iterator it = ResourceManager::GetMaterial(i)->components.begin(); it != ResourceManager::GetMaterial(i)->components.end(); ++it) {
                 if (ImGui::Button(("T" + std::to_string(j)).c_str()))
                 {
                     std::string s = FileDialogs::OpenFile("Image Files\0*.png;*.jpg;*.jpeg\0All Files\0*.*\0");
                     if ((s != "") && (s != ResourceManager::GetTexturesPath(it->second))) {
-
+                        /*
                         s = PathToRelative(s);
-                        p_mainWindow->scene->materials[i].ChangeTexture(j, s);
+                        p_mainWindow->scene->materials[i].ChangeTexture(j, s);*/
                     }
                 }
                 ImGui::SameLine();
@@ -553,10 +552,10 @@ namespace Chotra {
             {
                 ImGuiIO& io = ImGui::GetIO();
 
-                for (int i = 0; i < p_mainWindow->scene->materials.size(); ++i) {
+                for (int i = 0; i < ResourceManager::GetMaterialsCount(); ++i) {
 
                     ImGui::SetCursorPos(ImVec2(100 * i + 10, 50));
-                    if (ImGui::Selectable(p_mainWindow->scene->materials[i].name.c_str(), selected == 300 + i, 0, ImVec2(80, 100))) {
+                    if (ImGui::Selectable(ResourceManager::GetMaterialsName(i).c_str(), selected == 300 + i, 0, ImVec2(80, 100))) {
                         selected = 300 + i;
                     }
 
@@ -614,7 +613,13 @@ namespace Chotra {
 
                 if (ImGui::Button("Add texture..")) {
 
-                    //AddTexture();
+                    std::string s = FileDialogs::OpenFile("Image Files\0*.png;*.jpg;*.jpeg\0All Files\0*.*\0");
+                    if (s != "")  {
+                        
+                        s = PathToRelative(s);
+                        // TO DO: Check selectet object before any change. If that object exists, then abort. ???
+                        ResourceManager::AddTexture(s);
+                    }
                 }
                 ImGui::EndTabItem();
             }
@@ -638,10 +643,9 @@ namespace Chotra {
     }
 
     void Gui::AddMaterial() {
-
-        std::string nameNumber = "_" + std::to_string(p_mainWindow->scene->materials.size());
-        p_mainWindow->scene->AddMaterial("resources/models/default.mtl", nameNumber);
-        selected = 300 + p_mainWindow->scene->materials.size() - 1;
+                
+        ResourceManager::AddMaterial("resources/models/default.mtl");
+        selected = 300 + ResourceManager::GetMaterialsCount() - 1;
     }
 
     void Gui::AddSceneObject() {
@@ -692,9 +696,9 @@ namespace Chotra {
 
         ImGuiIO& io = ImGui::GetIO();;
 
-        for (int i = 0; i < p_mainWindow->scene->materials.size(); ++i) {
+        for (int i = 0; i < ResourceManager::GetMaterialsCount(); ++i) {
             ImGui::SetCursorPos(ImVec2(100 * i + 10, 42));
-            if (ImGui::Selectable(p_mainWindow->scene->materials[i].name.c_str(), chosed == i, 0, ImVec2(80, 100))) {
+            if (ImGui::Selectable(ResourceManager::GetMaterialsName(i).c_str(), chosed == i, 0, ImVec2(80, 100))) {
                 chosed = i;
                 p_mainWindow->scene->sceneObjects[sceneObjectIndex].ChangeMaterialIndex(chosed);
                 ImGui::CloseCurrentPopup();

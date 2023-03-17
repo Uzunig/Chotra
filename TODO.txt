@@ -1,3 +1,4 @@
+Checking for uniqueness of adding objects
 To make textures vector and meshes vector using polymorphic classes
 
 

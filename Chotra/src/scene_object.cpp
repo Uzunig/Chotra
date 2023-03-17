@@ -32,9 +32,9 @@ namespace Chotra {
         shader.Use();
         shader.SetMat4("model", modelMatrix);
         //mesh.Draw(shader);
-        std::map<std::string, unsigned int>::iterator it;
+        
         unsigned int j = 0;
-        for (std::map<std::string, unsigned int>::iterator it = scene.materials[materialIndex].components.begin(); it != scene.materials[materialIndex].components.end(); ++it) {
+        for (std::map<std::string, unsigned int>::iterator it = ResourceManager::GetMaterial(materialIndex)->components.begin(); it != ResourceManager::GetMaterial(materialIndex)->components.end(); ++it) {
             glActiveTexture(GL_TEXTURE0 + j); // перед связыванием активируем нужный текстурный юнит
 
             // Теперь устанавливаем сэмплер на нужный текстурный юнит

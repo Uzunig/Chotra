@@ -10,11 +10,11 @@
 
 namespace Chotra {
         
-    Material::Material(std::string mtl_path, std::string nameNumber) {
+    Material::Material(std::string path, std::string suffix) {
 
-        std::cout << "MTL path: " << mtl_path << std::endl;
-        std::string directory = mtl_path.substr(0, mtl_path.find_last_of('/')) + '/';
-        std::ifstream mtl_file(mtl_path);
+        std::cout << "MTL path: " << path << std::endl;
+        std::string directory = path.substr(0, path.find_last_of('/')) + '/';
+        std::ifstream mtl_file(path);
         if (!mtl_file) {
             std::cout << "The MTL file could not open for writing!" << std::endl;
 
@@ -22,7 +22,7 @@ namespace Chotra {
         else {
 
             
-            this->mtl_path = mtl_path;
+            this->path = path;
 
             while (mtl_file) {
                 std::string s;
@@ -51,7 +51,7 @@ namespace Chotra {
                 }
             }
         }
-        name = mtl_path.substr(mtl_path.find_last_of('/') + 1, mtl_path.length()) + nameNumber;
+        name = path.substr(path.find_last_of('/') + 1, path.length()) + "_" + suffix;
         
     }
 

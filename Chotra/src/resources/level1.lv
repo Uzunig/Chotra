@@ -8,7 +8,7 @@ ObjModel         resources/models/sphere.obj
 
 Material         resources/models/Model_Ambient/ground.mtl
 Material         resources/models/Model_Ambient/panels.mtl
-Material         resources/models/sphere.mtl
+//Material         resources/models/sphere.mtl
 
 
 
@@ -23,7 +23,7 @@ SceneObject  object_1   OBJModel     1        1        0.0  0.0  0.0    0.0 0.0 
 
                Name                 Geometry  Materiale        Position          Angle          Scale        Velocity         rVelocity       Visible       Color        Brightness
 
-SceneLight    light_0    OBJModel     2           2       -25.0 15.0  -30.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1      1.0 1.0 1.0        20000
+SceneLight    light_0    OBJModel     1           1       -25.0 15.0  -30.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1      1.0 1.0 1.0        20000
 
 //SceneLight    OBJModel     0       20.0 31.0 -60.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1     0.4 0.2 0.9        100
 //SceneLight    OBJModel     0       17.0 22.0 -60.0    0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0         1     0.4 0.2 0.9       100

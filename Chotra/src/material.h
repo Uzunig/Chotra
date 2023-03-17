@@ -13,10 +13,9 @@ namespace Chotra {
     class Material {
     public:
         Material() = delete;
-        Material(std::string mtl_path, std::string nameNumber = "");
-        std::string mtl_path;
+        Material(std::string mtl_path, std::string suffix = "");
+        std::string path;
         std::string name;
-        //std::vector<std::shared_ptr<MaterialTexture>> textures; //TO DO: class Texture with polimorphism using
         std::map<std::string, unsigned int> components;
                
         void ChangeTexture(unsigned int j, std::string& new_path);

@@ -1,10 +1,12 @@
 #include "resource_manager.h"
 
 #include "material_texture.h"
+#include "material.h"
 
 namespace Chotra {
 
     std::vector<std::shared_ptr<MaterialTexture>> ResourceManager::textures;
+    std::vector<std::shared_ptr<Material>> ResourceManager::materials;
 
     unsigned int ResourceManager::AddTexture(std::string path) {
 
@@ -32,5 +34,36 @@ namespace Chotra {
         return textures[i]->path;
     }
 
+
+
+    unsigned int ResourceManager::AddMaterial(std::string path) {
+
+        unsigned int index = materials.size(); //for create unique name suffix
+        materials.push_back(std::make_shared<Material>(path, std::to_string(index)));
+        return index;
+    }
+
+    void ResourceManager::ChangeMaterialSource(unsigned int i, std::string path) {
+              
+        Material mat(path, std::to_string(i));
+        *materials[i] = mat;
+    }
+
+    std::shared_ptr<Material> ResourceManager::GetMaterial(unsigned int i) {
+        return materials[i];
+    }
+
+    unsigned int ResourceManager::GetMaterialsCount() {
+
+        return materials.size();
+    }
+
+    std::string ResourceManager::GetMaterialsName(unsigned int i) {
+        return materials[i]->name;
+    }
+
+    std::string ResourceManager::GetMaterialsPath(unsigned int i) {
+        return materials[i]->path;
+    }
 
 } // namespace Chotra
