@@ -12,7 +12,6 @@ namespace Chotra {
         LoadModel(path);
         SetupMesh();
         name = path.substr(path.find_last_of('/') + 1, path.length()) + "##" + suffix;
-        std::cout << "Geometry created" << std::endl;
     }
         
     void ObjModel::LoadModel(std::string const& path) {

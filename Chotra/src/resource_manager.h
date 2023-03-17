@@ -42,7 +42,6 @@ namespace Chotra {
         static std::vector<std::shared_ptr<ObjModel>> geometries;
     };
 
+
 } // namespace Chotra
-
-
 #endif

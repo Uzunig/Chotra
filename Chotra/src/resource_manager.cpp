@@ -13,13 +13,25 @@ namespace Chotra {
     std::vector<std::shared_ptr<ObjModel>> ResourceManager::geometries;
 
     unsigned int ResourceManager::AddTexture(std::string path) {
-
+                
+        for (int i = 0; i < textures.size(); ++i) {
+            if (textures[i]->path == path) {
+                std::cout << "TEXTURE ADDING: Texture already exists!" << std::endl;
+                return i;
+            }
+        }
         textures.push_back(std::make_shared<MaterialTexture>(path));
         return textures.size() - 1;
     }
 
     void ResourceManager::ChangeTexture(unsigned int i, std::string path) {
 
+        for (int i = 0; i < textures.size(); ++i) {
+            if (textures[i]->path == path) {
+                std::cout << "TEXTURE CHANGING: Texture already exists!" << std::endl;
+                return;
+            }
+        }
         textures[i]->DeleteTexture();
         MaterialTexture tex(path);
         *textures[i] = tex;

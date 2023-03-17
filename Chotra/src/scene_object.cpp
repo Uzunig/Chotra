@@ -3,28 +3,26 @@
 #include "obj_model.h"
 #include "material.h"
 #include "environment.h"
-#include "scene.h"
 #include "shader.h"
 #include "material_texture.h"
 #include "resource_manager.h"
 
 namespace Chotra {
 
-    SceneObject::SceneObject(Scene& scene, unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
+    SceneObject::SceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
         glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible)
-        : scene(scene), geometryIndex(geometryIndex), materialIndex(materialIndex), name(name), position(position), angle(angle),
+        : geometryIndex(geometryIndex), materialIndex(materialIndex), name(name), position(position), angle(angle),
         scale(scale), velocity(velocity), rVelocity(rVelocity), visible(visible) {
 
         UpdateModelMatrix();
-        std::cout << "SceneObject created " << std::endl;
     }
 
-    void SceneObject::ChangeGeometryIndex(int geometryIndex) {
-        this->geometryIndex = geometryIndex;
+    void SceneObject::ChangeGeometryIndex(unsigned int i) {
+        geometryIndex = i;
     }
 
-    void SceneObject::ChangeMaterialIndex(int materialIndex) {
-        this->materialIndex = materialIndex;
+    void SceneObject::ChangeMaterialIndex(unsigned int i) {
+       materialIndex = i;
     }
 
     void SceneObject::Draw(Shader& shader) {

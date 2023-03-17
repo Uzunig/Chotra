@@ -404,29 +404,6 @@ namespace Chotra {
             ImGui::Text(ResourceManager::GetGeometryPath(i).c_str(), 230);
 
             ImGui::PopTextWrapPos();
-            
-            /*
-            if (ImGui::Button("..."))
-            {
-                std::string s = FileDialogs::OpenFile("OBJ Files\0*.obj\0All Files\0*.*\0");
-                if ((s != "") && (s != ResourceManager::GetGeometryPath(i))) {
-
-                    s = PathToRelative(s);
-                    std::string nameNumber = "_" + std::to_string(i);
-                    // TO DO: Check selectet object before any change.
-                    p_mainWindow->scene->ChangeGeometrySource(i, s, nameNumber);
-                    p_mainWindow->scene->objModels[i].icon = p_mainWindow->renderer->CreateGeometryIcon(i);
-                }
-            }
-            ImGui::SameLine();
-            char str0[128];
-            strcpy(str0, p_mainWindow->scene->objModels[i].path.c_str());
-            ImGui::InputText(p_mainWindow->scene->objModels[i].name.c_str(), str0, IM_ARRAYSIZE(str0));
-            if (str0 != p_mainWindow->scene->objModels[i].path.c_str()) {
-                p_mainWindow->scene->objModels[i].path = str0;
-            }
-            ImGui::Spacing();
-            ImGui::Separator();*/
 
         }
         else if ((selected >= 300) && (selected < 400)) {
@@ -486,7 +463,6 @@ namespace Chotra {
                 {
                     chosed = -1;
                     ChangeComponentsIndexModal(i, componentsName);
-                    std::cout << componentsName << std::endl;
                 }
 
                 ImGui::SetItemAllowOverlap();
@@ -702,7 +678,7 @@ namespace Chotra {
     void Gui::AddSceneObject() {
 
         std::string nameNumber = "_" + std::to_string(p_mainWindow->scene->sceneObjects.size());
-        p_mainWindow->scene->AddSceneObject(*p_mainWindow->scene, 0, 0, "sceneObject" + nameNumber);
+        p_mainWindow->scene->AddSceneObject(0, 0, "sceneObject" + nameNumber);
         selected = p_mainWindow->scene->sceneObjects.size() - 1;
         strcpy(str0, p_mainWindow->scene->sceneObjects[selected].name.c_str());
     }

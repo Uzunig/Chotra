@@ -19,10 +19,7 @@ namespace Chotra {
         unsigned int icon = 0;
 
         std::map<std::string, unsigned int> components;
-               
-        void ChangeTexture(unsigned int j, std::string& new_path);
-        void DeleteTexture(unsigned int j);
-        void DeleteAllTextures();
+        
     };
 } // namspace Chotra
 

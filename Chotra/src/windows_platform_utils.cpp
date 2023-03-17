@@ -40,7 +40,7 @@ namespace Chotra {
         ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
         if (GetOpenFileNameA(&ofn) == TRUE) {
-            std::cout << "Open file dialog" << std::endl;
+ 
             return ofn.lpstrFile;
         }
         std::cout << "Open file dialog is not opening" << std::endl;
