@@ -73,7 +73,7 @@ namespace Chotra {
         ShowAssetsBar();
         ShowPropertiesBar();
         ShowScoreBar();
-
+        //ShowDebuggingQuads(); // TO DO: There is a broblem with Hdr (likely) and y-orientation. To resolve. 
 
     }
 
@@ -656,6 +656,19 @@ namespace Chotra {
 
         }
         ImGui::End();
+    }
+
+    void Gui::ShowDebuggingQuads() {
+
+        unsigned int width = p_mainWindow->GetWidth() / 3;
+        unsigned int height = p_mainWindow->GetHeight() / 3;
+
+        ImGui::SetNextWindowPos(ImVec2(0, 30));
+        ImGui::SetNextWindowSize(ImVec2(width, height));
+       
+        ImTextureID my_tex_id = (void*)p_mainWindow->renderer->gPosition;
+        ImGui::Image(my_tex_id, ImVec2(width, height), uv_min, uv_max, tint_col, border_col);
+
     }
 
     void Gui::Render() {

@@ -54,6 +54,8 @@ namespace Chotra {
         void ShowPropertiesBar();
         void ShowScoreBar();
         void ShowAssetsBar();
+        void ShowDebuggingQuads();
+
         void Render();
 
         void AddGeometry();

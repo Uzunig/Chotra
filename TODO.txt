@@ -1,3 +1,5 @@
+Functions SetupQuad and DrawQuad. To create a class ScreenQuad. DebuggingQuad vill inherit the ScreenQuad.
+To pass debugging quads from Rederer to GUI
 Checking for uniqueness of adding objects
 To make textures vector and meshes vector using polymorphic classes
 
