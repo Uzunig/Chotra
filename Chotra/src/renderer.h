@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <random>
+#include <memory>
 
 #include "shader.h"
 #include "quad.h"
@@ -26,7 +27,7 @@ namespace Chotra {
 
         ShadowMap shadowMap;
 
-        std::vector<Quad> quads;
+        std::vector<std::shared_ptr<Quad>> quads;
 
         glm::mat4 projection;
         glm::mat4 view;
@@ -138,20 +139,16 @@ namespace Chotra {
 
         
         Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene);
-
-        //void GenerateScreenTexture();
-
+                
         void Init();
         void Render();
         void ForwardRender();
         void DeferredRender();
         void PassiveRender();
 
+        void SetupDebuggingQuads();
         void DrawDebuggingQuads();
-
-        void SetupQuad();
-        void RenderQuad();
-        
+                       
         void ConfigureFramebufferMSAA();
         void RenderWithMSAA();
 

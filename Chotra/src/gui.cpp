@@ -272,25 +272,6 @@ namespace Chotra {
             ImGui::SameLine();
             ImGui::Text(p_mainWindow->scene->sceneObjects[i].name.c_str());
 
-
-
-            ImGui::Text("Name");
-            ImGui::InputText(("##" + p_mainWindow->scene->sceneObjects[i].name).c_str(), str0, IM_ARRAYSIZE(str0));
-            ImGui::SameLine();
-            if (ImGui::Button("Apply")) {
-                p_mainWindow->scene->sceneObjects[i].name = str0;
-                std::cout << "InputText true " << std::endl;
-            }
-
-
-            ImGui::Checkbox(("visible " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].visible);
-
-            // Always center this window when appearing
-            ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-            ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-            ImGui::SetNextWindowSize(ImVec2(0, 160));
-
-
             ImGui::Text("Geometry: ");
             ImGui::SameLine();
 
@@ -299,7 +280,7 @@ namespace Chotra {
 
             if (ImGui::Button(ResourceManager::GetGeometryName(p_mainWindow->scene->sceneObjects[i].geometryIndex).c_str())) {
                 p_mainWindow->renderer->passiveMode = true;
-                                
+
                 ImGui::OpenPopup("Geometry");
             }
             if (ImGui::BeginPopupModal("Geometry", NULL, ImGuiWindowFlags_MenuBar))
@@ -313,7 +294,7 @@ namespace Chotra {
 
             ImGui::Text("Material: ");
             ImGui::SameLine();
-            
+
             ImGui::SetNextWindowPos(ImVec2(p_mainWindow->GetWidth() - 700, 20));
             ImGui::SetNextWindowSize(ImVec2(350, p_mainWindow->GetHeight() - 100));
 
@@ -326,6 +307,20 @@ namespace Chotra {
                 chosed = -1;
                 ChangeMaterialIndexModal(i);
             }
+
+            ImGui::Text("Name");
+            ImGui::InputText(("##" + p_mainWindow->scene->sceneObjects[i].name).c_str(), str0, IM_ARRAYSIZE(str0));
+            ImGui::SameLine();
+            if (ImGui::Button("Apply")) {
+                p_mainWindow->scene->sceneObjects[i].name = str0;
+                std::cout << "InputText true " << std::endl;
+            }
+
+
+            ImGui::Checkbox(("visible " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].visible);
+                    
+
+            
 
 
             if (ImGui::CollapsingHeader("Position")) {
