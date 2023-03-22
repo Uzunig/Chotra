@@ -67,6 +67,7 @@ namespace Chotra {
         void ChangeComponentsIndexModal(int MaterialIndex, std::string componentsName);
 
         std::string PathToRelative(std::string);
+        std::string NameWithoutSuffix(std::string);
         
 
     };
