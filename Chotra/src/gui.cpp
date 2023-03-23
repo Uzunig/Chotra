@@ -555,8 +555,8 @@ namespace Chotra {
 
     void Gui::ShowAssetsBar() {
 
-        ImGui::SetNextWindowPos(ImVec2(0, p_mainWindow->GetHeight() - 250));
-        ImGui::SetNextWindowSize(ImVec2(p_mainWindow->GetWidth() - 350, 250));
+        ImGui::SetNextWindowPos(ImVec2(0, p_mainWindow->GetHeight() - 260));
+        ImGui::SetNextWindowSize(ImVec2(p_mainWindow->GetWidth() - 350, 180));
 
         ImGui::Begin("Assets");
 
@@ -567,14 +567,29 @@ namespace Chotra {
 
             if (ImGui::BeginTabItem("Geometries"))
             {
+                ImGui::SetCursorPos(ImVec2(10, 100));
+                if (ImGui::Button("Add from file"))
+                {
+                    std::string s = FileDialogs::OpenFile("OBJ Files\0*.obj\0All Files\0*.*\0");
+                    if (s != "") {
+
+                        s = PathToRelative(s);
+                        ResourceManager::AddGeometry(s);
+                    }
+                }
+
+                ImGui::SetCursorPos(ImVec2(130, 50));
+                ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
+                ImGui::BeginChild("##ChildGeometries", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y), false, window_flags);
+
                 for (int i = 0; i < ResourceManager::GetGeometriesCount(); ++i) {
-                    ImGui::SetCursorPos(ImVec2(100 * i + 10, 50));
+                    ImGui::SetCursorPos(ImVec2(100 * i + 10, 0));
                     if (ImGui::Selectable(ResourceManager::GetGeometryName(i).c_str(), selected == 200 + i, 0, ImVec2(80, 100))) {
                         selected = 200 + i;
                     }
 
                     ImGui::SetItemAllowOverlap();
-                    ImGui::SetCursorPos(ImVec2(100 * i + 10, 68));
+                    ImGui::SetCursorPos(ImVec2(100 * i + 10, 18));
 
                     ImGui::PushID(i);
                     ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
@@ -584,31 +599,37 @@ namespace Chotra {
                     ImGui::PopID();
                     ImGui::SameLine();
                 }
+                ImGui::EndChild();
 
-                // Always center this window when appearing
-                ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-                ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-                if (ImGui::Button("Add geometry..")) {
-
-                    AddGeometry();
-                }
                 ImGui::EndTabItem();
             }
 
             if (ImGui::BeginTabItem("Materials"))
             {
-                ImGuiIO& io = ImGui::GetIO();
+                ImGui::SetCursorPos(ImVec2(10, 100));
+                if (ImGui::Button("Add from file"))
+                {
+                    std::string s = FileDialogs::OpenFile("MTL Files\0*.mtl\0All Files\0*.*\0");
+                    if (s != "") {
+
+                        s = PathToRelative(s);
+                        ResourceManager::AddMaterial(s);
+                    }
+                }
+
+                ImGui::SetCursorPos(ImVec2(130, 50));
+                ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
+                ImGui::BeginChild("##ChildMaterials", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y), false, window_flags);
 
                 for (int i = 0; i < ResourceManager::GetMaterialsCount(); ++i) {
 
-                    ImGui::SetCursorPos(ImVec2(100 * i + 10, 50));
+                    ImGui::SetCursorPos(ImVec2(100 * i + 10, 0));
                     if (ImGui::Selectable(ResourceManager::GetMaterialName(i).c_str(), selected == 300 + i, 0, ImVec2(80, 100))) {
                         selected = 300 + i;
                     }
 
                     ImGui::SetItemAllowOverlap();
-                    ImGui::SetCursorPos(ImVec2(100 * i + 10, 70));
+                    ImGui::SetCursorPos(ImVec2(100 * i + 10, 18));
 
                     ImGui::PushID(i);
                     ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
@@ -619,46 +640,14 @@ namespace Chotra {
                     ImGui::SameLine();
 
                 }
-
-                // Always center this window when appearing
-                ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-                ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-                if (ImGui::Button("Add material..")) {
-
-                    AddMaterial();
-                }
+                ImGui::EndChild();
+                
                 ImGui::EndTabItem();
             }
 
             if (ImGui::BeginTabItem("Textures"))
             {
-                ImGuiIO& io = ImGui::GetIO();
-
-                for (int i = 0; i < ResourceManager::GetTexturesCount(); ++i) {
-
-                    ImGui::SetCursorPos(ImVec2(100 * i + 10, 50));
-                    if (ImGui::Selectable(ResourceManager::GetTexturePath(i).c_str(), selected == 400 + i, 0, ImVec2(80, 100))) {
-                        selected = 400 + i;
-                    }
-
-                    ImGui::SetItemAllowOverlap();
-                    ImGui::SetCursorPos(ImVec2(100 * i + 10, 70));
-
-                    ImGui::PushID(i);
-                    ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(i);
-                    ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
-
-
-                    ImGui::PopID();
-                    ImGui::SameLine();
-
-                }
-
-                // Always center this window when appearing
-                ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-                ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
+                ImGui::SetCursorPos(ImVec2(10, 100));
                 if (ImGui::Button("Add texture..")) {
 
                     std::string s = FileDialogs::OpenFile("Image Files\0*.png;*.jpg;*.jpeg\0All Files\0*.*\0");
@@ -669,6 +658,33 @@ namespace Chotra {
                         ResourceManager::AddTexture(s);
                     }
                 }
+
+                ImGui::SetCursorPos(ImVec2(130, 50));
+                ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
+                ImGui::BeginChild("##ChildTextures", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y), false, window_flags);
+
+
+                for (int i = 0; i < ResourceManager::GetTexturesCount(); ++i) {
+
+                    ImGui::SetCursorPos(ImVec2(100 * i + 10, 00));
+                    if (ImGui::Selectable(ResourceManager::GetTexturePath(i).c_str(), selected == 400 + i, 0, ImVec2(80, 100))) {
+                        selected = 400 + i;
+                    }
+
+                    ImGui::SetItemAllowOverlap();
+                    ImGui::SetCursorPos(ImVec2(100 * i + 10, 18));
+
+                    ImGui::PushID(i);
+                    ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(i);
+                    ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
+
+
+                    ImGui::PopID();
+                    ImGui::SameLine();
+
+                }
+                ImGui::EndChild();
+
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();
@@ -719,35 +735,40 @@ namespace Chotra {
 
         ImGuiIO& io = ImGui::GetIO();
 
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
+        ImGui::BeginChild("##ChildGeometries", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y - 50), false, window_flags);
+           
         for (int i = 0; i < ResourceManager::GetGeometriesCount(); ++i) {
 
-            ImGui::SetCursorPos(ImVec2(10, 42 + 90 * i));
-            if (ImGui::Selectable(("##" + ResourceManager::GetGeometryPath(i)).c_str(), chosed == i, 0, ImVec2(330, 82))) {
+            ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
+            if (ImGui::Selectable(("##" + ResourceManager::GetGeometryPath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
                 p_mainWindow->scene->sceneObjects[sceneObjectIndex].ChangeGeometryIndex(chosed);
                 p_mainWindow->renderer->passiveMode = false;
+                ImGui::CloseCurrentPopup();
             }
 
             ImGui::SetItemAllowOverlap();
-            ImGui::SetCursorPos(ImVec2(10, 42 + 90 * i));
+            ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
 
             ImGui::PushID(i);
             ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
-            ImGui::SetCursorPos(ImVec2(100, 42 + 90 * i));
+            ImGui::SetCursorPos(ImVec2(100, 10 + 90 * i));
             ImGui::Text(NameWithoutSuffix(ResourceManager::GetGeometryName(i)).c_str());
 
-            ImGui::SetCursorPos(ImVec2(100, 62 + 90 * i));
-            ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + 230);
+            ImGui::SetCursorPos(ImVec2(100, 30 + 90 * i));
+            ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - 20);
 
-            ImGui::Text(ResourceManager::GetGeometryPath(i).c_str(), 230);
+            ImGui::Text(ResourceManager::GetGeometryPath(i).c_str());
 
             ImGui::PopTextWrapPos();
         }
+        ImGui::EndChild();
 
-        ImGui::SetCursorPos(ImVec2(100, 62 + 90 * ResourceManager::GetGeometriesCount()));
+        ImGui::SetCursorPos(ImVec2(20, ImGui::GetWindowHeight() - 40));
         if (ImGui::Button("Add from file"))
         {
             std::string s = FileDialogs::OpenFile("OBJ Files\0*.obj\0All Files\0*.*\0");
@@ -773,35 +794,40 @@ namespace Chotra {
 
         ImGuiIO& io = ImGui::GetIO();
 
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
+        ImGui::BeginChild("##ChildMaterials", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y - 50), false, window_flags);
+
         for (int i = 0; i < ResourceManager::GetMaterialsCount(); ++i) {
 
-            ImGui::SetCursorPos(ImVec2(10, 42 + 90 * i));
-            if (ImGui::Selectable(("##" + ResourceManager::GetTexturePath(i)).c_str(), chosed == i, 0, ImVec2(330, 82))) {
+            ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
+            if (ImGui::Selectable(("##" + ResourceManager::GetTexturePath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
                 p_mainWindow->scene->sceneObjects[sceneObjectIndex].ChangeMaterialIndex(chosed);
                 p_mainWindow->renderer->passiveMode = false;
+                ImGui::CloseCurrentPopup();
             }
 
             ImGui::SetItemAllowOverlap();
-            ImGui::SetCursorPos(ImVec2(10, 42 + 90 * i));
+            ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
 
             ImGui::PushID(i);
             ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
-            ImGui::SetCursorPos(ImVec2(100, 42 + 90 * i));
+            ImGui::SetCursorPos(ImVec2(100, 10 + 90 * i));
             ImGui::Text(NameWithoutSuffix(ResourceManager::GetMaterialName(i)).c_str());
 
-            ImGui::SetCursorPos(ImVec2(100, 62 + 90 * i));
-            ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + 230);
+            ImGui::SetCursorPos(ImVec2(100, 30 + 90 * i));
+            ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - 20);
 
-            ImGui::Text(ResourceManager::GetMaterialPath(i).c_str(), 230);
+            ImGui::Text(ResourceManager::GetMaterialPath(i).c_str());
 
             ImGui::PopTextWrapPos();
         }
+        ImGui::EndChild();
 
-        ImGui::SetCursorPos(ImVec2(100, 62 + 90 * ResourceManager::GetMaterialsCount()));
+        ImGui::SetCursorPos(ImVec2(20, ImGui::GetWindowHeight() - 40));
         if (ImGui::Button("Add from file"))
         {
             std::string s = FileDialogs::OpenFile("MTL Files\0*.mtl\0All Files\0*.*\0");
@@ -826,32 +852,37 @@ namespace Chotra {
 
         ImGuiIO& io = ImGui::GetIO();
 
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
+        ImGui::BeginChild("##ChildComponents", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y - 50), false, window_flags);
+
         for (int i = 0; i < ResourceManager::GetTexturesCount(); ++i) {
 
-            ImGui::SetCursorPos(ImVec2(10, 42 + 90 * i));
-            if (ImGui::Selectable(("##" + ResourceManager::GetTexturePath(i)).c_str(), chosed == i, 0, ImVec2(330, 82))) {
+            ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
+            if (ImGui::Selectable(("##" + ResourceManager::GetTexturePath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
                 ResourceManager::ChangeComponentIndex(materialIndex, componentsName, chosed);
                 p_mainWindow->renderer->passiveMode = false;
+                ImGui::CloseCurrentPopup();
             }
 
             ImGui::SetItemAllowOverlap();
-            ImGui::SetCursorPos(ImVec2(10, 42 + 90 * i));
+            ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
 
             ImGui::PushID(i);
             ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(i);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
-            ImGui::SetCursorPos(ImVec2(100, 62 + 90 * i));
-            ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + 230);
+            ImGui::SetCursorPos(ImVec2(100, 30 + 90 * i));
+            ImGui::PushTextWrapPos(ImGui::GetWindowWidth() - 20);
 
-            ImGui::Text(ResourceManager::GetTexturePath(i).c_str(), 230);
+            ImGui::Text(ResourceManager::GetTexturePath(i).c_str());
 
             ImGui::PopTextWrapPos();
         }
+        ImGui::EndChild();
 
-        ImGui::SetCursorPos(ImVec2(100, 62 + 90 * ResourceManager::GetTexturesCount()));
+        ImGui::SetCursorPos(ImVec2(20, ImGui::GetWindowHeight() - 40));
         if (ImGui::Button("Add from file"))
         {
             std::string s = FileDialogs::OpenFile("Image Files\0*.png;*.jpg;*.jpeg\0All Files\0*.*\0");

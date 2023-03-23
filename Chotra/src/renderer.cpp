@@ -150,7 +150,7 @@ namespace Chotra {
     }
 
     void Renderer::DrawDebuggingQuads() {
-
+        /*
         //Draw debugging quads
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
