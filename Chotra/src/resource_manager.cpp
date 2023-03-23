@@ -68,7 +68,6 @@ namespace Chotra {
     void ResourceManager::ChangeComponentIndex(unsigned int i, std::string componentsName, int chosed) {
 
         materials[i]->components[componentsName] = chosed;
-        std::cout << componentsName << std::endl;
     }
 
     std::shared_ptr<Material> ResourceManager::GetMaterial(unsigned int i) {
@@ -92,6 +91,12 @@ namespace Chotra {
 
     unsigned int ResourceManager::AddGeometry(std::string path) {
 
+        for (int i = 0; i < geometries.size(); ++i) {
+            if (geometries[i]->path == path) {
+                std::cout << "GEOMETRY ADDING: Geometry already exists!" << std::endl;
+                return i;
+            }
+        }
         unsigned int index = geometries.size(); //for create unique name suffix
         geometries.push_back(std::make_shared<ObjModel>(path, std::to_string(index)));
         return index;
@@ -99,6 +104,12 @@ namespace Chotra {
 
     void ResourceManager::ChangeGeometrySource(unsigned int i, std::string path) {
 
+        for (int i = 0; i < geometries.size(); ++i) {
+            if (geometries[i]->path == path) {
+                std::cout << "GEOMETRY ADDING: Such a geometry already exists! You can use it." << std::endl;
+                return;
+            }
+        }
         geometries[i]->DeleteBuffers();
         ObjModel geom(path);
         *geometries[i] = geom;

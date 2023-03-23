@@ -54,6 +54,8 @@ namespace Chotra {
         void ShowPropertiesBar();
         void ShowScoreBar();
         void ShowAssetsBar();
+        void ShowDebuggingQuads();
+
         void Render();
 
         void AddGeometry();
@@ -65,6 +67,7 @@ namespace Chotra {
         void ChangeComponentsIndexModal(int MaterialIndex, std::string componentsName);
 
         std::string PathToRelative(std::string);
+        std::string NameWithoutSuffix(std::string);
         
 
     };

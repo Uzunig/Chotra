@@ -9,6 +9,9 @@ namespace Chotra {
     class Quad {
     public:
         Quad(unsigned int X, unsigned int Y);
+        Quad();
+
+        void SetupQuad();
         void SetupQuad(unsigned int X, unsigned int Y);
         void RenderQuad();
 

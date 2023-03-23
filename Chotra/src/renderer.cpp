@@ -12,7 +12,7 @@
 namespace Chotra {
 
     Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene)
-        : width(width), height(height), camera(camera), scene(scene), 
+        : width(width), height(height), camera(camera), scene(scene),
         screenTexture(width, height), screenTexturePrevious(width, height),
         pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
         lightsShader("resources/shaders/pbr_shader.vs", "resources/shaders/lights_shader.fs"),
@@ -28,41 +28,27 @@ namespace Chotra {
         shaderDeferredLightingPass("resources/shaders/deferred_lighting_pass.vs", "resources/shaders/deferred_lighting_pass.fs"),
         shaderRenderOnScreen("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") {
 
-                
-        SetupQuad();
+
+
         shadowMap.ConfigureShadowMap(width, height);
         ConfigureFramebuffer();
         ConfigureFramebufferMSAA();
 
         ConfigureGeometryPass();
         ConfigureLightingPass();
-                
+
         ConfigureSSAO();
 
         ConfigureBloom();
-        
+
     }
-    
+
     void Renderer::Init() {
-          {
-            //Create debugging quads
-            Quad quad1 = Quad(0, 0);
-            quads.push_back(quad1);
+        {
+            //Creating screed quad
+            quads.push_back(std::make_shared<Quad>());
 
-            Quad quad2 = Quad(0, 1);
-            quads.push_back(quad2);
-
-            Quad quad3 = Quad(0, 2);
-            quads.push_back(quad3);
-
-            Quad quad4 = Quad(1, 0);
-            quads.push_back(quad4);
-
-            Quad quad5 = Quad(1, 1);
-            quads.push_back(quad5);
-
-            Quad quad6 = Quad(1, 2);
-            quads.push_back(quad6);
+            SetupDebuggingQuads();
         }
 
         // Активируем шейдер и передаем матрицы
@@ -85,7 +71,7 @@ namespace Chotra {
         shaderDeferredLightingPass.SetInt("shadowMap", 7);
         shaderDeferredLightingPass.SetInt("ssaoMap", 8);
         shaderDeferredLightingPass.SetInt("ssrMap", 9);
-    
+
 
 
         backgroundShader.Use();
@@ -145,12 +131,22 @@ namespace Chotra {
         RenderGeometryPass();
         GenerateSSAOMap();
         RenderLightingPass();
-                      
+
         RenderBloom();
         RenderOnScreen();
 
         DrawDebuggingQuads();
-        
+
+    }
+
+    void Renderer::SetupDebuggingQuads() {
+
+        quads.push_back(std::make_shared<Quad>(0, 0));
+        quads.push_back(std::make_shared<Quad>(0, 1));
+        quads.push_back(std::make_shared<Quad>(0, 2));
+        quads.push_back(std::make_shared<Quad>(1, 0));
+        quads.push_back(std::make_shared<Quad>(1, 1));
+        quads.push_back(std::make_shared<Quad>(1, 2));
     }
 
     void Renderer::DrawDebuggingQuads() {
@@ -158,56 +154,23 @@ namespace Chotra {
         //Draw debugging quads
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, gViewPosition);
-        quads[0].RenderQuad();
+        glBindTexture(GL_TEXTURE_2D, gPosition);
+        quads[1]->RenderQuad();
 
-        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious);
-        quads[1].RenderQuad();
-        
+        glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
+        quads[2]->RenderQuad();
+        /*
         glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
-        quads[2].RenderQuad();
-        
-        glBindTexture(GL_TEXTURE_2D, gRoughnessMap);
-        quads[3].RenderQuad();
+        quads[3]->RenderQuad();
 
-        glBindTexture(GL_TEXTURE_2D, gAoMap);
-        quads[4].RenderQuad();
+        glBindTexture(GL_TEXTURE_2D, gMetalRoughAoMap);
+        quads[4]->RenderQuad();
 
         glBindTexture(GL_TEXTURE_2D, gNormal);
-        quads[5].RenderQuad();*/
-    }
+        quads[5]->RenderQuad();
 
-    void Renderer::SetupQuad() {
-        if (quadVAO == 0)
-        {
-
-            float quadVertices[] = {
-                // координаты      // текстурные коодинаты
-               -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-               -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-                1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-                1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-            };
-
-            // Установка VAO плоскости
-            glGenVertexArrays(1, &quadVAO);
-            glGenBuffers(1, &quadVBO);
-            glBindVertexArray(quadVAO);
-            glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-        }
-    }
-
-    void Renderer::RenderQuad() {
-
-        glBindVertexArray(quadVAO);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glBindVertexArray(0);
-
+        glBindTexture(GL_TEXTURE_2D, gNormal);
+        quads[6]->RenderQuad();*/
     }
 
     void Renderer::ConfigureFramebufferMSAA() {
@@ -255,7 +218,7 @@ namespace Chotra {
 
         glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture.GetId(), 0);
-                
+
         // Создаем рендербуфер для прикрепляемых объектов глубины трафарета
         glGenRenderbuffers(1, &rbo);
         glBindRenderbuffer(GL_RENDERBUFFER, rbo);
@@ -264,7 +227,7 @@ namespace Chotra {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+            std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Конфигурируем второй постпроцессинг фреймбуфер
@@ -536,7 +499,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, screenTexture.GetId()); // теперь в качестве текстуры прямоугольника используем преобразованный прикрепленный цветовой объект 
         // Отрисовываем прямоугольник сцены
-        RenderQuad();
+        quads[0]->RenderQuad();
 
         bool horizontal = true;
         bool first_iteration = true;
@@ -560,7 +523,7 @@ namespace Chotra {
                 else {
                     glBindTexture(GL_TEXTURE_2D, first_iteration ? downPingpongColorbuffers[j - 1][!horizontal] : downPingpongColorbuffers[j][!horizontal]);
                 }
-                RenderQuad();
+                quads[0]->RenderQuad();
                 horizontal = !horizontal;
                 if (first_iteration)
                     first_iteration = false;
@@ -581,7 +544,7 @@ namespace Chotra {
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, downPingpongColorbuffers[15 - j][!horizontal]);
 
-            RenderQuad();
+            quads[0]->RenderQuad();
 
             horizontal = !horizontal;
             if (first_iteration)
@@ -601,10 +564,10 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, upColorbuffers[15]);
         shaderBloomFinal.SetInt("bloom", bloom);
         shaderBloomFinal.SetFloat("exposure", exposure);
-        
-        RenderQuad();
 
-        
+        quads[0]->RenderQuad();
+
+
     }
 
     float lerp(float a, float b, float f)
@@ -616,7 +579,7 @@ namespace Chotra {
 
         glGenFramebuffers(1, &ssaoFBO);  glGenFramebuffers(1, &ssaoBlurFBO);
         glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-        
+
 
         // Цветовой буфер SSAO 
         glGenTextures(1, &ssaoColorBuffer);
@@ -661,7 +624,7 @@ namespace Chotra {
         // Генерируем ядро выборки
         std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0); // генерируем случайное число типа float в диапазоне между 0.0 и 1.0
         std::default_random_engine generator;
-        
+
         for (unsigned int i = 0; i < 64; ++i)
         {
             glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
@@ -691,7 +654,7 @@ namespace Chotra {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
- 
+
         shaderSSAO.Use();
         shaderSSAO.SetInt("gViewPosition", 0);
         shaderSSAO.SetInt("gViewNormal", 1);
@@ -708,7 +671,7 @@ namespace Chotra {
         // 2. Генерируем текстуру для SSAO
         glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
         glClear(GL_COLOR_BUFFER_BIT);
-        shaderSSAO.Use(); 
+        shaderSSAO.Use();
 
         // Посылаем ядро + поворот 
         for (unsigned int i = 0; i < 64; ++i) {
@@ -719,7 +682,7 @@ namespace Chotra {
         shaderSSAO.SetInt("kernelSize", kernelSizeSSAO);
         shaderSSAO.SetFloat("radius", radiusSSAO);
         shaderSSAO.SetFloat("biasSSAO", biasSSAO);
-        
+
         shaderSSAO.SetFloat("biasSSR", biasSSR);
         shaderSSAO.SetFloat("rayStep", rayStep);
         shaderSSAO.SetInt("iterationCount", iterationCount);
@@ -734,8 +697,8 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, noiseTexture);
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, screenTexturePrevious.GetId()); // screen texture from the previous frame (I'm not sure it is correct or not)
-                
-        RenderQuad();
+
+        quads[0]->RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
@@ -746,7 +709,7 @@ namespace Chotra {
         shaderSSAOBlur.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-        RenderQuad();
+        quads[0]->RenderQuad();
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -846,7 +809,7 @@ namespace Chotra {
         shaderDeferredGeometryPass.SetMat4("view", view);
 
         scene.DrawSceneObjects(shaderDeferredGeometryPass);
-        
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
@@ -858,7 +821,7 @@ namespace Chotra {
         shaderDeferredLightingPass.SetInt("gNormal", 1);
         shaderDeferredLightingPass.SetInt("gAlbedoMap", 2);
         shaderDeferredLightingPass.SetInt("gMetalRoughAoMap", 3);
-        
+
     }
 
     void Renderer::RenderLightingPass() {
@@ -890,7 +853,7 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, ssaoMap);
         glActiveTexture(GL_TEXTURE9);
         glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
-       
+
         glActiveTexture(GL_TEXTURE0);
 
         for (unsigned int i = 0; i < scene.sceneLights.size(); ++i) {
@@ -898,43 +861,43 @@ namespace Chotra {
             shaderDeferredLightingPass.SetVec3("lightPositions[" + std::to_string(i) + "]", scene.sceneLights[i].position);
             shaderDeferredLightingPass.SetVec3("lightColors[" + std::to_string(i) + "]", scene.sceneLights[i].color * (float)scene.sceneLights[i].brightness);
         }
- 
+
         shaderDeferredLightingPass.SetVec3("camPos", camera.Position);
         shaderDeferredLightingPass.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         shaderDeferredLightingPass.SetFloat("shadowBiasMin", shadowBiasMin);
         shaderDeferredLightingPass.SetFloat("shadowBiasMax", shadowBiasMax);
 
-        
-            glViewport(0, 0, width, height);
+
+        glViewport(0, 0, width, height);
 
 
-            // Рендерим прямоугольник
-            RenderQuad();
+        // Рендерим прямоугольник
+        quads[0]->RenderQuad();
 
-            // 2.5. Копируем содержимое буфера глубины (геометрический проход) в буфер глубины заданного по умолчанию фреймбуфера
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer); // пишем в заданный по умолчанию фреймбуфер
-            glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        // 2.5. Копируем содержимое буфера глубины (геометрический проход) в буфер глубины заданного по умолчанию фреймбуфера
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer); // пишем в заданный по умолчанию фреймбуфер
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
-            lightsShader.Use();
-            lightsShader.SetMat4("projection", projection);
-            lightsShader.SetMat4("view", view);
-            lightsShader.SetVec3("camPos", camera.Position);
-            scene.DrawSceneLights(lightsShader);
+        lightsShader.Use();
+        lightsShader.SetMat4("projection", projection);
+        lightsShader.SetMat4("view", view);
+        lightsShader.SetVec3("camPos", camera.Position);
+        scene.DrawSceneLights(lightsShader);
 
-            if (drawSkybox) {
-                // Skybox drawing
-                backgroundShader.Use();
-                backgroundShader.SetMat4("projection", projection);
-                backgroundShader.SetMat4("view", view);
-                backgroundShader.SetFloat("exposure", backgroundExposure);
-                scene.environment.Draw();
-            }
+        if (drawSkybox) {
+            // Skybox drawing
+            backgroundShader.Use();
+            backgroundShader.SetMat4("projection", projection);
+            backgroundShader.SetMat4("view", view);
+            backgroundShader.SetFloat("exposure", backgroundExposure);
+            scene.environment.Draw();
+        }
     }
 
 
     void Renderer::RenderOnScreen() {
-      
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -942,18 +905,18 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
         shaderRenderOnScreen.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
-        
+
         glViewport(0, 0, width, height);
 
         // Рендерим прямоугольник
-        RenderQuad();
-         
+        quads[0]->RenderQuad();
+
 
     }
 
     unsigned int Renderer::CreateGeometryIcon(unsigned int i) {
         return 0;
     }
-   
+
 
 } // namespace Chotra

@@ -1,34 +1,25 @@
 Type                 Path  
+ObjModel         resources/models/default.obj
 ObjModel         resources/models/Model_Ambient/ground.obj
 ObjModel         resources/models/Model_Ambient/panels.obj
-ObjModel         resources/models/sphere.obj
-//ObjModel         resources/models/armor/armor.obj
-//ObjModel         resources/models/radio/radio.obj
 
-
+Material         resources/models/default.mtl
 Material         resources/models/Model_Ambient/ground.mtl
 Material         resources/models/Model_Ambient/panels.mtl
-//Material         resources/models/sphere.mtl
+
+
+
 
 
 
                Name              Geometry  Materiale      Position          Angle          Scale        Velocity         rVelocity       Visible
                          
-SceneObject  object_0   OBJModel     0        0         0.0  0.0  0.0    0.0 0.0 0.0    0.5 0.5 0.5    0.0 0.0 0.0     0.0 0.0 0.0          1
-SceneObject  object_1   OBJModel     1        1        0.0  0.0  0.0    0.0 0.0 0.0    0.5 0.5 0.5    0.0 0.0 0.0     0.0 0.0 0.0          1
-//SceneObject  object_2   OBJModel     1         0.0   1.5  0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
-//SceneObject  object_3   OBJModel     2         0.0   2.0  -5.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
-//SceneObject  object_4   OBJModel     3        -3.0   1.5   0.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0     0.0 0.0 0.0          1
+SceneObject  object_0   OBJModel     1        1         0.0  0.0  0.0    0.0 0.0 0.0    0.5 0.5 0.5    0.0 0.0 0.0     0.0 0.0 0.0          1
+SceneObject  object_1   OBJModel     2        2         0.0  0.0  0.0    0.0 0.0 0.0    0.5 0.5 0.5    0.0 0.0 0.0     0.0 0.0 0.0          1
+
 
 
                Name                 Geometry  Materiale        Position          Angle          Scale        Velocity         rVelocity       Visible       Color        Brightness
 
 SceneLight    light_0    OBJModel     1           1       -25.0 15.0  -30.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1      1.0 1.0 1.0        20000
 
-//SceneLight    OBJModel     0       20.0 31.0 -60.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1     0.4 0.2 0.9        100
-//SceneLight    OBJModel     0       17.0 22.0 -60.0    0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0         1     0.4 0.2 0.9       100
-//SceneLight    OBJModel     0        2.0 22.0 -60.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1     0.4 0.2 0.9       100 
-//SceneLight    OBJModel     0        0.0 30.0 -60.0   0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0          1     0.4 0.2 0.9        100 
-//SceneLight    OBJModel     0      -10.0 34.0 -60.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1     0.4 0.2 0.9        100
-//SceneLight    OBJModel     0      -17.0 38.0 -60.0    0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0         1     0.4 0.2 0.9       100
-//SceneLight    OBJModel     0      -30.0 36.0 -60.0     0.0 0.0 0.0    0.05 0.05 0.05    0.0 0.0 0.0      0.0 0.0 0.0        1     0.4 0.2 0.9       100 
