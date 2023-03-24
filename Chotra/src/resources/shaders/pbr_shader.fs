@@ -190,7 +190,7 @@ void main()
         // Масштабируем освещенность при помощи NdotL
         float NdotL = max(dot(N, L), 0.0);        
 
-	  // Вычисляем тень
+	  // Вычисляем тень от каждого источника света кромк Солнца
         float shadow = ShadowCalculation(FragPosLightSpace);  
 
         // Добавляем к исходящей энергитической яркости Lo
@@ -215,10 +215,10 @@ void main()
 
     vec3 ambient = (kD * diffuse + specular) * ao;
     
-    // Вычисляем тень
-    //float shadow = ShadowCalculation(FragPosLightSpace);   
+    // Вычисляем тень от Солнца
+    float shadow = ShadowCalculation(FragPosLightSpace);   
  
-    vec3 color = ambient + Lo;
+    vec3 color = ambient * (1.0 - shadow) + Lo;
 
     // Тональная компрессия HDR
     //color = color / (color + vec3(1.0));

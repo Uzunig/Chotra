@@ -31,7 +31,7 @@ vec4 SSR(vec4 position, vec3 reflection)
 {
     vec4 outColor = vec4(0.0f, 1.0f, 0.0f, 0.0f);
     
-    if (position.a != 2.0) {    // TO DO: to optimize!
+    if (position.a != 2.0) {    // TO DO: to optimize! 
         return vec4(1.0f, 0.0f, 0.0f, 0.0f);
     }
 
@@ -48,7 +48,7 @@ vec4 SSR(vec4 position, vec3 reflection)
 
         float alphaFromScreen = texture(gViewPosition, marchingUV.xy).a; 
         if (alphaFromScreen != 2.0) {    // TO DO: to optimize!
-            return vec4(0.0f, 0.0f, 1.0f, 0.0f);;
+            return vec4(1.0f, 1.0f, 0.0f, 0.0f);
         }
 
         // Получаем значения глубины точки выборки
@@ -58,11 +58,11 @@ vec4 SSR(vec4 position, vec3 reflection)
         if (abs(delta) < accuracySSR) {
 			step *= sign(delta) * (-0.5);
             if (abs(delta) < (accuracySSR * 0.5)) {
-                //outColor = vec4(1.0f, 1.0f, 0.0f, 0.0f);
+                //outColor = vec4(0.0f, 0.0f, 1.0f, 0.0f);
 			    outColor = vec4(texture(gAlbedoMap, marchingUV.xy).xyz, 1.0); 
                 return outColor;
             }
-            //outColor = vec4(1.0f, 0.0f, 0.0f, 0.0f);
+            //outColor = vec4(0.0f, 1.0f, 1.0f, 0.0f);
             outColor = vec4(texture(gAlbedoMap, marchingUV.xy).xyz, 1.0);
             //return outColor;
         }    
@@ -90,7 +90,7 @@ vec4 SSR1(vec4 position, vec3 reflection)
 
     vec3 startPosition = position.xyz + reflection * biasSSR;
     vec3 marchingPosition = startPosition;
-    vec3 endPosition = position.xyz + reflection * 7; // iterationCount
+    vec3 endPosition = position.xyz + reflection * iterationCount; // iterationCount
         	
     vec4 startPositionScreen = vec4(startPosition, 1.0);
     startPositionScreen = projection * startPositionScreen;
@@ -122,7 +122,7 @@ vec4 SSR1(vec4 position, vec3 reflection)
 
         float alphaFromScreen = texture(gViewPosition, marchingPositionUV.xy).a; 
         if (alphaFromScreen != 2.0) {    // TO DO: to optimize!
-            return vec4(0.0f, 0.0f, 1.0f, 0.0f);
+            return vec4(1.0f, 1.0f, 0.0f, 0.0f);
         }
         
         float deltaZ = abs(marchingPosition.z) - abs(currentFrag.z);
@@ -188,6 +188,6 @@ void main()
 
     //SSR
     vec3 reflectionDirection = normalize(reflect(normalize(fragPos.xyz), normalize(normal)));
-    reflectedUv = SSR(fragPos, reflectionDirection);
+    reflectedUv = SSR1(fragPos, reflectionDirection);
 	
 }

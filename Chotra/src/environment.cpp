@@ -2,15 +2,18 @@
 
 #include"stb_image.h"
 
-#include "shader.h"
+
+#include "resource_manager.h"
+#include "scene_light.h"
 
 namespace Chotra {
 
 
-    Environment::Environment(std::string hdri_path) {
+    Environment::Environment(std::string hdri_path, std::shared_ptr<SceneLight> sun) :
+                                  sunShader("resources/shaders/sun_shader.vs", "resources/shaders/sun_shader.fs"), sun(sun) {
 
         if (LoadHDRi(hdri_path)) {
-            
+                        
             SetFrameBuffer();
             GenTextures();
             SetCubeMap();
@@ -95,14 +98,25 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, hdrTexture);
 
+        sunShader.Use();
+        sunShader.SetVec3("lightColor", sun->color * (float)sun->brightness);
+        sunShader.SetMat4("model", sun->modelMatrix);
+
         glViewport(0, 0, envMapSize, envMapSize);
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         for (unsigned int i = 0; i < 6; ++i) {
-            equirectangularToCubemapShader.SetMat4("view", captureSettings.captureViews[i]);
+            
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+            equirectangularToCubemapShader.Use();
+            equirectangularToCubemapShader.SetMat4("view", captureSettings.captureViews[i]);
             RenderCube();
+
+            sunShader.Use();
+            sunShader.SetMat4("view", captureSettings.captureViews[i]);
+            sunShader.SetMat4("projection", captureSettings.captureProjection);
+            RenderSun();
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -341,6 +355,19 @@ namespace Chotra {
         RenderCube();
         glCullFace(GL_BACK);
     }
+
+    void Environment::RenderSun() {
+                    
+        glDisable(GL_DEPTH_TEST);
+        // Отрисовываем меш
+        glBindVertexArray(ResourceManager::GetGeometryVAO(0));
+        glDrawArrays(GL_TRIANGLES, 0, ResourceManager::GetGeometryVerticesCount(0));
+        //glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
+        glBindVertexArray(0);
+        glEnable(GL_DEPTH_TEST);
+
+    }
+
 
 } // namspace Chotra
 

@@ -12,8 +12,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-
-#include "environment.h"
+#include <memory>
 
 namespace Chotra {
     
@@ -22,14 +21,17 @@ namespace Chotra {
     class Material;
     class SceneLight;
     class SceneObject;
+    class Environment;
+    class Sun;
 
     class Scene {
     public:
                     
         std::vector<SceneObject> sceneObjects;
         std::vector<SceneLight> sceneLights;
+        std::vector<std::shared_ptr<SceneLight>> sceneSuns;
                 
-        Environment environment;
+        std::shared_ptr<Environment> environment;
 
         Scene();
         ~Scene();
@@ -38,6 +40,8 @@ namespace Chotra {
         void AddSceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position = glm::vec3(0.0f), glm::vec3 angle = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 rVelocity = glm::vec3(0.0f), bool visible = true);
         void AddSceneLight(unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
                            int visible, glm::vec3 color, int brightness);
+        void AddSceneSun(unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
+            int visible, glm::vec3 color, int brightness);
                
         void Update(float dt);
         void DrawSceneObjects(Shader& shader);

@@ -15,7 +15,6 @@ namespace Chotra {
         : width(width), height(height), camera(camera), scene(scene),
         screenTexture(width, height), screenTexturePrevious(width, height),
         pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
-        lightsShader("resources/shaders/pbr_shader.vs", "resources/shaders/lights_shader.fs"),
         screenShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_shader.fs"),
         downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/downsampling.fs"),
         combineShader("resources/shaders/screen_shader.vs", "resources/shaders/combine.fs"),
@@ -57,12 +56,12 @@ namespace Chotra {
         pbrShader.SetInt("prefilterMap", 6);
         pbrShader.SetInt("brdfLUT", 7);
         pbrShader.SetInt("shadowMap", 8);
-
+        /*
         lightsShader.Use();
         lightsShader.SetInt("irradianceMap", 5);
         lightsShader.SetInt("prefilterMap", 6);
         lightsShader.SetInt("brdfLUT", 7);
-
+        */
         // Активируем шейдер и передаем матрицы
         shaderDeferredLightingPass.Use();
         shaderDeferredLightingPass.SetInt("irradianceMap", 4);
@@ -109,7 +108,6 @@ namespace Chotra {
 
     void Renderer::ForwardRender() {
 
-        //GenerateShadowMap();
         shadowMap.GenerateShadowMap(scene);
 
         if (enableMSAA) {
@@ -150,14 +148,14 @@ namespace Chotra {
     }
 
     void Renderer::DrawDebuggingQuads() {
-        /*
+        
         //Draw debugging quads
         screenShader.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, gPosition);
+        glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
         quads[1]->RenderQuad();
 
-        glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
+        glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
         quads[2]->RenderQuad();
         /*
         glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
@@ -280,19 +278,19 @@ namespace Chotra {
         pbrShader.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         pbrShader.SetFloat("shadowBiasMin", shadowBiasMin);
         pbrShader.SetFloat("shadowBiasMax", shadowBiasMax);
-
+        /*
         lightsShader.Use();
         lightsShader.SetMat4("projection", projection);
         lightsShader.SetMat4("view", view);
         lightsShader.SetVec3("camPos", camera.Position);
-
+        */
         // Связываем предварительно вычисленные IBL-данные
         glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.irradianceMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment->irradianceMap);
         glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.prefilterMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment->prefilterMap);
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, scene.environment.brdfLUTTexture);
+        glBindTexture(GL_TEXTURE_2D, scene.environment->brdfLUTTexture);
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
 
@@ -309,7 +307,7 @@ namespace Chotra {
         scene.DrawSceneObjects(pbrShader);
 
 
-        scene.DrawSceneLights(lightsShader);
+        //scene.DrawSceneLights(lightsShader);
 
         if (drawSkybox) {
             // Skybox drawing
@@ -317,7 +315,7 @@ namespace Chotra {
             backgroundShader.SetMat4("projection", projection);
             backgroundShader.SetMat4("view", view);
             backgroundShader.SetFloat("exposure", backgroundExposure);
-            scene.environment.Draw();
+            scene.environment->Draw();
         }
 
         // 2. Теперь блитируем мультисэмплированный буфер(ы) в нормальный цветовой буфер промежуточного FBO. Изображение сохранено в screenTexture
@@ -355,11 +353,11 @@ namespace Chotra {
 
         // Связываем предварительно вычисленные IBL-данные
         glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.irradianceMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment->irradianceMap);
         glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.prefilterMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment->prefilterMap);
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, scene.environment.brdfLUTTexture);
+        glBindTexture(GL_TEXTURE_2D, scene.environment->brdfLUTTexture);
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
 
@@ -375,13 +373,13 @@ namespace Chotra {
 
         scene.DrawSceneObjects(pbrShader);
 
-
+        /*
         lightsShader.Use();
         lightsShader.SetMat4("projection", projection);
         lightsShader.SetMat4("view", view);
         lightsShader.SetVec3("camPos", camera.Position);
 
-        scene.DrawSceneLights(lightsShader);
+        scene.DrawSceneLights(lightsShader);*/
 
         if (drawSkybox) {
             // Skybox drawing
@@ -389,7 +387,7 @@ namespace Chotra {
             backgroundShader.SetMat4("projection", projection);
             backgroundShader.SetMat4("view", view);
             backgroundShader.SetFloat("exposure", backgroundExposure);
-            scene.environment.Draw();
+            scene.environment->Draw();
         }
 
     }
@@ -842,11 +840,11 @@ namespace Chotra {
 
         // Связываем предварительно вычисленные IBL-данные
         glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.irradianceMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment->irradianceMap);
         glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment.prefilterMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment->prefilterMap);
         glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_2D, scene.environment.brdfLUTTexture);
+        glBindTexture(GL_TEXTURE_2D, scene.environment->brdfLUTTexture);
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
         glActiveTexture(GL_TEXTURE8);
@@ -862,6 +860,7 @@ namespace Chotra {
             shaderDeferredLightingPass.SetVec3("lightColors[" + std::to_string(i) + "]", scene.sceneLights[i].color * (float)scene.sceneLights[i].brightness);
         }
 
+        shaderDeferredLightingPass.SetVec3("sunPosition", scene.sceneSuns[0]->position);
         shaderDeferredLightingPass.SetVec3("camPos", camera.Position);
         shaderDeferredLightingPass.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         shaderDeferredLightingPass.SetFloat("shadowBiasMin", shadowBiasMin);
@@ -878,20 +877,20 @@ namespace Chotra {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer); // пишем в заданный по умолчанию фреймбуфер
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-
+        /*
         lightsShader.Use();
         lightsShader.SetMat4("projection", projection);
         lightsShader.SetMat4("view", view);
         lightsShader.SetVec3("camPos", camera.Position);
         scene.DrawSceneLights(lightsShader);
-
+        */
         if (drawSkybox) {
             // Skybox drawing
             backgroundShader.Use();
             backgroundShader.SetMat4("projection", projection);
             backgroundShader.SetMat4("view", view);
             backgroundShader.SetFloat("exposure", backgroundExposure);
-            scene.environment.Draw();
+            scene.environment->Draw();
         }
     }
 

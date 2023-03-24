@@ -5,14 +5,15 @@
 #include "environment.h"
 #include "shader.h"
 #include "resource_manager.h"
+#include "environment.h"
 
 namespace Chotra {
 
-    Scene::Scene()
-        : environment("resources/hdr/Sky.hdr") {
+    Scene::Scene() {
 
         LoadSceneFromFile("resources/level1.lv");
 
+        environment = std::make_shared<Environment>("resources/hdr/Sky.hdr", sceneSuns[0]);
     }
 
     Scene::~Scene() {
@@ -35,6 +36,13 @@ namespace Chotra {
             scale, velocity, rVelocity, visible, color, brightness);
 
         sceneLights.push_back(sLight);
+    }
+
+    void Scene::AddSceneSun(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
+        int visible, glm::vec3 color, int brightness) {
+
+        sceneSuns.push_back(std::make_shared<SceneLight>(geometryIndex, materialIndex, name, position, angle,
+            scale, velocity, rVelocity, visible, color, brightness));
     }
 
     void Scene::Update(float deltaTime) {
@@ -60,13 +68,12 @@ namespace Chotra {
     }
 
     void Scene::DrawSceneObjects(Shader& shader) {
-
+        glCullFace(GL_BACK);
         for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
             if (sceneObjects[i].visible) {
                 sceneObjects[i].Draw(shader);
             }
         }
-
     }
 
     void Scene::DrawSceneLights(Shader& shader) {
@@ -182,6 +189,50 @@ namespace Chotra {
                         AddSceneLight(geometryIndex, materialIndex, name, position, angle,
                             scale, velocity, rVelocity, visible, color, intensity);
                     }
+
+                }
+                else if (s == "SceneSun") {
+                    std::string name;
+                    level_file >> name;
+
+                    std::string meshType;
+                    level_file >> meshType;
+
+                    unsigned int geometryIndex;
+                    level_file >> geometryIndex;
+
+                    unsigned int materialIndex;
+                    level_file >> materialIndex;
+
+                    glm::vec3 position;
+                    level_file >> position.x >> position.y >> position.z;
+
+                    glm::vec3 angle;
+                    level_file >> angle.x >> angle.y >> angle.z;
+
+                    glm::vec3 scale;
+                    level_file >> scale.x >> scale.y >> scale.z;
+
+                    glm::vec3 velocity;
+                    level_file >> velocity.x >> velocity.y >> velocity.z;
+
+                    glm::vec3 rVelocity;
+                    level_file >> rVelocity.x >> rVelocity.y >> rVelocity.z;
+
+                    int visible;
+                    level_file >> visible;
+
+                    glm::vec3 color;
+                    level_file >> color.x >> color.y >> color.z;
+
+                    int intensity;
+                    level_file >> intensity;
+
+                    if (meshType == "OBJModel") {
+                        AddSceneSun(geometryIndex, materialIndex, name, position, angle,
+                            scale, velocity, rVelocity, visible, color, intensity);
+                    }
+
                 }
             }
         }

@@ -29,6 +29,8 @@ uniform sampler2D ssrMap;
 uniform vec3 lightPositions[7];
 uniform vec3 lightColors[7];
 
+uniform vec3 sunPosition;
+
 uniform vec3 camPos;
 
 const float PI = 3.14159265359;
@@ -80,7 +82,7 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 }   
 
 
-float ShadowCalculation(vec4 fragPosLightSpace)
+float ShadowCalculation(vec3 lightPosition, vec4 fragPosLightSpace)
 {
     // Выполняем деление перспективы
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -98,7 +100,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     vec3 normal = texture(gNormal, TexCoords).rgb;
     vec3 WorldPos = texture(gPosition, TexCoords).rgb;
 
-    vec3 lightDir = normalize(lightPositions[0] - WorldPos);
+    vec3 lightDir = normalize(lightPosition - WorldPos);
     float bias = max(shadowBiasMax * (1.0 - dot(normal, lightDir)), shadowBiasMin);
 	
     // Проверка нахождения текущего фрагмента в тени
@@ -148,7 +150,7 @@ void main()
     // Уравнение отражения
     vec3 Lo = vec3(0.0);
 
-    for(int i = 0; i < 3; ++i) 
+    for(int i = 0; i < 0; ++i) 
     {
         // Вычисляем энергетическую яркость каждого источника света
         vec3 L = normalize(lightPositions[i] - WorldPos);
@@ -179,9 +181,9 @@ void main()
         // Масштабируем освещенность при помощи NdotL
         float NdotL = max(dot(N, L), 0.0);        
 
-	  // Вычисляем тень
+	  // Вычисляем тень 
         vec4  FragPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0); // TO DO: Вычислять снаружи 
-        float shadow = ShadowCalculation(FragPosLightSpace);  
+        float shadow = ShadowCalculation(lightPositions[0], FragPosLightSpace);  
         
         // Добавляем к исходящей энергитической яркости Lo
         Lo += ((kD * albedo / PI + specular) * radiance * NdotL) * (1.0 - shadow); // обратите внимание, что мы уже умножали BRDF на коэффициент Френеля(kS), поэтому нам не нужно снова умножать на kS
@@ -209,11 +211,14 @@ void main()
     vec3 ambient = (kD * diffuse + specular) * ao * ssao; 
     vec3 ambient1 = (kD * diffuse + specular1) * ao * ssao; 
     
-    // Вычисляем тень
-    //float shadow = ShadowCalculation(FragPosLightSpace);   
+    
+
+    // Shadow calculation from Sun
+    vec4  FragPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0); // TO DO: Вычислять снаружи 
+    float shadow = ShadowCalculation(sunPosition, FragPosLightSpace);  
  
-    vec3 color = ambient + Lo;
-    vec3 color1 = ambient1 + Lo;
+    vec3 color = ambient * (1.0 - shadow) + Lo;
+    vec3 color1 = ambient1 * (1.0 - shadow) + Lo;
     // Тональная компрессия HDR
     //color = color / (color + vec3(1.0));
     

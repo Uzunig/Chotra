@@ -39,7 +39,7 @@ namespace Chotra {
         unsigned int& height;
 
         Shader pbrShader;
-        Shader lightsShader;
+        //Shader lightsShader;
                 
         Shader screenShader;
         Shader downSamplingShader;
@@ -73,17 +73,17 @@ namespace Chotra {
         bool gammaCorrection = true;
 
         bool showShadows = true;
-        float shadowBiasMin = 0.00f;
-        float shadowBiasMax = 0.0f;
+        float shadowBiasMin = 0.003f;
+        float shadowBiasMax = 0.003f;
 
         int kernelSizeSSAO = 64;
         float radiusSSAO = 0.5;
         float biasSSAO = 0.025;
 
-        float biasSSR = 20.0f; // 20,0
+        float biasSSR = 0.4f; // 20,0
         float rayStep = 0.014f; // 0,014f
-        int iterationCount = 1400; // 1400
-        float accuracySSR = 0.05f; // 0.05f
+        int iterationCount = 16; // 1400
+        float accuracySSR = 0.15f; // 0.05f
                 
         ScreenTexture screenTexture; 
                 
