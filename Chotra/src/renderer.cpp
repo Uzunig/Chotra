@@ -278,6 +278,7 @@ namespace Chotra {
         pbrShader.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         pbrShader.SetFloat("shadowBiasMin", shadowBiasMin);
         pbrShader.SetFloat("shadowBiasMax", shadowBiasMax);
+        pbrShader.SetFloat("shadowOpacity", shadowOpacity);
         /*
         lightsShader.Use();
         lightsShader.SetMat4("projection", projection);
@@ -350,6 +351,7 @@ namespace Chotra {
         pbrShader.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         pbrShader.SetFloat("shadowBiasMin", shadowBiasMin);
         pbrShader.SetFloat("shadowBiasMax", shadowBiasMax);
+        pbrShader.SetFloat("shadowOpacity", shadowOpacity);
 
         // —в€зываем предварительно вычисленные IBL-данные
         glActiveTexture(GL_TEXTURE5);
@@ -865,6 +867,7 @@ namespace Chotra {
         shaderDeferredLightingPass.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         shaderDeferredLightingPass.SetFloat("shadowBiasMin", shadowBiasMin);
         shaderDeferredLightingPass.SetFloat("shadowBiasMax", shadowBiasMax);
+        shaderDeferredLightingPass.SetFloat("shadowOpacity", shadowOpacity);
 
 
         glViewport(0, 0, width, height);

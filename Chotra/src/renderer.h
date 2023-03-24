@@ -73,8 +73,9 @@ namespace Chotra {
         bool gammaCorrection = true;
 
         bool showShadows = true;
-        float shadowBiasMin = 0.003f;
-        float shadowBiasMax = 0.003f;
+        float shadowBiasMin = 0.0003f;
+        float shadowBiasMax = 0.00015f;
+        float shadowOpacity = 0.5f;
 
         int kernelSizeSSAO = 64;
         float radiusSSAO = 0.5;

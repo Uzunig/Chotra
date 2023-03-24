@@ -21,7 +21,8 @@ uniform sampler2D brdfLUT;
 // Shadows
 uniform sampler2D shadowMap;
 uniform float shadowBiasMin;
-uniform float shadowBiasMax; 
+uniform float shadowBiasMax;
+uniform float shadowOpacity;
 
 
 // Освещение
@@ -218,7 +219,7 @@ void main()
     // Вычисляем тень от Солнца
     float shadow = ShadowCalculation(FragPosLightSpace);   
  
-    vec3 color = ambient * (1.0 - shadow) + Lo;
+    vec3 color = ambient * (1.0 - shadow * shadowOpacity) + Lo;
 
     // Тональная компрессия HDR
     //color = color / (color + vec3(1.0));

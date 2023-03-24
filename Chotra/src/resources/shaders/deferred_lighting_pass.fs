@@ -20,6 +20,7 @@ uniform sampler2D shadowMap;
 uniform float shadowBiasMin;
 uniform float shadowBiasMax;
 uniform mat4 lightSpaceMatrix;
+uniform float shadowOpacity;
 
 uniform sampler2D ssaoMap;
 uniform sampler2D ssrMap;
@@ -217,8 +218,8 @@ void main()
     vec4  FragPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0); // TO DO: Вычислять снаружи 
     float shadow = ShadowCalculation(sunPosition, FragPosLightSpace);  
  
-    vec3 color = ambient * (1.0 - shadow) + Lo;
-    vec3 color1 = ambient1 * (1.0 - shadow) + Lo;
+    vec3 color = ambient * (1.0 - shadow * shadowOpacity) + Lo;
+    vec3 color1 = ambient1 * (1.0 - shadow * shadowOpacity) + Lo;
     // Тональная компрессия HDR
     //color = color / (color + vec3(1.0));
     

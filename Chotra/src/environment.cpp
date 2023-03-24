@@ -192,6 +192,7 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         unsigned int maxMipLevels = 5;
 
+       
         for (unsigned int mip = 0; mip < maxMipLevels; ++mip) {
             // Изменяем размеры фреймбуфера в соответствии с размерами мипмап-карты
             unsigned int mipWidth = prefilterMapSize * std::pow(0.5, mip);

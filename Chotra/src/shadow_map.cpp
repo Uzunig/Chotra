@@ -11,7 +11,6 @@ namespace Chotra {
     ShadowMap::ShadowMap() 
               : simpleDepthShader("resources/shaders/shadow_depth.vs", "resources/shaders/shadow_depth.fs") {
         
-           
     }
 
     
@@ -43,14 +42,14 @@ namespace Chotra {
 
         float near_plane = 1.0f, far_plane = 100.0f;
         //lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)shadowMapSize / (GLfloat)shadowMapSize, near_plane, far_plane); // обратите внимание, что если вы используете матрицу перспективной проекции, то вам придется изменить положение света, так как текущего положения света недостаточно для отображения всей сцены
-        lightProjection = glm::ortho(-30.0f, 30.0f, -30.0f, 30.0f, near_plane, far_plane);
+        lightProjection = glm::ortho(-9.0f, 9.0f, -5.0f, 5.0f, near_plane, far_plane);
         lightView = glm::lookAt(scene.sceneSuns[0]->position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
         lightSpaceMatrix = lightProjection * lightView;
 
         simpleDepthShader.Use();
         simpleDepthShader.SetMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-        glViewport(0, 0, width, height);
+        glViewport(0, 0,width, height);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
