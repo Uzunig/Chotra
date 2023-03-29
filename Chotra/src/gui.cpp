@@ -182,7 +182,7 @@ namespace Chotra {
             if (ImGui::CollapsingHeader("SSR")) {
                 ImGui::SliderFloat("biasSSR", &p_mainWindow->renderer->biasSSR, 0.001f, 20.0f);
                 ImGui::SliderFloat("rayStep", &p_mainWindow->renderer->rayStep, 0.001f, 5.0f);
-                ImGui::SliderInt("iterationCount", &p_mainWindow->renderer->iterationCount, 0, 3000);
+                ImGui::SliderInt("iterationCount", &p_mainWindow->renderer->iterationCount, 0, 200);
                 ImGui::SliderFloat("accuracy", &p_mainWindow->renderer->accuracySSR, 0.001f, 5.0f);
 
             }
@@ -198,8 +198,8 @@ namespace Chotra {
             ImGui::Checkbox("Show shadows", &p_mainWindow->renderer->showShadows);
             if (p_mainWindow->renderer->showShadows) {
 
-                ImGui::SliderFloat("Bias min", &p_mainWindow->renderer->shadowBiasMin, 0.0001f, 0.001f);
-                ImGui::SliderFloat("Bias max", &p_mainWindow->renderer->shadowBiasMax, 0.0001f, 0.001f);
+                ImGui::SliderFloat("Bias min", &p_mainWindow->renderer->shadowBiasMin, 0.0001f, 0.001f, "%.4f");
+                ImGui::SliderFloat("Bias max", &p_mainWindow->renderer->shadowBiasMax, 0.0001f, 0.001f, "%.4f");
                 ImGui::SliderFloat("Opacity", &p_mainWindow->renderer->shadowOpacity, 0.0f, 1.0f);
 
             }

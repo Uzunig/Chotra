@@ -1,3 +1,6 @@
+Sun shadow: Take from the prefilter map null if the reflection vector equals the direction of the sun.
+SSR: The previous frame image may be better, if it is equal to fragColor and after rendering mips for previous frame.
+
 Chcking for uniqueness of txtures and gometris when adding.
 Render textures, framebuffers, renderbuffers - classify everything
 Сreate a base class Renderer that will be inherited by other classes (DeferredRender, ForwardRender). Create class RenderManager that will lead all rendering process.

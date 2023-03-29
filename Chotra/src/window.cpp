@@ -66,6 +66,7 @@ namespace Chotra {
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
         glEnable(GL_MULTISAMPLE);
+        glfwSwapInterval(0);
 
         glfwSetWindowUserPointer(glfwWindow, &windowData);
 

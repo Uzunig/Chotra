@@ -41,7 +41,7 @@ namespace Chotra {
         Shader pbrShader;
         //Shader lightsShader;
                 
-        Shader screenShader;
+        Shader screenDivideShader;
         Shader downSamplingShader;
         Shader combineShader;
 
@@ -73,17 +73,17 @@ namespace Chotra {
         bool gammaCorrection = true;
 
         bool showShadows = true;
-        float shadowBiasMin = 0.0003f;
-        float shadowBiasMax = 0.00015f;
+        float shadowBiasMin = 0.0009f;
+        float shadowBiasMax = 0.0006f;
         float shadowOpacity = 0.5f;
 
         int kernelSizeSSAO = 64;
         float radiusSSAO = 0.5;
         float biasSSAO = 0.025;
 
-        float biasSSR = 0.4f; // 20,0
+        float biasSSR = 0.5f; // 20,0
         float rayStep = 0.014f; // 0,014f
-        int iterationCount = 16; // 1400
+        int iterationCount = 7; // 1400
         float accuracySSR = 0.15f; // 0.05f
                 
         ScreenTexture screenTexture; 
@@ -117,8 +117,7 @@ namespace Chotra {
         unsigned int hdrFBO;
         unsigned int colorBuffers[2];
         unsigned int rboDepth;
-        unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-
+        
         unsigned int downPingpongFBO[16][2];
         unsigned int downPingpongColorbuffers[16][2];
 
@@ -168,7 +167,7 @@ namespace Chotra {
         void ConfigureLightingPass();
         void RenderLightingPass();
 
-        void RenderOnScreen();
+        void RenderToScreen();
 
         unsigned int CreateGeometryIcon(unsigned int i);
 

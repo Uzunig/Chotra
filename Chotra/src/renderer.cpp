@@ -15,7 +15,7 @@ namespace Chotra {
         : width(width), height(height), camera(camera), scene(scene),
         screenTexture(width, height), screenTexturePrevious(width, height),
         pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
-        screenShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_shader.fs"),
+        screenDivideShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_divide_shader.fs"),
         downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/downsampling.fs"),
         combineShader("resources/shaders/screen_shader.vs", "resources/shaders/combine.fs"),
         shaderBlur("resources/shaders/screen_shader.vs", "resources/shaders/blur.fs"),
@@ -76,8 +76,8 @@ namespace Chotra {
         backgroundShader.Use();
         backgroundShader.SetInt("environmentMap", 0);
 
-        screenShader.Use();
-        screenShader.SetInt("screenTexture", 0);
+        screenDivideShader.Use();
+        screenDivideShader.SetInt("screenTexture", 0);
 
         shaderRenderOnScreen.Use();
         shaderRenderOnScreen.SetInt("screenTexture", 0);
@@ -103,7 +103,7 @@ namespace Chotra {
 
     void Renderer::PassiveRender() {
 
-        RenderOnScreen();
+        RenderToScreen();
     }
 
     void Renderer::ForwardRender() {
@@ -118,7 +118,7 @@ namespace Chotra {
         }
 
         RenderBloom();
-        RenderOnScreen();
+        RenderToScreen();
 
         DrawDebuggingQuads();
     }
@@ -131,7 +131,7 @@ namespace Chotra {
         RenderLightingPass();
 
         RenderBloom();
-        RenderOnScreen();
+        RenderToScreen();
 
         DrawDebuggingQuads();
 
@@ -150,7 +150,7 @@ namespace Chotra {
     void Renderer::DrawDebuggingQuads() {
         
         //Draw debugging quads
-        screenShader.Use();
+        screenDivideShader.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
         quads[1]->RenderQuad();
@@ -422,7 +422,7 @@ namespace Chotra {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
 
         // Сообщаем OpenGL, какой прикрепленный цветовой буфер мы будем использовать для рендеринга
-
+        unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
         glDrawBuffers(2, attachments);
 
         // Проверяем готовность фреймбуфера
@@ -495,7 +495,7 @@ namespace Chotra {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
 
-        screenShader.Use();
+        screenDivideShader.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, screenTexture.GetId()); // теперь в качестве текстуры прямоугольника используем преобразованный прикрепленный цветовой объект 
         // Отрисовываем прямоугольник сцены
@@ -898,7 +898,7 @@ namespace Chotra {
     }
 
 
-    void Renderer::RenderOnScreen() {
+    void Renderer::RenderToScreen() {
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
