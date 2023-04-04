@@ -202,8 +202,8 @@ void main()
     
     // Производим выборки из префильтрованной карты LUT-текстуры BRDF и затем объединяем их вместе в соответствии с аппроксимацией разделенной суммы, чтобы получить зеркальную часть IBL
     const float MAX_REFLECTION_LOD = 4.0;
-    vec3 prefilteredColor = textureLod(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;
-    vec4 reflectedColor = textureLod(ssrMap, TexCoords,  roughness * MAX_REFLECTION_LOD).rgba;
+    vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+    vec4 reflectedColor = textureLod(ssrMap, TexCoords, roughness * MAX_REFLECTION_LOD).rgba;
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
 
     vec3 specular = mix(prefilteredColor, reflectedColor.rgb, 1.0 * reflectedColor.a ) * (F * brdf.x + brdf.y);

@@ -81,10 +81,10 @@ namespace Chotra {
         float radiusSSAO = 0.5;
         float biasSSAO = 0.025;
 
-        float biasSSR = 0.5f; // 20,0
+        float biasSSR = 0.3f; // 20,0
         float rayStep = 0.014f; // 0,014f
-        int iterationCount = 7; // 1400
-        float accuracySSR = 0.15f; // 0.05f
+        int iterationCount = 6; // 1400
+        float accuracySSR = 0.05f; // 0.05f
                 
         ScreenTexture screenTexture; 
                 

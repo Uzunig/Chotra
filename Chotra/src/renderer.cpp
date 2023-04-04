@@ -157,10 +157,10 @@ namespace Chotra {
 
         glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
         quads[2]->RenderQuad();
-        /*
+       
         glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
         quads[3]->RenderQuad();
-
+        /*
         glBindTexture(GL_TEXTURE_2D, gMetalRoughAoMap);
         quads[4]->RenderQuad();
 
@@ -237,6 +237,10 @@ namespace Chotra {
 
         glBindTexture(GL_TEXTURE_2D, screenTexturePrevious.GetId());
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, screenTexturePrevious.GetId(), 0);
+        float borderColor[] = { 1.0f, 1.0f, 0.0f, 0.0f };
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
         glDrawBuffers(2, attachments);
