@@ -1,4 +1,5 @@
 Sun shadow: Take from the prefilter map null if the reflection vector equals the direction of the sun.
+Create shadow map(no depth map) with possibility of postprocessing before using.
 SSR: The previous frame image may be better, if it is equal to fragColor and after rendering mips for previous frame.
 
 Chcking for uniqueness of txtures and gometris when adding.
