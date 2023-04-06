@@ -9,7 +9,7 @@ namespace Chotra {
     class GaussianBlurer {
     public:
         GaussianBlurer(unsigned int width, unsigned int height);
-        void Blur(unsigned int& blurTexture);
+        void Blur(unsigned int& blurryTexture, unsigned int& blurredTexture);
 
     private:
         unsigned int width;

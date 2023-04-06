@@ -7,6 +7,7 @@
 #include "scene_light.h"
 #include "scene_object.h"
 #include "quad.h"
+#include "blur.h"
 
 
 namespace Chotra {
@@ -402,7 +403,7 @@ namespace Chotra {
 
         glGenFramebuffers(1, &hdrFBO);
         glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
-
+        
         // Создаем 2 цветовых фреймбуфера типа с плавающей точкой (первый - для обычного рендеринга, другой - для граничных значений яркости)
         glGenTextures(2, colorBuffers);
         for (unsigned int i = 0; i < 2; i++)
@@ -417,7 +418,7 @@ namespace Chotra {
             // Прикрепляем текстуру к фреймбуферу
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i], 0);
         }
-
+        
         // Создаем и прикрепляем буфер глубины (рендербуфер)
 
         glGenRenderbuffers(1, &rboDepth);

@@ -21,6 +21,7 @@ namespace Chotra {
 
     class Scene;
     class Camera;
+    class GaussianBlurer;
             
     class Renderer {
     public:
@@ -28,6 +29,7 @@ namespace Chotra {
         ShadowMap shadowMap;
 
         std::vector<std::shared_ptr<Quad>> quads;
+        std::shared_ptr<GaussianBlurer> gaussianBlurer;
 
         glm::mat4 projection;
         glm::mat4 view;

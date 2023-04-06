@@ -35,7 +35,7 @@ namespace Chotra {
 
     }
 
-    void GaussianBlurer::Blur(unsigned int& blurTexture) {
+    void GaussianBlurer::Blur(unsigned int& blurryTexture, unsigned int& blurredTexture) {
 
         // 2. Размываем яркие фрагменты с помощью двухпроходного размытия по Гауссу
         bool horizontal = true, first_iteration = true;
@@ -45,7 +45,7 @@ namespace Chotra {
         {
             glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
             shaderBlur.SetInt("horizontal", horizontal);
-            glBindTexture(GL_TEXTURE_2D, first_iteration ? blurTexture : pingpongColorbuffers[!horizontal]);  // привязка текстуры другого фреймбуфера (или сцены, если это - первая итерация)
+            glBindTexture(GL_TEXTURE_2D, first_iteration ? blurryTexture : pingpongColorbuffers[!horizontal]);  // привязка текстуры другого фреймбуфера (или сцены, если это - первая итерация)
             quad->RenderQuad();
             horizontal = !horizontal;
             if (first_iteration)
