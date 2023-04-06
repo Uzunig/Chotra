@@ -14,6 +14,9 @@ add_library(Chotra STATIC
 	src/environment.cpp
 	src/environment.h
 
+	src/blur.cpp
+	src/blur.h
+
       src/gui.cpp
 	src/gui.h
 

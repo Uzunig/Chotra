@@ -218,8 +218,8 @@ vec4 SSR2(vec4 position, vec3 reflection)
 
 vec4 SSR3(vec4 position, vec3 reflection)
 {
-    
-    vec4 outColor = vec4(abs(reflection.x), abs(reflection.y), abs(reflection.z) , 0.0f);
+    vec3 ray = reflection * iterationCount;
+    vec4 outColor = vec4(abs(ray.x), abs(ray.y), abs(ray.z) , 0.0f);
     
        
     return outColor;
