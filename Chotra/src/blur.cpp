@@ -13,7 +13,7 @@ namespace Chotra {
 
     void GaussianBlurer::SetupFramebuffers(unsigned int width, unsigned int height) {
 
-        // ping-pong-פנוילבףפונ הכÿ נאחלûעטÿ
+        // ping-pong-framebuffer fo blur
         
         glGenFramebuffers(2, pingpongFBO);
         glGenTextures(2, pingpongColorbuffers);
