@@ -516,6 +516,7 @@ namespace Chotra {
             glViewport(0, 0, width / (j + 1) * 2, height / (j + 1) * 2);
             // 2. Размываем яркие фрагменты с помощью двухпроходного размытия по Гауссу
             horizontal = true;
+
             first_iteration = true;
             shaderBlur.Use();
             for (unsigned int i = 0; i < amount; i++)

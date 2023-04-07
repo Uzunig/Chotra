@@ -9,7 +9,7 @@ namespace Chotra {
     class GaussianBlurer {
     public:
         GaussianBlurer(unsigned int width, unsigned int height);
-        void Blur(unsigned int& blurryTexture, unsigned int& blurredTexture);
+        void Blur(unsigned int& blurryTexture, unsigned int& blurredFramebuffer);
 
     private:
         unsigned int width;
@@ -19,8 +19,8 @@ namespace Chotra {
 
         std::shared_ptr<Quad> quad;
 
-        unsigned int pingpongFBO[2];
-        unsigned int pingpongColorbuffers[2];
+        unsigned int pingpongFBO;
+        unsigned int pingpongColorbuffer;
 
         void SetupFramebuffers(unsigned int width, unsigned int height);
                                          
