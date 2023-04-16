@@ -1,3 +1,5 @@
+Fix roughness.
+Add environment assets.
 Chcking for uniqueness of txtures and gometris when adding.
 Render textures, framebuffers, renderbuffers - classify everything
 Сreate a base class Renderer that will be inherited by other classes (DeferredRender, ForwardRender). Create class RenderManager that will lead all rendering process.
