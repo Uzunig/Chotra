@@ -17,6 +17,9 @@ namespace Chotra {
         unsigned int colorBuffers[2];
         unsigned int rboDepth;
 
+        unsigned int downFBO[16];
+        unsigned int down—olorbuffers[16];
+
         void SetupFramebuffers();
                                          
     };

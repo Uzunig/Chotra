@@ -112,7 +112,7 @@ float ShadowCalculation(vec3 lightPosition, vec4 fragPosLightSpace)
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
     for(int x = -1; x <= 1; ++x)
     {
-        for(int y = 0; y <= 0; ++y)
+        for(int y = -1; y <= 1; ++y)
         {
             float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
             shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
@@ -201,7 +201,7 @@ void main()
     vec3 diffuse = irradiance * albedo;
     
     // Производим выборки из префильтрованной карты LUT-текстуры BRDF и затем объединяем их вместе в соответствии с аппроксимацией разделенной суммы, чтобы получить зеркальную часть IBL
-    const float MAX_REFLECTION_LOD = 4.0;
+    const float MAX_REFLECTION_LOD = 7.0;
     vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
     vec4 reflectedColor = textureLod(ssrMap, TexCoords, roughness * MAX_REFLECTION_LOD).rgba;
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;

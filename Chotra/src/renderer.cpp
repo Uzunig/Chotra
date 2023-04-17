@@ -149,7 +149,7 @@ namespace Chotra {
     }
 
     void Renderer::DrawDebuggingQuads() {
-        
+        /*
         //Draw debugging quads
         screenDivideShader.Use();
         glActiveTexture(GL_TEXTURE0);
@@ -524,9 +524,11 @@ namespace Chotra {
                 glBindFramebuffer(GL_FRAMEBUFFER, downPingpongFBO[j][horizontal]);
                 shaderBlur.SetInt("horizontal", horizontal);
                 if (first_iteration && (j == 0)) {
+                    glActiveTexture(GL_TEXTURE0);
                     glBindTexture(GL_TEXTURE_2D, first_iteration ? colorBuffers[1] : downPingpongColorbuffers[j][!horizontal]);
                 }
                 else {
+                    glActiveTexture(GL_TEXTURE0);
                     glBindTexture(GL_TEXTURE_2D, first_iteration ? downPingpongColorbuffers[j - 1][!horizontal] : downPingpongColorbuffers[j][!horizontal]);
                 }
                 quads[0]->RenderQuad();
@@ -606,7 +608,7 @@ namespace Chotra {
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, reflectedUvMap, 0);
 
         // Генерируем мипмап-карты, OpenGL автоматически выделит нужное количество памяти
-        //glGenerateMipmap(GL_TEXTURE_2D);
+        glGenerateMipmap(GL_TEXTURE_2D);
 
         // Указываем OpenGL на то, в какой прикрепленный цветовой буфер (заданного фреймбуфера) мы собираемся выполнять рендеринг 
         unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };

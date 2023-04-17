@@ -43,12 +43,14 @@ namespace Chotra {
         for (unsigned int i = 0; i < amount; i++)
         {
             if (horizontal) {
-                glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO);
+                glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, first_iteration ? blurryTexture : blurredFramebuffer);  // привязка текстуры другого фреймбуфера (или сцены, если это - первая итерация)
+                glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO);
             }
             else {
-                glBindFramebuffer(GL_FRAMEBUFFER, blurredFramebuffer);
+                glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, first_iteration ? blurryTexture : pingpongColorbuffer);  // привязка текстуры другого фреймбуфера (или сцены, если это - первая итерация)
+                glBindFramebuffer(GL_FRAMEBUFFER, blurredFramebuffer);
             }
             shaderBlur.SetInt("horizontal", horizontal);
             quad->RenderQuad();

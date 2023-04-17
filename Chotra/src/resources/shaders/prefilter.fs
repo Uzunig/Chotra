@@ -9,7 +9,6 @@ const float PI = 3.14159265359;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
-	
     float a = roughness*roughness;
     float a2 = a*a;
     float NdotH = max(dot(N, H), 0.0);
@@ -61,15 +60,14 @@ vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
 }
 
 void main()
-{
-	float rough = roughness;		
+{		
     vec3 N = normalize(WorldPos);
     
     // Делаем упрощающее предположение, что V = R = N
     vec3 R = N;
     vec3 V = R;
 
-    const uint SAMPLE_COUNT = 1u; //1024
+    const uint SAMPLE_COUNT = 1024u;
     vec3 prefilteredColor = vec3(0.0);
     float totalWeight = 0.0;
     
@@ -77,25 +75,25 @@ void main()
     {
         // Генерируем вектор выборки, смещенный в сторону предпочтительного направления (выборка по важности)
         vec2 Xi = Hammersley(i, SAMPLE_COUNT);
-        vec3 H = ImportanceSampleGGX(Xi, N, rough);
+        vec3 H = ImportanceSampleGGX(Xi, N, roughness);
         vec3 L  = normalize(2.0 * dot(V, H) * H - V);
 
         float NdotL = max(dot(N, L), 0.0);
         if(NdotL > 0.0)
         {
             // Производим выборку значений из мипмап-уровня карты окружения в зависимости от значения шероховатости
-            float D = DistributionGGX(N, H, rough);
+            float D = DistributionGGX(N, H, roughness);
             float NdotH = max(dot(N, H), 0.0);
             float HdotV = max(dot(H, V), 0.0);
             float pdf = D * NdotH / (4.0 * HdotV) + 0.0001; 
 
-            float resolution = 1024.0; // разрешение исходной кубической карты (каждой грани)
+            float resolution = 512.0; // разрешение исходной кубической карты (каждой грани)
             float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
             float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
 
-            float mipLevel = rough == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel); 
+            float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel); 
             
-            prefilteredColor += textureLod(environmentMap, L, mipLevel).rgb * NdotL; 
+            prefilteredColor += textureLod(environmentMap, L, mipLevel).rgb * NdotL;
             totalWeight += NdotL;
         }
     }
@@ -103,6 +101,4 @@ void main()
     prefilteredColor = prefilteredColor / totalWeight;
 
     FragColor = vec4(prefilteredColor, 1.0);
-	//FragColor = vec4(vec3(1.0), 1.0);
 }
-
