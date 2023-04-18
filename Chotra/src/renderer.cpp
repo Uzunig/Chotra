@@ -952,6 +952,7 @@ namespace Chotra {
         }
 
         shaderDeferredLightingPass.SetVec3("sunPosition", scene.sceneSuns[0]->position);
+        shaderDeferredLightingPass.SetVec3("sunColor", scene.sceneSuns[0]->color);
         shaderDeferredLightingPass.SetVec3("camPos", camera.Position);
         shaderDeferredLightingPass.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         shaderDeferredLightingPass.SetFloat("shadowBiasMin", shadowBiasMin);

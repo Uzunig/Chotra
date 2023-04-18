@@ -151,6 +151,45 @@ void main()
 
     // Уравнение отражения
     vec3 Lo = vec3(0.0);
+    for(int i = 0; i < 1; ++i) 
+    {
+        // Вычисляем энергетическую яркость каждого Солнца
+        vec3 L = normalize(sunPosition * 1000.0 - WorldPos);
+        vec3 H = normalize(V + L);
+        
+        vec3 radiance = sunColor;
+
+        // BRDF Кука-Торренса
+        float NDF = DistributionGGX(N, H, roughness);   
+        float G = GeometrySmith(N, V, L, roughness);    
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);        
+        
+        vec3 nominator = NDF * G * F;
+        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // 0.001 to prevent divide by zero.
+        vec3 specular = nominator / denominator;
+        
+         // kS эквивалентно коэффициенту Френеля
+        vec3 kS = F;
+		
+        // Чтобы выполнялся закон сохранения энергии, сумма энергий диффузной и отраженной составляющих света не может быть больше 1.0 
+		// (кроме тех случаев, когда сама поверхность имеет возможность излучать свет); 
+		// для выполнения данного соотношения диффузная составляющая (kD) должна равняться значению 1.0 - kS
+        vec3 kD = vec3(1.0) - kS;
+		
+        kD *= 1.0 - metallic;	                
+            
+        // Масштабируем освещенность при помощи NdotL
+        float NdotL = max(dot(N, L), 0.0);        
+
+	  // Вычисляем тень 
+        vec4  FragPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0); // TO DO: Вычислять снаружи 
+        float shadow = ShadowCalculation(sunPosition, FragPosLightSpace);  
+        
+        // Добавляем к исходящей энергитической яркости Lo
+        Lo += ((kD * albedo / PI + specular) * radiance * NdotL) * (1.0 - shadow); // обратите внимание, что мы уже умножали BRDF на коэффициент Френеля(kS), поэтому нам не нужно снова умножать на kS
+    }   
+
+
 
     for(int i = 0; i < 0; ++i) 
     {
@@ -216,11 +255,11 @@ void main()
     
 
     // Shadow calculation from Sun
-    vec4  FragPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0); // TO DO: Вычислять снаружи 
-    float shadow = ShadowCalculation(sunPosition, FragPosLightSpace);  
+//    vec4  FragPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0); // TO DO: Вычислять снаружи 
+  //  float shadow = ShadowCalculation(sunPosition, FragPosLightSpace);  
  
-    vec3 color = ambient * (1.0 - shadow * shadowOpacity) + Lo;
-    vec3 color1 = ambient1 * (1.0 - shadow * shadowOpacity) + Lo;
+    vec3 color = ambient + Lo;
+    vec3 color1 = ambient1 + Lo;
     // Тональная компрессия HDR
     //color = color / (color + vec3(1.0));
     
