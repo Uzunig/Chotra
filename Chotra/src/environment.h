@@ -55,6 +55,7 @@ namespace Chotra {
         unsigned int quadVBO;
 
         unsigned int envCubemap;
+        unsigned int skybox;
         unsigned int irradianceMap;
         unsigned int prefilterMap;
         unsigned int brdfLUTTexture;
@@ -66,6 +67,7 @@ namespace Chotra {
         void UpdateMaps();
 
         void SetCubeMap();
+        void SetSkybox();
         void SetIrradianceMap();
         void SetPrefilterMap();
         void SetBrdfLUTTexture();

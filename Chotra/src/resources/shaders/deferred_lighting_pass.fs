@@ -31,6 +31,7 @@ uniform vec3 lightPositions[7];
 uniform vec3 lightColors[7];
 
 uniform vec3 sunPosition;
+uniform vec3 sunColor;
 
 uniform vec3 camPos;
 

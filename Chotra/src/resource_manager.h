@@ -37,6 +37,7 @@ namespace Chotra {
         static unsigned int GetGeometryVAO(unsigned int i);
 
     private:
+
         static std::vector<std::shared_ptr<MaterialTexture>> textures;
         static std::vector<std::shared_ptr<Material>> materials;
         static std::vector<std::shared_ptr<ObjModel>> geometries;
