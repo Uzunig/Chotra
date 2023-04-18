@@ -54,6 +54,9 @@ namespace Chotra {
 
         Shader shaderSSAO;
         Shader shaderSSAOBlur;
+
+        Shader shaderSSR;
+        Shader shaderSSRBlur;
                
         Shader shaderDeferredGeometryPass;
         Shader shaderDeferredLightingPass;
@@ -129,10 +132,14 @@ namespace Chotra {
         unsigned int ssaoFBO;
         unsigned int ssaoBlurFBO;
         unsigned int ssaoColorBuffer;
-        unsigned int reflectedUvMap;
         unsigned int ssaoMap;
         unsigned int noiseTexture;
         std::vector<glm::vec3> ssaoKernel;
+
+        unsigned int ssrFBO;
+        unsigned int ssrBlurFBO;
+        unsigned int ssrColorBuffer;
+        unsigned int ssrMap;
          
         unsigned int quadVAO = 0;
         unsigned int quadVBO;
@@ -162,6 +169,9 @@ namespace Chotra {
                         
         void ConfigureSSAO();
         void GenerateSSAOMap();
+
+        void ConfigureSSR();
+        void GenerateSSRMap();
 
         void ConfigureGeometryPass();
         void RenderGeometryPass();

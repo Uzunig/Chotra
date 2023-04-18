@@ -24,6 +24,8 @@ namespace Chotra {
         backgroundShader("resources/shaders/background.vs", "resources/shaders/background.fs"),
         shaderSSAO("resources/shaders/screen_shader.vs", "resources/shaders/ssao.fs"),
         shaderSSAOBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssao_blur.fs"),
+        shaderSSR("resources/shaders/screen_shader.vs", "resources/shaders/ssr.fs"),
+        shaderSSRBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssr_blur.fs"),
         shaderDeferredGeometryPass("resources/shaders/deferred_geometry_pass.vs", "resources/shaders/deferred_geometry_pass.fs"),
         shaderDeferredLightingPass("resources/shaders/deferred_lighting_pass.vs", "resources/shaders/deferred_lighting_pass.fs"),
         shaderRenderOnScreen("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") {
@@ -38,6 +40,7 @@ namespace Chotra {
         ConfigureLightingPass();
 
         ConfigureSSAO();
+        ConfigureSSR();
 
         ConfigureBloom();
 
@@ -128,7 +131,10 @@ namespace Chotra {
 
         shadowMap.GenerateShadowMap(scene);
         RenderGeometryPass();
+
         GenerateSSAOMap();
+        GenerateSSRMap();
+
         RenderLightingPass();
 
         RenderBloom();
@@ -149,17 +155,17 @@ namespace Chotra {
     }
 
     void Renderer::DrawDebuggingQuads() {
-        /*
+        
         //Draw debugging quads
         screenDivideShader.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
         quads[1]->RenderQuad();
 
-        glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
+        glBindTexture(GL_TEXTURE_2D, ssrColorBuffer);
         quads[2]->RenderQuad();
-       
-        glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
+      
+        glBindTexture(GL_TEXTURE_2D, ssrMap);
         quads[3]->RenderQuad();
         /*
         glBindTexture(GL_TEXTURE_2D, gMetalRoughAoMap);
@@ -585,9 +591,10 @@ namespace Chotra {
 
     void Renderer::ConfigureSSAO() {
 
-        glGenFramebuffers(1, &ssaoFBO);  glGenFramebuffers(1, &ssaoBlurFBO);
+        glGenFramebuffers(1, &ssaoFBO);  
+        glGenFramebuffers(1, &ssaoBlurFBO);
+        
         glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-
 
         // Цветовой буфер SSAO 
         glGenTextures(1, &ssaoColorBuffer);
@@ -596,26 +603,9 @@ namespace Chotra {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
-
-        glGenTextures(1, &reflectedUvMap);
-        glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, reflectedUvMap, 0);
-
-        // Генерируем мипмап-карты, OpenGL автоматически выделит нужное количество памяти
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        // Указываем OpenGL на то, в какой прикрепленный цветовой буфер (заданного фреймбуфера) мы собираемся выполнять рендеринг 
-        unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-        glDrawBuffers(2, attachments);
-
+               
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "SSAO_SSR Framebuffer not complete!" << std::endl;
+            std::cout << "SSAO Framebuffer not complete!" << std::endl;
 
         // И стадия размытия
         glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
@@ -667,7 +657,6 @@ namespace Chotra {
         shaderSSAO.SetInt("gViewPosition", 0);
         shaderSSAO.SetInt("gViewNormal", 1);
         shaderSSAO.SetInt("texNoise", 2);
-        shaderSSAO.SetInt("gAlbedoMap", 3);
 
         shaderSSAOBlur.Use();
         shaderSSAOBlur.SetInt("ssaoInput", 0);
@@ -690,22 +679,14 @@ namespace Chotra {
         shaderSSAO.SetInt("kernelSize", kernelSizeSSAO);
         shaderSSAO.SetFloat("radius", radiusSSAO);
         shaderSSAO.SetFloat("biasSSAO", biasSSAO);
-
-        shaderSSAO.SetFloat("biasSSR", biasSSR);
-        shaderSSAO.SetFloat("rayStep", rayStep);
-        shaderSSAO.SetInt("iterationCount", iterationCount);
-        shaderSSAO.SetFloat("accuracySSR", accuracySSR);
-
-
+        
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, gViewPosition); // gPosition in view space
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, gViewNormal);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, noiseTexture);
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious.GetId()); // screen texture from the previous frame (I'm not sure it is correct or not)
-
+  
         quads[0]->RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -720,8 +701,108 @@ namespace Chotra {
         quads[0]->RenderQuad();
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void Renderer::ConfigureSSR() {
+
+        glGenFramebuffers(1, &ssrFBO);  
+        glGenFramebuffers(1, &ssrBlurFBO);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
+        
+        glGenTextures(1, &ssrColorBuffer);
+        glBindTexture(GL_TEXTURE_2D, ssrColorBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssrColorBuffer, 0);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "SSR Framebuffer not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, ssrBlurFBO);
+
+        glGenTextures(1, &ssrMap);
+        glBindTexture(GL_TEXTURE_2D, ssrMap);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssrMap, 0);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "SSR Blur Framebuffer not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        shaderSSR.Use();
+        shaderSSR.SetInt("gViewPosition", 0);
+        shaderSSR.SetInt("gViewNormal", 1);
+        shaderSSR.SetInt("previousMap", 2);
+
+        shaderSSAOBlur.Use();
+        shaderSSAOBlur.SetInt("ssrInput", 0);
 
     }
+
+    
+    void Renderer::GenerateSSRMap() {
+
+        // 2. Генерируем текстуру для SSR        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
+        glClear(GL_COLOR_BUFFER_BIT);
+        shaderSSR.Use();
+                
+        shaderSSR.SetMat4("projection", projection);
+        shaderSSR.SetMat4("view", view);
+        
+        shaderSSR.SetFloat("biasSSR", biasSSR);
+        shaderSSR.SetFloat("rayStep", rayStep);
+        shaderSSR.SetInt("iterationCount", iterationCount);
+        shaderSSR.SetFloat("accuracySSR", accuracySSR);
+
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, gViewPosition); // gPosition in view space
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, gViewNormal);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious.GetId()); // screen texture from the previous frame (I'm not sure it is correct or not)
+
+        quads[0]->RenderQuad();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+        // Create mips for different roughneses
+        glBindFramebuffer(GL_FRAMEBUFFER, ssrBlurFBO);
+        unsigned int maxMipLevels = 8;
+
+
+        for (unsigned int mip = 0; mip < maxMipLevels; ++mip) {
+            unsigned int mipWidth = width * std::pow(0.5, mip);
+            unsigned int mipHeight = height * std::pow(0.5, mip);
+            
+            shaderSSRBlur.Use();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, ssrColorBuffer);
+
+            glViewport(0, 0, mipWidth, mipHeight);
+                        
+            glBindFramebuffer(GL_FRAMEBUFFER, ssrBlurFBO);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssrMap, mip);
+            glClear(GL_COLOR_BUFFER_BIT);
+            quads[0]->RenderQuad();
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    }
+
 
     void Renderer::ConfigureGeometryPass() {
         // Конфигурирование g-буфера фреймбуфера
@@ -860,7 +941,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, ssaoMap);
         glActiveTexture(GL_TEXTURE9);
-        glBindTexture(GL_TEXTURE_2D, reflectedUvMap);
+        glBindTexture(GL_TEXTURE_2D, ssrMap);
 
         glActiveTexture(GL_TEXTURE0);
 

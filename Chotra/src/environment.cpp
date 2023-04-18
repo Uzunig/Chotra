@@ -31,7 +31,6 @@ namespace Chotra {
         SetBrdfLUTTexture();
     }
 
-
     void Environment::SetFrameBuffer() {
 
         glGenFramebuffers(1, &captureFBO);
