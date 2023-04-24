@@ -137,9 +137,9 @@ namespace Chotra {
         std::vector<glm::vec3> ssaoKernel;
 
         unsigned int ssrFBO;
-        unsigned int ssrBlurFBO;
-        unsigned int ssrColorBuffer;
-        unsigned int ssrMap;
+        //unsigned int ssrBlurFBO;
+        unsigned int ssrUvMap;
+       // unsigned int ssrMap;
          
         unsigned int quadVAO = 0;
         unsigned int quadVBO;

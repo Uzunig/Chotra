@@ -1,5 +1,5 @@
 #version 330 core
-out vec4 ssrColorBuffer;
+out vec4 ssrUvMap;
 
 in vec2 TexCoords;
 
@@ -188,10 +188,9 @@ vec4 SSR2(vec4 position, vec3 reflection)
 
         if (abs(deltaZ) < accuracySSR) {
 			 
-            outColor = vec4(texture(previousMap, marchingPositionUV.xy).xyz, 1.0);
+            outColor = vec4(marchingPositionUV.xy, 0.0, 1.0);
             return outColor;
         }    
-
 
         marchingPosition = startPosition + i * increment;
         marchingPositionScreen.xy = startPositionScreen.xy + i * incrementScreen;
@@ -201,19 +200,8 @@ vec4 SSR2(vec4 position, vec3 reflection)
 
     
     return outColor;
-    
 }
 
-
-vec4 SSR3(vec4 position, vec3 reflection)
-{
-    vec3 ray = reflection * iterationCount;
-    vec4 outColor = vec4(abs(ray.x), abs(ray.y), abs(ray.z) , 0.0f);
-    
-       
-    return outColor;
-    
-}
 
 void main()
 {
@@ -224,6 +212,6 @@ void main()
     
     //SSR
     vec3 reflectionDirection = normalize(reflect(fragPos.xyz, normal));
-    ssrColorBuffer = SSR2(fragPos, reflectionDirection);
+    ssrUvMap = SSR2(fragPos, reflectionDirection);
 
 }
