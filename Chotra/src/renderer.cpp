@@ -14,7 +14,14 @@ namespace Chotra {
 
     Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene)
         : width(width), height(height), camera(camera), scene(scene),
-        screenTexture(width, height), screenTexturePrevious(width, height),
+        screenTexture(width, height, GL_RGBA16F, GL_RGBA),
+        lScreenTexture(width, height, GL_RGB16F, GL_RGB),
+        lFresnelSchlickRoughness(width, height, GL_RGB16F, GL_RGB),
+        lDiffuse(width, height, GL_RGB16F, GL_RGB),
+        lkD(width, height, GL_RGB16F, GL_RGB),
+        lBrdf(width, height, GL_RGB16F, GL_RGB),
+        lLo(width, height, GL_RGB16F, GL_RGB),
+        lAo(width, height, GL_RED, GL_RED),
         pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
         screenDivideShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_divide_shader.fs"),
         downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/downsampling.fs"),
@@ -27,7 +34,8 @@ namespace Chotra {
         shaderSSR("resources/shaders/screen_shader.vs", "resources/shaders/ssr.fs"),
         shaderSSRBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssr_blur.fs"),
         shaderDeferredGeometryPass("resources/shaders/deferred_geometry_pass.vs", "resources/shaders/deferred_geometry_pass.fs"),
-        shaderDeferredLightingPass("resources/shaders/deferred_lighting_pass.vs", "resources/shaders/deferred_lighting_pass.fs"),
+        shaderDeferredPreLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred_pre_lighting_pass.fs"),
+        shaderDeferredLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred_lighting_pass.fs"),
         shaderRenderOnScreen("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") {
 
 
@@ -37,10 +45,12 @@ namespace Chotra {
         ConfigureFramebufferMSAA();
 
         ConfigureGeometryPass();
-        ConfigureLightingPass();
-
+       
         ConfigureSSAO();
         ConfigureSSR();
+
+        ConfigurePreLightingPass();
+        ConfigureLightingPass();
 
         ConfigureBloom();
 
@@ -66,15 +76,7 @@ namespace Chotra {
         lightsShader.SetInt("prefilterMap", 6);
         lightsShader.SetInt("brdfLUT", 7);
         */
-        // Активируем шейдер и передаем матрицы
-        shaderDeferredLightingPass.Use();
-        shaderDeferredLightingPass.SetInt("irradianceMap", 4);
-        shaderDeferredLightingPass.SetInt("prefilterMap", 5);
-        shaderDeferredLightingPass.SetInt("brdfLUT", 6);
-        shaderDeferredLightingPass.SetInt("shadowMap", 7);
-        shaderDeferredLightingPass.SetInt("ssaoMap", 8);
-        shaderDeferredLightingPass.SetInt("ssrMap", 9);
-
+        
 
 
         backgroundShader.Use();
@@ -135,6 +137,7 @@ namespace Chotra {
         GenerateSSAOMap();
         GenerateSSRMap();
 
+        RenderPreLightingPass();
         RenderLightingPass();
 
         RenderBloom();
@@ -159,22 +162,22 @@ namespace Chotra {
         //Draw debugging quads
         screenDivideShader.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
-        quads[1]->RenderQuad();
-
         glBindTexture(GL_TEXTURE_2D, ssrUvMap);
+        quads[1]->RenderQuad();
+        /*
+        glBindTexture(GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId());
         quads[2]->RenderQuad();
-      /*
-        glBindTexture(GL_TEXTURE_2D, ssrMap);
+      
+        glBindTexture(GL_TEXTURE_2D, lDiffuse.GetId());
         quads[3]->RenderQuad();
         
-        glBindTexture(GL_TEXTURE_2D, gMetalRoughAoMap);
+        glBindTexture(GL_TEXTURE_2D, lkD.GetId());
         quads[4]->RenderQuad();
 
-        glBindTexture(GL_TEXTURE_2D, gNormal);
+        glBindTexture(GL_TEXTURE_2D, ssrUvMap);
         quads[5]->RenderQuad();
-
-        glBindTexture(GL_TEXTURE_2D, gNormal);
+        
+        glBindTexture(GL_TEXTURE_2D, lAo.GetId());
         quads[6]->RenderQuad();*/
     }
 
@@ -235,33 +238,6 @@ namespace Chotra {
             std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // Конфигурируем второй постпроцессинг фреймбуфер
-        glGenFramebuffers(1, &framebufferPrevious);
-        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPrevious);
-
-        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture.GetId(), 0);
-
-        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious.GetId());
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, screenTexturePrevious.GetId(), 0);
-        float borderColor[] = { 1.0f, 1.0f, 0.0f, 0.0f };
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-        unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-        glDrawBuffers(2, attachments);
-
-        // Создаем рендербуфер для прикрепляемых объектов глубины трафарета
-        glGenRenderbuffers(1, &rboPrevious);
-        glBindRenderbuffer(GL_RENDERBUFFER, rboPrevious);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboPrevious);
-
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     void Renderer::RenderWithMSAA() {
@@ -402,7 +378,6 @@ namespace Chotra {
             backgroundShader.SetFloat("exposure", backgroundExposure);
             scene.environment->Draw();
         }
-
     }
 
     void Renderer::ConfigureBloom() {
@@ -772,8 +747,8 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, gViewPosition); // gPosition in view space
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, gViewNormal);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, screenTexturePrevious.GetId()); // screen texture from the previous frame (I'm not sure it is correct or not)
+       // glActiveTexture(GL_TEXTURE2);
+        //glBindTexture(GL_TEXTURE_2D, screenTexturePrevious.GetId()); // screen texture from the previous frame (I'm not sure it is correct or not)
 
         quads[0]->RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -902,24 +877,94 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    void Renderer::ConfigurePreLightingPass() {
+
+        // Конфигурируем второй постпроцессинг фреймбуфер
+        glGenFramebuffers(1, &framebufferPreLighting);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPreLighting);
+
+        glBindTexture(GL_TEXTURE_2D, lScreenTexture.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lScreenTexture.GetId(), 0);
+        
+        glBindTexture(GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId(), 0);
+
+        glBindTexture(GL_TEXTURE_2D, lDiffuse.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, lDiffuse.GetId(), 0);
+
+        glBindTexture(GL_TEXTURE_2D, lkD.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, lkD.GetId(), 0);
+
+        glBindTexture(GL_TEXTURE_2D, lBrdf.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, lBrdf.GetId(), 0);
+
+        glBindTexture(GL_TEXTURE_2D, lLo.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, lLo.GetId(), 0);
+
+        glBindTexture(GL_TEXTURE_2D, lAo.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT6, GL_TEXTURE_2D, lAo.GetId(), 0);
+        float borderColor[] = { 1.0f, 1.0f, 0.0f, 0.0f };
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        
+        unsigned int attachments[7] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, 
+                                        GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6 };
+        glDrawBuffers(7, attachments);
+
+        // Создаем рендербуфер для прикрепляемых объектов глубины трафарета
+        glGenRenderbuffers(1, &rboPreLighting);
+        glBindRenderbuffer(GL_RENDERBUFFER, rboPreLighting);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboPreLighting);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+        // Конфигурация шейдеров
+        shaderDeferredPreLightingPass.Use();
+        shaderDeferredPreLightingPass.SetInt("gPosition", 0);
+        shaderDeferredPreLightingPass.SetInt("gNormal", 1);
+        shaderDeferredPreLightingPass.SetInt("gAlbedoMap", 2);
+        shaderDeferredPreLightingPass.SetInt("gMetalRoughAoMap", 3);
+
+        shaderDeferredPreLightingPass.SetInt("irradianceMap", 4);
+        shaderDeferredPreLightingPass.SetInt("prefilterMap", 5);
+        shaderDeferredPreLightingPass.SetInt("brdfLUT", 6);
+        shaderDeferredPreLightingPass.SetInt("shadowMap", 7);
+        shaderDeferredPreLightingPass.SetInt("ssaoMap", 8);
+        shaderDeferredPreLightingPass.SetInt("ssrMap", 9);
+
+
+
+    }
+
     void Renderer::ConfigureLightingPass() {
 
         // Конфигурация шейдеров
         shaderDeferredLightingPass.Use();
-        shaderDeferredLightingPass.SetInt("gPosition", 0);
-        shaderDeferredLightingPass.SetInt("gNormal", 1);
-        shaderDeferredLightingPass.SetInt("gAlbedoMap", 2);
-        shaderDeferredLightingPass.SetInt("gMetalRoughAoMap", 3);
+        shaderDeferredLightingPass.SetInt("lScreenTexture", 0);
+        shaderDeferredLightingPass.SetInt("lFresnelSchlickRoughness", 1);
+        shaderDeferredLightingPass.SetInt("lDiffuse", 2);
+        shaderDeferredLightingPass.SetInt("lkD", 3);
+        shaderDeferredLightingPass.SetInt("lBrdf", 4);
+        shaderDeferredLightingPass.SetInt("lLo", 5);
+        shaderDeferredLightingPass.SetInt("lAo", 6);
+        shaderDeferredLightingPass.SetInt("ssrUvMap", 7);
 
     }
 
-    void Renderer::RenderLightingPass() {
 
-        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPrevious);
+    void Renderer::RenderPreLightingPass() {
+
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPreLighting);
 
         // 2. Проход освещения: вычисление освещение, перебирая попиксельно экранный прямоугольник, используя содержимое g-буфера
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shaderDeferredLightingPass.Use();
+        shaderDeferredPreLightingPass.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, gPosition);
         glActiveTexture(GL_TEXTURE1);
@@ -946,18 +991,18 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE0);
 
         for (unsigned int i = 0; i < scene.sceneLights.size(); ++i) {
-            shaderDeferredLightingPass.Use();
-            shaderDeferredLightingPass.SetVec3("lightPositions[" + std::to_string(i) + "]", scene.sceneLights[i].position);
-            shaderDeferredLightingPass.SetVec3("lightColors[" + std::to_string(i) + "]", scene.sceneLights[i].color * (float)scene.sceneLights[i].brightness);
+            shaderDeferredPreLightingPass.Use();
+            shaderDeferredPreLightingPass.SetVec3("lightPositions[" + std::to_string(i) + "]", scene.sceneLights[i].position);
+            shaderDeferredPreLightingPass.SetVec3("lightColors[" + std::to_string(i) + "]", scene.sceneLights[i].color * (float)scene.sceneLights[i].brightness);
         }
 
-        shaderDeferredLightingPass.SetVec3("sunPosition", scene.sceneSuns[0]->position);
-        shaderDeferredLightingPass.SetVec3("sunColor", scene.sceneSuns[0]->color);
-        shaderDeferredLightingPass.SetVec3("camPos", camera.Position);
-        shaderDeferredLightingPass.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
-        shaderDeferredLightingPass.SetFloat("shadowBiasMin", shadowBiasMin);
-        shaderDeferredLightingPass.SetFloat("shadowBiasMax", shadowBiasMax);
-        shaderDeferredLightingPass.SetFloat("shadowOpacity", shadowOpacity);
+        shaderDeferredPreLightingPass.SetVec3("sunPosition", scene.sceneSuns[0]->position);
+        shaderDeferredPreLightingPass.SetVec3("sunColor", scene.sceneSuns[0]->color);
+        shaderDeferredPreLightingPass.SetVec3("camPos", camera.Position);
+        shaderDeferredPreLightingPass.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
+        shaderDeferredPreLightingPass.SetFloat("shadowBiasMin", shadowBiasMin);
+        shaderDeferredPreLightingPass.SetFloat("shadowBiasMax", shadowBiasMax);
+        shaderDeferredPreLightingPass.SetFloat("shadowOpacity", shadowOpacity);
 
 
         glViewport(0, 0, width, height);
@@ -968,7 +1013,7 @@ namespace Chotra {
 
         // 2.5. Копируем содержимое буфера глубины (геометрический проход) в буфер глубины заданного по умолчанию фреймбуфера
         glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer); // пишем в заданный по умолчанию фреймбуфер
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferPreLighting); // пишем в заданный по умолчанию фреймбуфер
         glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
         /*
         lightsShader.Use();
@@ -985,6 +1030,39 @@ namespace Chotra {
             backgroundShader.SetFloat("exposure", backgroundExposure);
             scene.environment->Draw();
         }
+    }
+
+    void Renderer::RenderLightingPass() {
+
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+        // 2. Проход освещения: вычисление освещение, перебирая попиксельно экранный прямоугольник, используя содержимое g-буфера
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        shaderDeferredLightingPass.Use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, lScreenTexture.GetId());
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId());
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, lDiffuse.GetId());
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, lkD.GetId());
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, lBrdf.GetId());
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, lLo.GetId());
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, lAo.GetId());
+        glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, ssrUvMap);
+       
+    
+        glViewport(0, 0, width, height);
+
+
+        // Рендерим прямоугольник
+        quads[0]->RenderQuad();
+               
     }
 
 

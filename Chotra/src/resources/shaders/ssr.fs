@@ -48,11 +48,11 @@ vec4 SSR(vec4 position, vec3 reflection)
 			step *= sign(delta) * (-0.5);
             if (abs(delta) < (accuracySSR * 0.5)) {
                 //outColor = vec4(0.0f, 0.0f, 1.0f, 0.0f);
-			    outColor = vec4(texture(previousMap, marchingUV.xy).xyz, 1.0); 
+			    outColor = vec4(marchingUV.xy, 0.0, 1.0); 
                 return outColor;
             }
             //outColor = vec4(0.0f, 1.0f, 1.0f, 0.0f);
-            outColor = vec4(texture(previousMap, marchingUV.xy).xyz, 1.0);
+            outColor = vec4(marchingUV.xy, 0.0, 1.0);
             //return outColor;
         }    
         marchingPosition += step;
@@ -118,7 +118,7 @@ vec4 SSR1(vec4 position, vec3 reflection)
 
         if (abs(deltaZ) < accuracySSR) {
 			 
-            outColor = vec4(texture(previousMap, marchingPositionUV.xy).xyz, 1.0);
+            outColor = vec4(marchingPositionUV.xy, 0.0, 1.0);
             return outColor;
         }    
 

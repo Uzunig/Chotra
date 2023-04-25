@@ -182,7 +182,7 @@ namespace Chotra {
             if (ImGui::CollapsingHeader("SSR")) {
                 ImGui::SliderFloat("biasSSR", &p_mainWindow->renderer->biasSSR, 0.001f, 20.0f);
                 ImGui::SliderFloat("rayStep", &p_mainWindow->renderer->rayStep, 0.001f, 5.0f);
-                ImGui::SliderInt("iterationCount", &p_mainWindow->renderer->iterationCount, 0, 100);
+                ImGui::SliderInt("iterationCount", &p_mainWindow->renderer->iterationCount, 0, 200);
                 ImGui::SliderFloat("accuracy", &p_mainWindow->renderer->accuracySSR, 0.001f, 1.0f);
 
             }

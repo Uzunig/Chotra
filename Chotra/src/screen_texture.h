@@ -7,7 +7,7 @@ namespace Chotra {
 
     class ScreenTexture : public Texture {
     public:
-        ScreenTexture(unsigned int width, unsigned int height);
+        ScreenTexture(unsigned int width, unsigned int height, GLenum internalFormat, GLenum format);
 
     protected:
         

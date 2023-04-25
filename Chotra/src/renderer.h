@@ -59,6 +59,7 @@ namespace Chotra {
         Shader shaderSSRBlur;
                
         Shader shaderDeferredGeometryPass;
+        Shader shaderDeferredPreLightingPass;
         Shader shaderDeferredLightingPass;
 
         Shader shaderRenderOnScreen;
@@ -108,9 +109,15 @@ namespace Chotra {
         unsigned int rbo;
 
         // Framebuffer without MSAA
-        unsigned int framebufferPrevious;
-        unsigned int rboPrevious;
-        ScreenTexture screenTexturePrevious;
+        unsigned int framebufferPreLighting;
+        unsigned int rboPreLighting;
+        ScreenTexture lScreenTexture;
+        ScreenTexture lFresnelSchlickRoughness;
+        ScreenTexture lDiffuse;
+        ScreenTexture lkD;
+        ScreenTexture lBrdf;
+        ScreenTexture lLo;
+        ScreenTexture lAo;
 
         // Framebuffer with MSAA
         unsigned int framebufferMSAA;
@@ -175,8 +182,10 @@ namespace Chotra {
 
         void ConfigureGeometryPass();
         void RenderGeometryPass();
-
+        
+        void ConfigurePreLightingPass();
         void ConfigureLightingPass();
+        void RenderPreLightingPass();
         void RenderLightingPass();
 
         void RenderToScreen();

@@ -18,6 +18,7 @@ namespace Chotra {
         unsigned int id = 0;
         int width;
         int height;
+        GLenum internalFormat;
         GLenum format;
 
         virtual void GenerateTexture() = 0;
