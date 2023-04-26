@@ -9,6 +9,7 @@
 #include "camera.h"
 #include "scene.h"
 #include "renderer.h"
+#include "resource_manager.h"
 
 #include "Chotra/Events/event.h"
 
@@ -139,10 +140,13 @@ namespace Chotra {
         // tell GLFW to captur our mouse
         //glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-        camera = Camera(glm::vec3(0.0f, 5.0f, 25.0f));
-        scene = std::make_unique<Scene>();   
+        //camera = Camera(glm::vec3(0.0f, 5.0f, 25.0f));
+        //scene = std::make_unique<Scene>();  
+
+        ResourceManager::MakeCamera(glm::vec3(0.0f, 5.0f, 25.0f));
+        ResourceManager::MakeScene();
         
-        renderer = std::make_unique<Renderer>(windowData.width, windowData.height, camera, *scene);
+        renderer = std::make_unique<Renderer>(windowData.width, windowData.height);
         renderer->Init();
         gui = std::make_unique<Gui>(this);
 
@@ -161,10 +165,10 @@ namespace Chotra {
     void Window::OnUpdate(float deltaTime) {
 
         fps = 1 / deltaTime;
-        camera.ProcessKeyboard(deltaTime);
+        ResourceManager::camera->ProcessKeyboard(deltaTime);
         //scene->DemoUpdate(deltaTime);
-        scene->Update(deltaTime);
-        renderer->Render();
+        ResourceManager::UpdateScene(deltaTime);
+        renderer->Render(ResourceManager::GetScene(), ResourceManager::GetCamera());
 
         gui->Show();
         gui->Render();

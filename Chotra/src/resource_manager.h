@@ -5,12 +5,18 @@
 #include <string>
 #include <memory>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 namespace Chotra {
 
     class MaterialTexture;
     class Material;
     class ObjModel;
+    class Scene;
+    class Camera;
 
     class ResourceManager {
     public:
@@ -36,11 +42,23 @@ namespace Chotra {
         static unsigned int GetGeometryVerticesCount(unsigned int i);
         static unsigned int GetGeometryVAO(unsigned int i);
 
+        static void MakeScene();
+        static std::shared_ptr<Scene> GetScene();
+        static void UpdateScene(float deltaTime);
+
+        static void MakeCamera(glm::vec3 position);
+        static std::shared_ptr<Camera> GetCamera();
+
+
+        static std::shared_ptr<Scene> scene;
+        static std::shared_ptr<Camera> camera;
     private:
 
         static std::vector<std::shared_ptr<MaterialTexture>> textures;
         static std::vector<std::shared_ptr<Material>> materials;
         static std::vector<std::shared_ptr<ObjModel>> geometries;
+
+        
     };
 
 

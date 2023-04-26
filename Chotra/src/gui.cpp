@@ -156,8 +156,8 @@ namespace Chotra {
         }
 
         if (ImGui::CollapsingHeader("Camera settings")) {
-            ImGui::SliderFloat("Speed", &p_mainWindow->camera.MovementSpeed, 3.0f, 30.0f);
-            ImGui::SliderFloat("Zoom", &p_mainWindow->camera.Zoom, 15.0f, 90.0f);
+            ImGui::SliderFloat("Speed", &ResourceManager::camera->MovementSpeed, 3.0f, 30.0f);
+            ImGui::SliderFloat("Zoom", &ResourceManager::camera->Zoom, 15.0f, 90.0f);
             //ImGui::Checkbox("Perspective projection", &renderer->perspectiveProjection);
 
         }
@@ -221,10 +221,10 @@ namespace Chotra {
             if (ImGui::TreeNode("Scene objects"))
             {
 
-                for (int i = 0; i < p_mainWindow->scene->sceneObjects.size(); ++i) {
-                    if (ImGui::Selectable(p_mainWindow->scene->sceneObjects[i].name.c_str(), selected == i)) {
+                for (int i = 0; i < ResourceManager::scene->sceneObjects.size(); ++i) {
+                    if (ImGui::Selectable(ResourceManager::scene->sceneObjects[i].name.c_str(), selected == i)) {
                         selected = i;
-                        strcpy(str0, p_mainWindow->scene->sceneObjects[i].name.c_str());
+                        strcpy(str0, ResourceManager::scene->sceneObjects[i].name.c_str());
                     }
                 }
 
@@ -238,7 +238,7 @@ namespace Chotra {
             if (ImGui::TreeNode("Lights"))
             {
 
-                for (int i = 0; i < p_mainWindow->scene->sceneLights.size(); ++i) {
+                for (int i = 0; i < ResourceManager::scene->sceneLights.size(); ++i) {
                     if (ImGui::Selectable(("Light " + std::to_string(i)).c_str(), selected == 100 + i)) {
                         selected = 100 + i;
                     }
@@ -271,7 +271,7 @@ namespace Chotra {
             int i = selected;
             ImGui::Text("Scene object:");
             ImGui::SameLine();
-            ImGui::Text(p_mainWindow->scene->sceneObjects[i].name.c_str());
+            ImGui::Text(ResourceManager::scene->sceneObjects[i].name.c_str());
 
             ImGui::SetCursorPos(ImVec2(10, 50));
             ImGui::Text("Geometry:");
@@ -280,7 +280,7 @@ namespace Chotra {
             ImGui::SetNextWindowSize(ImVec2(350, p_mainWindow->GetHeight() - 100));
 
             ImGui::SetCursorPos(ImVec2(10, 70));
-            if (ImGui::Selectable(("##" + ResourceManager::GetGeometryName(p_mainWindow->scene->sceneObjects[i].geometryIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
+            if (ImGui::Selectable(("##" + ResourceManager::GetGeometryName(ResourceManager::scene->sceneObjects[i].geometryIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
                 p_mainWindow->renderer->passiveMode = true;
                 ImGui::OpenPopup("Geometries");
             }
@@ -300,12 +300,12 @@ namespace Chotra {
             ImGui::PopID();
 
             ImGui::SetCursorPos(ImVec2(100, 70));
-            ImGui::Text(NameWithoutSuffix(ResourceManager::GetGeometryName(p_mainWindow->scene->sceneObjects[i].geometryIndex)).c_str());
+            ImGui::Text(NameWithoutSuffix(ResourceManager::GetGeometryName(ResourceManager::scene->sceneObjects[i].geometryIndex)).c_str());
 
             ImGui::SetCursorPos(ImVec2(100, 90));
             ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + 230);
 
-            ImGui::Text(ResourceManager::GetGeometryPath(p_mainWindow->scene->sceneObjects[i].geometryIndex).c_str(), 230);
+            ImGui::Text(ResourceManager::GetGeometryPath(ResourceManager::scene->sceneObjects[i].geometryIndex).c_str(), 230);
 
             ImGui::PopTextWrapPos();
 
@@ -316,7 +316,7 @@ namespace Chotra {
             ImGui::SetNextWindowSize(ImVec2(350, p_mainWindow->GetHeight() - 100));
 
             ImGui::SetCursorPos(ImVec2(10, 180));
-            if (ImGui::Selectable(("##" + ResourceManager::GetMaterialName(p_mainWindow->scene->sceneObjects[i].materialIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
+            if (ImGui::Selectable(("##" + ResourceManager::GetMaterialName(ResourceManager::scene->sceneObjects[i].materialIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
                 p_mainWindow->renderer->passiveMode = true;
                 ImGui::OpenPopup("Materials");
             }
@@ -336,59 +336,59 @@ namespace Chotra {
             ImGui::PopID();
 
             ImGui::SetCursorPos(ImVec2(100, 180));
-            ImGui::Text(NameWithoutSuffix(ResourceManager::GetMaterialName(p_mainWindow->scene->sceneObjects[i].materialIndex)).c_str());
+            ImGui::Text(NameWithoutSuffix(ResourceManager::GetMaterialName(ResourceManager::scene->sceneObjects[i].materialIndex)).c_str());
 
             ImGui::SetCursorPos(ImVec2(100, 200));
             ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + 230);
-            ImGui::Text(ResourceManager::GetMaterialPath(p_mainWindow->scene->sceneObjects[i].materialIndex).c_str(), 230);
+            ImGui::Text(ResourceManager::GetMaterialPath(ResourceManager::scene->sceneObjects[i].materialIndex).c_str(), 230);
             ImGui::PopTextWrapPos();
 
             ImGui::SetCursorPos(ImVec2(10, 280));
 
-            ImGui::Checkbox(("visible##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].visible);
+            ImGui::Checkbox(("visible##" + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].visible);
 
 
             if (ImGui::CollapsingHeader("Position")) {
-                ImGui::InputFloat(("x##P " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
-                ImGui::InputFloat(("y##P " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
-                ImGui::InputFloat(("z##P " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
+                ImGui::InputFloat(("x##P " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
+                ImGui::InputFloat(("y##P " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
+                ImGui::InputFloat(("z##P " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
             }
             if (ImGui::CollapsingHeader("Angle")) {
-                ImGui::InputFloat(("x##A " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].angle.x, 0.1f, 180.0f, "%0.1f");
-                ImGui::InputFloat(("y##A " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].angle.y, 0.1f, 180.0f, "%0.1f");
-                ImGui::InputFloat(("z##A " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].angle.z, 0.1f, 180.0f, "%0.1f");
+                ImGui::InputFloat(("x##A " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].angle.x, 0.1f, 180.0f, "%0.1f");
+                ImGui::InputFloat(("y##A " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].angle.y, 0.1f, 180.0f, "%0.1f");
+                ImGui::InputFloat(("z##A " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].angle.z, 0.1f, 180.0f, "%0.1f");
             }
 
             if (ImGui::CollapsingHeader("Scale")) {
-                ImGui::InputFloat(("x##S " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].scale.x, 0.1f, 10.0f, "%.1f");
-                ImGui::InputFloat(("y##S " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].scale.y, 0.1f, 10.0f, "%.1f");
-                ImGui::InputFloat(("z##S " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].scale.z, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("x##S " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].scale.x, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("y##S " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].scale.y, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("z##S " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].scale.z, 0.1f, 10.0f, "%.1f");
             }
 
             if (ImGui::CollapsingHeader("Velocity")) {
-                ImGui::InputFloat(("x##V " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].velocity.x, 0.1f, 10.0f, "%.1f");
-                ImGui::InputFloat(("y##V " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].velocity.y, 0.1f, 10.0f, "%.1f");
-                ImGui::InputFloat(("z##V " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].velocity.z, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("x##V " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].velocity.x, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("y##V " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].velocity.y, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("z##V " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].velocity.z, 0.1f, 10.0f, "%.1f");
             }
 
             if (ImGui::CollapsingHeader("Rotation velocity")) {
-                ImGui::InputFloat(("x##R " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].rVelocity.x, 0.1f, 10.0f, "%.1f");
-                ImGui::InputFloat(("y##R " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].rVelocity.y, 0.1f, 10.0f, "%.1f");
-                ImGui::InputFloat(("z##R " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].rVelocity.z, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("x##R " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].rVelocity.x, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("y##R " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].rVelocity.y, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("z##R " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i].rVelocity.z, 0.1f, 10.0f, "%.1f");
             }
         }
         else if ((selected >= 100) && (selected < 200)) {
             int i = selected - 100;
             ImGui::Text("Light:");
             ImGui::SameLine();
-            ImGui::Text(p_mainWindow->scene->sceneLights[i].name.c_str());
-            ImGui::InputFloat(("x ##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("y ##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("z ##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
-            ImGui::SliderFloat(("r ##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].color.r, 0.005f, 1.0f);
-            ImGui::SliderFloat(("g ##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].color.g, 0.005f, 1.0f);
-            ImGui::SliderFloat(("b ##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].color.b, 0.005f, 1.0f);
-            ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].brightness, 0, 10000);
+            ImGui::Text(ResourceManager::scene->sceneLights[i].name.c_str());
+            ImGui::InputFloat(("x ##" + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
+            ImGui::InputFloat(("y ##" + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
+            ImGui::InputFloat(("z ##" + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
+            ImGui::SliderFloat(("r ##" + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i].color.r, 0.005f, 1.0f);
+            ImGui::SliderFloat(("g ##" + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i].color.g, 0.005f, 1.0f);
+            ImGui::SliderFloat(("b ##" + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i].color.b, 0.005f, 1.0f);
+            ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i].brightness, 0, 10000);
         }
         else if ((selected >= 200) && (selected < 300)) {
             int i = selected - 200;
@@ -726,10 +726,10 @@ namespace Chotra {
 
     void Gui::AddSceneObject() {
 
-        std::string nameNumber = "_" + std::to_string(p_mainWindow->scene->sceneObjects.size());
-        p_mainWindow->scene->AddSceneObject(0, 0, "sceneObject" + nameNumber);
-        selected = p_mainWindow->scene->sceneObjects.size() - 1;
-        strcpy(str0, p_mainWindow->scene->sceneObjects[selected].name.c_str());
+        std::string nameNumber = "_" + std::to_string(ResourceManager::scene->sceneObjects.size());
+        ResourceManager::scene->AddSceneObject(0, 0, "sceneObject" + nameNumber);
+        selected = ResourceManager::scene->sceneObjects.size() - 1;
+        strcpy(str0, ResourceManager::scene->sceneObjects[selected].name.c_str());
     }
 
     void Gui::ChangeGeometryIndexModal(int sceneObjectIndex) {
@@ -744,7 +744,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
             if (ImGui::Selectable(("##" + ResourceManager::GetGeometryPath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
-                p_mainWindow->scene->sceneObjects[sceneObjectIndex].ChangeGeometryIndex(chosed);
+                ResourceManager::scene->sceneObjects[sceneObjectIndex].ChangeGeometryIndex(chosed);
                 p_mainWindow->renderer->passiveMode = false;
                 ImGui::CloseCurrentPopup();
             }
@@ -803,7 +803,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
             if (ImGui::Selectable(("##" + ResourceManager::GetTexturePath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
-                p_mainWindow->scene->sceneObjects[sceneObjectIndex].ChangeMaterialIndex(chosed);
+                ResourceManager::scene->sceneObjects[sceneObjectIndex].ChangeMaterialIndex(chosed);
                 p_mainWindow->renderer->passiveMode = false;
                 ImGui::CloseCurrentPopup();
             }

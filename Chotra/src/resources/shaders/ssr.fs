@@ -170,7 +170,7 @@ vec4 SSR2(vec4 position, vec3 reflection)
     vec3 increment = (endPosition - startPosition) / delta;
     vec2 incrementUV = (endPositionUV.xy - startPositionUV.xy) / delta;
       
-    for (int i = 1; i <= delta; ++i) {
+    for (float i = 1.0; i <= delta; ++i) {
                      
         vec4 currentFrag = texture(gViewPosition, marchingPositionUV.xy);
                 
@@ -186,9 +186,8 @@ vec4 SSR2(vec4 position, vec3 reflection)
             return outColor;
         }    
 
-        marchingPosition = startPosition + (i * increment);
-        marchingPositionUV.xy = startPositionUV.xy + (i * incrementUV);
-  
+        marchingPosition = startPosition + (increment * i);
+        marchingPositionUV.xy = startPositionUV.xy + (incrementUV * i);
     }
 
     return outColor;

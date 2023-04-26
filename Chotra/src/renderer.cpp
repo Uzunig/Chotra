@@ -12,8 +12,8 @@
 
 namespace Chotra {
 
-    Renderer::Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene)
-        : width(width), height(height), camera(camera), scene(scene),
+    Renderer::Renderer(unsigned int& width, unsigned int& height)
+        : width(width), height(height), //camera(camera), scene(scene),
         screenTexture(width, height, GL_RGBA16F, GL_RGBA),
         lScreenTexture(width, height, GL_RGB16F, GL_RGB),
         lFresnelSchlickRoughness(width, height, GL_RGB16F, GL_RGB),
@@ -90,15 +90,15 @@ namespace Chotra {
 
     }
 
-    void Renderer::Render() {
+    void Renderer::Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
 
         if (!passiveMode) {
             if (renderingMode == 0) {
-                ForwardRender();
+                ForwardRender(scene, camera);
 
             }
             else if (renderingMode == 1) {
-                DeferredRender();
+                DeferredRender(scene, camera);
 
             }
         }
@@ -112,15 +112,15 @@ namespace Chotra {
         RenderToScreen();
     }
 
-    void Renderer::ForwardRender() {
+    void Renderer::ForwardRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
 
         shadowMap.GenerateShadowMap(scene);
 
         if (enableMSAA) {
-            RenderWithMSAA();
+            RenderWithMSAA(scene, camera);
         }
         else {
-            RenderWithoutMSAA();
+            RenderWithoutMSAA(scene, camera);
         }
 
         RenderBloom();
@@ -129,15 +129,15 @@ namespace Chotra {
         DrawDebuggingQuads();
     }
 
-    void Renderer::DeferredRender() {
+    void Renderer::DeferredRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
 
         shadowMap.GenerateShadowMap(scene);
-        RenderGeometryPass();
+        RenderGeometryPass(scene, camera);
 
         GenerateSSAOMap();
         GenerateSSRMap();
 
-        RenderPreLightingPass();
+        RenderPreLightingPass(scene, camera);
         RenderLightingPass();
 
         RenderBloom();
@@ -240,7 +240,7 @@ namespace Chotra {
 
     }
 
-    void Renderer::RenderWithMSAA() {
+    void Renderer::RenderWithMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
         // 1. Отрисовываем обычную сцену в мультисэмплированные буферы
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferMSAA);
 
@@ -251,17 +251,17 @@ namespace Chotra {
         glEnable(GL_DEPTH_TEST);
 
         if (perspectiveProjection) {
-            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 500.0f);
+            projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 500.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
         }
-        view = camera.GetViewMatrix();
+        view = camera->GetViewMatrix();
 
         pbrShader.Use();
         pbrShader.SetMat4("projection", projection);
         pbrShader.SetMat4("view", view);
-        pbrShader.SetVec3("camPos", camera.Position);
+        pbrShader.SetVec3("camPos", camera->Position);
         pbrShader.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         pbrShader.SetFloat("shadowBiasMin", shadowBiasMin);
         pbrShader.SetFloat("shadowBiasMax", shadowBiasMax);
@@ -274,11 +274,11 @@ namespace Chotra {
         */
         // Связываем предварительно вычисленные IBL-данные
         glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment->irradianceMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene->environment->irradianceMap);
         glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment->prefilterMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene->environment->prefilterMap);
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, scene.environment->brdfLUTTexture);
+        glBindTexture(GL_TEXTURE_2D, scene->environment->brdfLUTTexture);
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
 
@@ -286,13 +286,13 @@ namespace Chotra {
 
 
 
-        for (unsigned int i = 0; i < scene.sceneLights.size(); ++i) {
+        for (unsigned int i = 0; i < scene->sceneLights.size(); ++i) {
             pbrShader.Use();
-            pbrShader.SetVec3("lightPositions[" + std::to_string(i) + "]", scene.sceneLights[i].position);
-            pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", scene.sceneLights[i].color * (float)scene.sceneLights[i].brightness);
+            pbrShader.SetVec3("lightPositions[" + std::to_string(i) + "]", scene->sceneLights[i].position);
+            pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i].color * (float)scene->sceneLights[i].brightness);
         }
 
-        scene.DrawSceneObjects(pbrShader);
+        scene->DrawSceneObjects(pbrShader);
 
 
         //scene.DrawSceneLights(lightsShader);
@@ -303,7 +303,7 @@ namespace Chotra {
             backgroundShader.SetMat4("projection", projection);
             backgroundShader.SetMat4("view", view);
             backgroundShader.SetFloat("exposure", backgroundExposure);
-            scene.environment->Draw();
+            scene->environment->Draw();
         }
 
         // 2. Теперь блитируем мультисэмплированный буфер(ы) в нормальный цветовой буфер промежуточного FBO. Изображение сохранено в screenTexture
@@ -313,7 +313,7 @@ namespace Chotra {
 
     }
 
-    void Renderer::RenderWithoutMSAA() {
+    void Renderer::RenderWithoutMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
         // 1. Отрисовываем обычную сцену буферы
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
@@ -324,17 +324,17 @@ namespace Chotra {
         glEnable(GL_DEPTH_TEST);
 
         if (perspectiveProjection) {
-            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.1f, 500.0f);
+            projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 500.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
         }
-        view = camera.GetViewMatrix();
+        view = camera->GetViewMatrix();
 
         pbrShader.Use();
         pbrShader.SetMat4("projection", projection);
         pbrShader.SetMat4("view", view);
-        pbrShader.SetVec3("camPos", camera.Position);
+        pbrShader.SetVec3("camPos", camera->Position);
         pbrShader.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         pbrShader.SetFloat("shadowBiasMin", shadowBiasMin);
         pbrShader.SetFloat("shadowBiasMax", shadowBiasMax);
@@ -342,11 +342,11 @@ namespace Chotra {
 
         // Связываем предварительно вычисленные IBL-данные
         glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment->irradianceMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene->environment->irradianceMap);
         glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment->prefilterMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene->environment->prefilterMap);
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, scene.environment->brdfLUTTexture);
+        glBindTexture(GL_TEXTURE_2D, scene->environment->brdfLUTTexture);
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
 
@@ -354,13 +354,13 @@ namespace Chotra {
 
 
 
-        for (unsigned int i = 0; i < scene.sceneLights.size(); ++i) {
+        for (unsigned int i = 0; i < scene->sceneLights.size(); ++i) {
             pbrShader.Use();
-            pbrShader.SetVec3("lightPositions[" + std::to_string(i) + "]", scene.sceneLights[i].position);
-            pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", scene.sceneLights[i].color * (float)scene.sceneLights[i].brightness);
+            pbrShader.SetVec3("lightPositions[" + std::to_string(i) + "]", scene->sceneLights[i].position);
+            pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i].color * (float)scene->sceneLights[i].brightness);
         }
 
-        scene.DrawSceneObjects(pbrShader);
+        scene->DrawSceneObjects(pbrShader);
 
         /*
         lightsShader.Use();
@@ -376,7 +376,7 @@ namespace Chotra {
             backgroundShader.SetMat4("projection", projection);
             backgroundShader.SetMat4("view", view);
             backgroundShader.SetFloat("exposure", backgroundExposure);
-            scene.environment->Draw();
+            scene->environment->Draw();
         }
     }
 
@@ -852,7 +852,7 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void Renderer::RenderGeometryPass() {
+    void Renderer::RenderGeometryPass(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
 
         glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
         glViewport(0, 0, width, height);
@@ -861,18 +861,18 @@ namespace Chotra {
         glEnable(GL_DEPTH_TEST);
 
         if (perspectiveProjection) {
-            projection = glm::perspective(glm::radians(camera.Zoom), (float)width / (float)height, 0.01f, 500.0f);
+            projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.01f, 500.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
         }
-        view = camera.GetViewMatrix();
+        view = camera->GetViewMatrix();
 
         shaderDeferredGeometryPass.Use();
         shaderDeferredGeometryPass.SetMat4("projection", projection);
         shaderDeferredGeometryPass.SetMat4("view", view);
 
-        scene.DrawSceneObjects(shaderDeferredGeometryPass);
+        scene->DrawSceneObjects(shaderDeferredGeometryPass);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -958,7 +958,7 @@ namespace Chotra {
     }
 
 
-    void Renderer::RenderPreLightingPass() {
+    void Renderer::RenderPreLightingPass(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
 
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferPreLighting);
 
@@ -976,11 +976,11 @@ namespace Chotra {
 
         // Связываем предварительно вычисленные IBL-данные
         glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment->irradianceMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene->environment->irradianceMap);
         glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, scene.environment->prefilterMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, scene->environment->prefilterMap);
         glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_2D, scene.environment->brdfLUTTexture);
+        glBindTexture(GL_TEXTURE_2D, scene->environment->brdfLUTTexture);
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
         glActiveTexture(GL_TEXTURE8);
@@ -990,15 +990,15 @@ namespace Chotra {
 
         glActiveTexture(GL_TEXTURE0);
 
-        for (unsigned int i = 0; i < scene.sceneLights.size(); ++i) {
+        for (unsigned int i = 0; i < scene->sceneLights.size(); ++i) {
             shaderDeferredPreLightingPass.Use();
-            shaderDeferredPreLightingPass.SetVec3("lightPositions[" + std::to_string(i) + "]", scene.sceneLights[i].position);
-            shaderDeferredPreLightingPass.SetVec3("lightColors[" + std::to_string(i) + "]", scene.sceneLights[i].color * (float)scene.sceneLights[i].brightness);
+            shaderDeferredPreLightingPass.SetVec3("lightPositions[" + std::to_string(i) + "]", scene->sceneLights[i].position);
+            shaderDeferredPreLightingPass.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i].color * (float)scene->sceneLights[i].brightness);
         }
 
-        shaderDeferredPreLightingPass.SetVec3("sunPosition", scene.sceneSuns[0]->position);
-        shaderDeferredPreLightingPass.SetVec3("sunColor", scene.sceneSuns[0]->color);
-        shaderDeferredPreLightingPass.SetVec3("camPos", camera.Position);
+        shaderDeferredPreLightingPass.SetVec3("sunPosition", scene->sceneSuns[0]->position);
+        shaderDeferredPreLightingPass.SetVec3("sunColor", scene->sceneSuns[0]->color);
+        shaderDeferredPreLightingPass.SetVec3("camPos", camera->Position);
         shaderDeferredPreLightingPass.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         shaderDeferredPreLightingPass.SetFloat("shadowBiasMin", shadowBiasMin);
         shaderDeferredPreLightingPass.SetFloat("shadowBiasMax", shadowBiasMax);
@@ -1028,7 +1028,7 @@ namespace Chotra {
             backgroundShader.SetMat4("projection", projection);
             backgroundShader.SetMat4("view", view);
             backgroundShader.SetFloat("exposure", backgroundExposure);
-            scene.environment->Draw();
+            scene->environment->Draw();
         }
     }
 

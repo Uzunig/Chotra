@@ -22,7 +22,7 @@ namespace Chotra {
         glm::mat4 GetLightSpaceMatrix();
 
         void ConfigureShadowMap(unsigned int width, unsigned int height);
-        void GenerateShadowMap(Scene& scene);
+        void GenerateShadowMap(std::shared_ptr<Scene> scene);
 
     private:
                                

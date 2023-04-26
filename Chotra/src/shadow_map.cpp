@@ -35,7 +35,7 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void ShadowMap::GenerateShadowMap(Scene& scene) {
+    void ShadowMap::GenerateShadowMap(std::shared_ptr<Scene> scene) {
        
         // Scene rendering from light position
         glm::mat4 lightProjection, lightView;
@@ -43,7 +43,7 @@ namespace Chotra {
         float near_plane = 1.0f, far_plane = 100.0f;
         //lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)shadowMapSize / (GLfloat)shadowMapSize, near_plane, far_plane); // обратите внимание, что если вы используете матрицу перспективной проекции, то вам придется изменить положение света, так как текущего положения света недостаточно для отображения всей сцены
         lightProjection = glm::ortho(-9.0f, 9.0f, -5.0f, 5.0f, near_plane, far_plane);
-        lightView = glm::lookAt(scene.sceneSuns[0]->position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+        lightView = glm::lookAt(scene->sceneSuns[0]->position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
         lightSpaceMatrix = lightProjection * lightView;
 
         simpleDepthShader.Use();
@@ -57,7 +57,7 @@ namespace Chotra {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
                 
-        scene.DrawSceneObjects(simpleDepthShader);
+        scene->DrawSceneObjects(simpleDepthShader);
         
         glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

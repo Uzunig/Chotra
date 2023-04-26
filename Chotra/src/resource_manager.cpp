@@ -5,12 +5,17 @@
 #include "material_texture.h"
 #include "material.h"
 #include "obj_model.h"
+#include "scene.h"
+#include "camera.h"
 
 namespace Chotra {
 
     std::vector<std::shared_ptr<MaterialTexture>> ResourceManager::textures;
     std::vector<std::shared_ptr<Material>> ResourceManager::materials;
     std::vector<std::shared_ptr<ObjModel>> ResourceManager::geometries;
+
+    std::shared_ptr<Scene> ResourceManager::scene;
+    std::shared_ptr<Camera> ResourceManager::camera;
 
     unsigned int ResourceManager::AddTexture(std::string path) {
                 
@@ -133,6 +138,26 @@ namespace Chotra {
     
     unsigned int ResourceManager::GetGeometryVAO(unsigned int i) {
         return geometries[i]->VAO;
+    }
+
+    void ResourceManager::MakeScene() {
+        scene = std::make_shared<Scene>();
+    }
+
+    std::shared_ptr<Scene> ResourceManager::GetScene() {
+        return scene;
+    }
+
+    void ResourceManager::UpdateScene(float deltaTime) {
+        scene->Update(deltaTime);
+    }
+
+    void ResourceManager::MakeCamera(glm::vec3 position) {
+        camera = std::make_shared<Camera>(position);
+    }
+
+    std::shared_ptr<Camera> ResourceManager::GetCamera() {
+        return camera;
     }
 
 

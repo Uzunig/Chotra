@@ -34,8 +34,8 @@ namespace Chotra {
         glm::mat4 projection;
         glm::mat4 view;
 
-        Camera& camera;
-        Scene& scene;
+        //Camera& camera;
+        //Scene& scene;
                                        
         unsigned int& width;
         unsigned int& height;
@@ -154,22 +154,22 @@ namespace Chotra {
        
 
         
-        Renderer(unsigned int& width, unsigned int& height, Camera& camera, Scene& scene);
+        Renderer(unsigned int& width, unsigned int& height);
                 
         void Init();
-        void Render();
-        void ForwardRender();
-        void DeferredRender();
+        void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
+        void ForwardRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
+        void DeferredRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void PassiveRender();
 
         void SetupDebuggingQuads();
         void DrawDebuggingQuads();
                        
         void ConfigureFramebufferMSAA();
-        void RenderWithMSAA();
+        void RenderWithMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
 
         void ConfigureFramebuffer();
-        void RenderWithoutMSAA();
+        void RenderWithoutMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
 
         void ConfigureBloom();
         void RenderBloom();
@@ -181,11 +181,11 @@ namespace Chotra {
         void GenerateSSRMap();
 
         void ConfigureGeometryPass();
-        void RenderGeometryPass();
+        void RenderGeometryPass(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         
         void ConfigurePreLightingPass();
         void ConfigureLightingPass();
-        void RenderPreLightingPass();
+        void RenderPreLightingPass(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void RenderLightingPass();
 
         void RenderToScreen();
