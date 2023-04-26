@@ -5,7 +5,7 @@ layout (location = 2) out vec3 lDiffuse;
 layout (location = 3) out vec3 lkD;
 layout (location = 4) out vec3 lBrdf;
 layout (location = 5) out vec3 lLo;
-layout (location = 6) out float lAo;
+layout (location = 6) out vec3 lRoughAo;
 
 
 //out vec4 FragColor;
@@ -30,8 +30,6 @@ uniform mat4 lightSpaceMatrix;
 uniform float shadowOpacity;
 
 uniform sampler2D ssaoMap;
-uniform sampler2D ssrMap;
- 
 
 // Освещение
 uniform vec3 lightPositions[7];
@@ -250,7 +248,7 @@ void main()
     // Производим выборки из префильтрованной карты LUT-текстуры BRDF и затем объединяем их вместе в соответствии с аппроксимацией разделенной суммы, чтобы получить зеркальную часть IBL
     const float MAX_REFLECTION_LOD = 7.0;
     vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
-    vec4 reflectedColor = textureLod(ssrMap, TexCoords, roughness * MAX_REFLECTION_LOD).rgba;
+    //vec4 reflectedColor = textureLod(ssrMap, TexCoords, roughness * MAX_REFLECTION_LOD).rgba;
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
        
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
@@ -270,7 +268,7 @@ void main()
     lBrdf = vec3(brdf, 0.0);
     lkD = kD;
     lLo = Lo;
-    lAo = ao * ssao;
+    lRoughAo = vec3(roughness, ao * ssao, 0.0);
 
     lScreenTexture = color;
 }

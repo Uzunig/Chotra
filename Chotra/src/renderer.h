@@ -117,7 +117,7 @@ namespace Chotra {
         ScreenTexture lkD;
         ScreenTexture lBrdf;
         ScreenTexture lLo;
-        ScreenTexture lAo;
+        ScreenTexture lRoughAo;
 
         // Framebuffer with MSAA
         unsigned int framebufferMSAA;

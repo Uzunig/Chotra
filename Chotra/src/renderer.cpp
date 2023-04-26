@@ -21,7 +21,7 @@ namespace Chotra {
         lkD(width, height, GL_RGB16F, GL_RGB),
         lBrdf(width, height, GL_RGB16F, GL_RGB),
         lLo(width, height, GL_RGB16F, GL_RGB),
-        lAo(width, height, GL_RED, GL_RED),
+        lRoughAo(width, height, GL_RGB16F, GL_RGB),
         pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
         screenDivideShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_divide_shader.fs"),
         downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/downsampling.fs"),
@@ -885,7 +885,10 @@ namespace Chotra {
 
         glBindTexture(GL_TEXTURE_2D, lScreenTexture.GetId());
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lScreenTexture.GetId(), 0);
-        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glGenerateMipmap(GL_TEXTURE_2D);
+                
         glBindTexture(GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId());
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId(), 0);
 
@@ -901,13 +904,13 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, lLo.GetId());
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, lLo.GetId(), 0);
 
-        glBindTexture(GL_TEXTURE_2D, lAo.GetId());
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT6, GL_TEXTURE_2D, lAo.GetId(), 0);
+        glBindTexture(GL_TEXTURE_2D, lRoughAo.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT6, GL_TEXTURE_2D, lRoughAo.GetId(), 0);
         float borderColor[] = { 1.0f, 1.0f, 0.0f, 0.0f };
         glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        
+                        
         unsigned int attachments[7] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, 
                                         GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6 };
         glDrawBuffers(7, attachments);
@@ -936,10 +939,7 @@ namespace Chotra {
         shaderDeferredPreLightingPass.SetInt("brdfLUT", 6);
         shaderDeferredPreLightingPass.SetInt("shadowMap", 7);
         shaderDeferredPreLightingPass.SetInt("ssaoMap", 8);
-        shaderDeferredPreLightingPass.SetInt("ssrMap", 9);
-
-
-
+        
     }
 
     void Renderer::ConfigureLightingPass() {
@@ -952,7 +952,7 @@ namespace Chotra {
         shaderDeferredLightingPass.SetInt("lkD", 3);
         shaderDeferredLightingPass.SetInt("lBrdf", 4);
         shaderDeferredLightingPass.SetInt("lLo", 5);
-        shaderDeferredLightingPass.SetInt("lAo", 6);
+        shaderDeferredLightingPass.SetInt("lRoughAo", 6);
         shaderDeferredLightingPass.SetInt("ssrUvMap", 7);
 
     }
@@ -985,8 +985,6 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, shadowMap.GetMap());
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, ssaoMap);
-        glActiveTexture(GL_TEXTURE9);
-        glBindTexture(GL_TEXTURE_2D, ssrUvMap);
 
         glActiveTexture(GL_TEXTURE0);
 
@@ -1052,7 +1050,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE5);
         glBindTexture(GL_TEXTURE_2D, lLo.GetId());
         glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_2D, lAo.GetId());
+        glBindTexture(GL_TEXTURE_2D, lRoughAo.GetId());
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, ssrUvMap);
        
