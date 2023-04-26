@@ -142,45 +142,39 @@ vec4 SSR2(vec4 position, vec3 reflection)
     if (position.a != 2.0) {    // TO DO: to optimize!
         return vec4(0.0f, 0.0f, 0.0f, 0.0f);
     }
-
         
     vec2 texSize  = textureSize(gViewPosition, 0).xy;
-    vec2 texCoord = gl_FragCoord.xy / texSize;
-
+    
     vec3 startPosition = position.xyz + reflection * biasSSR;
     vec3 marchingPosition = startPosition;
     vec3 endPosition = startPosition + reflection * iterationCount; 
         	
-    vec4 startPositionScreen = vec4(startPosition, 1.0);
-    startPositionScreen = projection * startPositionScreen;
-    startPositionScreen.xyz /= startPositionScreen.w; // деление перспективы
-    startPositionScreen.xy = startPositionScreen.xy * 0.5 + 0.5; // приведение к диапазону 0.0 - 1.0
-    startPositionScreen.xy  *= texSize;
+    vec4 startPositionUV = vec4(startPosition, 1.0);
+    startPositionUV = projection * startPositionUV;
+    startPositionUV.xyz /= startPositionUV.w; // деление перспективы
+    startPositionUV.xy = startPositionUV.xy * 0.5 + 0.5; // приведение к диапазону 0.0 - 1.0
+    
+    vec4 marchingPositionUV = startPositionUV;
 
-    vec4 marchingPositionScreen = startPositionScreen;
-
-    vec4 endPositionScreen = vec4(endPosition, 1.0);
-    endPositionScreen = projection * endPositionScreen;
-    endPositionScreen.xyz /= endPositionScreen.w; // деление перспективы
-    endPositionScreen.xy = endPositionScreen.xy * 0.5 + 0.5; // приведение к диапазону 0.0 - 1.0
-    endPositionScreen.xy  *= texSize;
+    vec4 endPositionUV = vec4(endPosition, 1.0);
+    endPositionUV = projection * endPositionUV;
+    endPositionUV.xyz /= endPositionUV.w; // деление перспективы
+    endPositionUV.xy = endPositionUV.xy * 0.5 + 0.5; // приведение к диапазону 0.0 - 1.0
                
-    float deltaX    = endPositionScreen.x - startPositionScreen.x;
-    float deltaY    = endPositionScreen.y - startPositionScreen.y;
+    float deltaX    = floor((endPositionUV.x - startPositionUV.x) * texSize.x);
+    float deltaY    = floor((endPositionUV.y - startPositionUV.y) * texSize.y);
 
     float useX      = abs(deltaX) >= abs(deltaY) ? 1.0 : 0.0;
-    float delta     = mix(abs(deltaY), abs(deltaX), useX) * clamp(resolution, 0.0, 1.0);
-    vec2  incrementScreen = vec2(deltaX, deltaY) / delta;
+    float delta     = mix(abs(deltaY), abs(deltaX), useX);
+
     vec3 increment = (endPosition - startPosition) / delta;
-
-   
-    for (int i = 0; i < delta; ++i) {
-        
-        vec2 marchingPositionUV = marchingPositionScreen.xy / texSize;
+    vec2 incrementUV = (endPositionUV.xy - startPositionUV.xy) / delta;
+      
+    for (int i = 1; i <= delta; ++i) {
+                     
         vec4 currentFrag = texture(gViewPosition, marchingPositionUV.xy);
-
-        float alphaFromScreen = currentFrag.a; 
-        if (alphaFromScreen != 2.0) {    // TO DO: to optimize!
+                
+        if (currentFrag.a != 2.0) {    // TO DO: to optimize!
             return vec4(0.0f, 0.0f, 0.0f, 0.0f);
         }
         
@@ -192,13 +186,11 @@ vec4 SSR2(vec4 position, vec3 reflection)
             return outColor;
         }    
 
-        marchingPosition = startPosition + i * increment;
-        marchingPositionScreen.xy = startPositionScreen.xy + i * incrementScreen;
+        marchingPosition = startPosition + (i * increment);
+        marchingPositionUV.xy = startPositionUV.xy + (i * incrementUV);
   
     }
 
-
-    
     return outColor;
 }
 

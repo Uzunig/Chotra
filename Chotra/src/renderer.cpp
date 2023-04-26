@@ -164,10 +164,10 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, ssrUvMap);
         quads[1]->RenderQuad();
-        /*
-        glBindTexture(GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId());
+        
+        glBindTexture(GL_TEXTURE_2D, gViewNormal);
         quads[2]->RenderQuad();
-      
+      /*
         glBindTexture(GL_TEXTURE_2D, lDiffuse.GetId());
         quads[3]->RenderQuad();
         
