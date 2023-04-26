@@ -172,6 +172,11 @@ vec4 SSR2(vec4 position, vec3 reflection)
       
     for (float i = 1.0; i <= delta; ++i) {
                      
+        //vec4 marchingPositionUV = vec4(marchingPosition, 1.0);
+        //marchingPositionUV = projection * marchingPositionUV;
+        //marchingPositionUV.xyz /= marchingPositionUV.w; // деление перспективы
+        //marchingPositionUV.xy = marchingPositionUV.xy * 0.5 + 0.5; // приведение к диапазону 0.0 - 1.0
+
         vec4 currentFrag = texture(gViewPosition, marchingPositionUV.xy);
                 
         if (currentFrag.a != 2.0) {    // TO DO: to optimize!
