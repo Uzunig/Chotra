@@ -143,9 +143,12 @@ namespace Chotra {
         //camera = Camera(glm::vec3(0.0f, 5.0f, 25.0f));
         //scene = std::make_unique<Scene>();  
 
+        ResourceManager::MakeMiniCamera(glm::vec3(0.0f, 1.0f, 10.0f));
+        ResourceManager::MakeMiniScene("resources/level_mini.lv");
+
         ResourceManager::MakeCamera(glm::vec3(0.0f, 5.0f, 25.0f));
-        ResourceManager::MakeScene();
-        
+        ResourceManager::MakeScene("resources/level1.lv");
+                        
         renderer = std::make_unique<Renderer>(windowData.width, windowData.height);
         renderer->Init();
         gui = std::make_unique<Gui>(this);

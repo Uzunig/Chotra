@@ -9,9 +9,9 @@
 
 namespace Chotra {
 
-    Scene::Scene() {
+    Scene::Scene(std::string path) {
 
-        LoadSceneFromFile("resources/level1.lv");
+        LoadSceneFromFile(path);
 
         environment = std::make_shared<Environment>("resources/hdr/Sky.hdr", sceneSuns[0]);
     }

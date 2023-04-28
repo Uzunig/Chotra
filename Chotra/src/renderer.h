@@ -158,6 +158,7 @@ namespace Chotra {
                 
         void Init();
         void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
+        void MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void ForwardRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void DeferredRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void PassiveRender();

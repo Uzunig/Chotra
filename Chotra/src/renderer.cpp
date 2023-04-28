@@ -45,7 +45,7 @@ namespace Chotra {
         ConfigureFramebufferMSAA();
 
         ConfigureGeometryPass();
-       
+
         ConfigureSSAO();
         ConfigureSSR();
 
@@ -76,7 +76,7 @@ namespace Chotra {
         lightsShader.SetInt("prefilterMap", 6);
         lightsShader.SetInt("brdfLUT", 7);
         */
-        
+
 
 
         backgroundShader.Use();
@@ -105,6 +105,11 @@ namespace Chotra {
         else {
             PassiveRender();
         }
+    }
+
+    void Renderer::MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
+
+        ForwardRender(scene, camera);
     }
 
     void Renderer::PassiveRender() {
@@ -158,27 +163,27 @@ namespace Chotra {
     }
 
     void Renderer::DrawDebuggingQuads() {
-        
+
         //Draw debugging quads
         screenDivideShader.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, ssrUvMap);
         quads[1]->RenderQuad();
-        
+
         glBindTexture(GL_TEXTURE_2D, gViewNormal);
         quads[2]->RenderQuad();
-      /*
-        glBindTexture(GL_TEXTURE_2D, lDiffuse.GetId());
-        quads[3]->RenderQuad();
-        
-        glBindTexture(GL_TEXTURE_2D, lkD.GetId());
-        quads[4]->RenderQuad();
+        /*
+          glBindTexture(GL_TEXTURE_2D, lDiffuse.GetId());
+          quads[3]->RenderQuad();
 
-        glBindTexture(GL_TEXTURE_2D, ssrUvMap);
-        quads[5]->RenderQuad();
-        
-        glBindTexture(GL_TEXTURE_2D, lAo.GetId());
-        quads[6]->RenderQuad();*/
+          glBindTexture(GL_TEXTURE_2D, lkD.GetId());
+          quads[4]->RenderQuad();
+
+          glBindTexture(GL_TEXTURE_2D, ssrUvMap);
+          quads[5]->RenderQuad();
+
+          glBindTexture(GL_TEXTURE_2D, lAo.GetId());
+          quads[6]->RenderQuad();*/
     }
 
     void Renderer::ConfigureFramebufferMSAA() {
@@ -384,7 +389,7 @@ namespace Chotra {
 
         glGenFramebuffers(1, &hdrFBO);
         glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
-        
+
         // Создаем 2 цветовых фреймбуфера типа с плавающей точкой (первый - для обычного рендеринга, другой - для граничных значений яркости)
         glGenTextures(2, colorBuffers);
         for (unsigned int i = 0; i < 2; i++)
@@ -399,7 +404,7 @@ namespace Chotra {
             // Прикрепляем текстуру к фреймбуферу
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i], 0);
         }
-        
+
         // Создаем и прикрепляем буфер глубины (рендербуфер)
 
         glGenRenderbuffers(1, &rboDepth);
@@ -566,9 +571,9 @@ namespace Chotra {
 
     void Renderer::ConfigureSSAO() {
 
-        glGenFramebuffers(1, &ssaoFBO);  
+        glGenFramebuffers(1, &ssaoFBO);
         glGenFramebuffers(1, &ssaoBlurFBO);
-        
+
         glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 
         // Цветовой буфер SSAO 
@@ -578,7 +583,7 @@ namespace Chotra {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
-               
+
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cout << "SSAO Framebuffer not complete!" << std::endl;
 
@@ -654,14 +659,14 @@ namespace Chotra {
         shaderSSAO.SetInt("kernelSize", kernelSizeSSAO);
         shaderSSAO.SetFloat("radius", radiusSSAO);
         shaderSSAO.SetFloat("biasSSAO", biasSSAO);
-        
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, gViewPosition); // gPosition in view space
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, gViewNormal);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, noiseTexture);
-  
+
         quads[0]->RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -680,11 +685,11 @@ namespace Chotra {
 
     void Renderer::ConfigureSSR() {
 
-        glGenFramebuffers(1, &ssrFBO);  
+        glGenFramebuffers(1, &ssrFBO);
         //glGenFramebuffers(1, &ssrBlurFBO);
 
         glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
-        
+
         glGenTextures(1, &ssrUvMap);
         glBindTexture(GL_TEXTURE_2D, ssrUvMap);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
@@ -726,17 +731,17 @@ namespace Chotra {
         */
     }
 
-    
+
     void Renderer::GenerateSSRMap() {
 
         // 2. Генерируем текстуру для SSR        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
         glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
         glClear(GL_COLOR_BUFFER_BIT);
         shaderSSR.Use();
-                
+
         shaderSSR.SetMat4("projection", projection);
         shaderSSR.SetMat4("view", view);
-        
+
         shaderSSR.SetFloat("biasSSR", biasSSR);
         shaderSSR.SetFloat("rayStep", rayStep);
         shaderSSR.SetInt("iterationCount", iterationCount);
@@ -747,8 +752,8 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, gViewPosition); // gPosition in view space
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, gViewNormal);
-       // glActiveTexture(GL_TEXTURE2);
-        //glBindTexture(GL_TEXTURE_2D, screenTexturePrevious.GetId()); // screen texture from the previous frame (I'm not sure it is correct or not)
+        // glActiveTexture(GL_TEXTURE2);
+         //glBindTexture(GL_TEXTURE_2D, screenTexturePrevious.GetId()); // screen texture from the previous frame (I'm not sure it is correct or not)
 
         quads[0]->RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -762,13 +767,13 @@ namespace Chotra {
         for (unsigned int mip = 0; mip < maxMipLevels; ++mip) {
             unsigned int mipWidth = width * std::pow(0.5, mip);
             unsigned int mipHeight = height * std::pow(0.5, mip);
-            
+
             shaderSSRBlur.Use();
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, ssrColorBuffer);
 
             glViewport(0, 0, mipWidth, mipHeight);
-                        
+
             glBindFramebuffer(GL_FRAMEBUFFER, ssrBlurFBO);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssrMap, mip);
             glClear(GL_COLOR_BUFFER_BIT);
@@ -888,7 +893,7 @@ namespace Chotra {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glGenerateMipmap(GL_TEXTURE_2D);
-                
+
         glBindTexture(GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId());
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId(), 0);
 
@@ -910,8 +915,8 @@ namespace Chotra {
         glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-                        
-        unsigned int attachments[7] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, 
+
+        unsigned int attachments[7] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2,
                                         GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6 };
         glDrawBuffers(7, attachments);
 
@@ -939,7 +944,7 @@ namespace Chotra {
         shaderDeferredPreLightingPass.SetInt("brdfLUT", 6);
         shaderDeferredPreLightingPass.SetInt("shadowMap", 7);
         shaderDeferredPreLightingPass.SetInt("ssaoMap", 8);
-        
+
     }
 
     void Renderer::ConfigureLightingPass() {
@@ -1053,14 +1058,14 @@ namespace Chotra {
         glBindTexture(GL_TEXTURE_2D, lRoughAo.GetId());
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, ssrUvMap);
-       
-    
+
+
         glViewport(0, 0, width, height);
 
 
         // Рендерим прямоугольник
         quads[0]->RenderQuad();
-               
+
     }
 
 

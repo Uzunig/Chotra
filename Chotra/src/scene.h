@@ -33,7 +33,7 @@ namespace Chotra {
                 
         std::shared_ptr<Environment> environment;
 
-        Scene();
+        Scene(std::string path);
         ~Scene();
         
         void LoadSceneFromFile(std::string const& path);

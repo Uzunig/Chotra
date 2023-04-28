@@ -42,18 +42,27 @@ namespace Chotra {
         static unsigned int GetGeometryVerticesCount(unsigned int i);
         static unsigned int GetGeometryVAO(unsigned int i);
 
-        static void MakeScene();
+        static void MakeScene(std::string path);
         static std::shared_ptr<Scene> GetScene();
         static void UpdateScene(float deltaTime);
 
         static void MakeCamera(glm::vec3 position);
         static std::shared_ptr<Camera> GetCamera();
 
+        static void MakeMiniScene(std::string path);
+               
+        static void MakeMiniCamera(glm::vec3 position);
+       
+
 
         static std::shared_ptr<Scene> scene;
         static std::shared_ptr<Camera> camera;
-    private:
 
+        static std::shared_ptr<Scene> miniScene;
+        static std::shared_ptr<Camera> miniCamera;
+
+    private:
+                
         static std::vector<std::shared_ptr<MaterialTexture>> textures;
         static std::vector<std::shared_ptr<Material>> materials;
         static std::vector<std::shared_ptr<ObjModel>> geometries;

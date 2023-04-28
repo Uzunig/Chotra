@@ -17,6 +17,9 @@ namespace Chotra {
     std::shared_ptr<Scene> ResourceManager::scene;
     std::shared_ptr<Camera> ResourceManager::camera;
 
+    std::shared_ptr<Scene> ResourceManager::miniScene;
+    std::shared_ptr<Camera> ResourceManager::miniCamera;
+
     unsigned int ResourceManager::AddTexture(std::string path) {
                 
         for (int i = 0; i < textures.size(); ++i) {
@@ -140,9 +143,11 @@ namespace Chotra {
         return geometries[i]->VAO;
     }
 
-    void ResourceManager::MakeScene() {
-        scene = std::make_shared<Scene>();
+    void ResourceManager::MakeScene(std::string path) {
+        scene = std::make_shared<Scene>(path);
+
     }
+
 
     std::shared_ptr<Scene> ResourceManager::GetScene() {
         return scene;
@@ -160,5 +165,12 @@ namespace Chotra {
         return camera;
     }
 
+    void ResourceManager::MakeMiniScene(std::string path) {
+        miniScene = std::make_shared<Scene>(path);
+    }
+
+    void ResourceManager::MakeMiniCamera(glm::vec3 position) {
+        miniCamera = std::make_shared<Camera>(position);
+    }
 
 } // namespace Chotra
