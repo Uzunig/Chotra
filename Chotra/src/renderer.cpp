@@ -21,7 +21,7 @@ namespace Chotra {
         lkD(width, height, GL_RGB16F, GL_RGB),
         lBrdf(width, height, GL_RGB16F, GL_RGB),
         lLo(width, height, GL_RGB16F, GL_RGB),
-        lRoughAo(width, height, GL_RGB16F, GL_RGB),
+        lRoughAo(width, height, GL_RGB, GL_RGB),
         pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
         screenDivideShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_divide_shader.fs"),
         downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/downsampling.fs"),
@@ -107,9 +107,49 @@ namespace Chotra {
         }
     }
 
-    void Renderer::MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
+    void Renderer::MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera, ScreenTexture& iconTexture) {
+         
+        unsigned int width = this->width;
+        unsigned int height = this->height;
 
-        ForwardRender(scene, camera);
+        this->width = 100;
+        this->height = 100;
+
+        bool drawSkybox = this->drawSkybox;
+        this->drawSkybox = false;
+
+        shadowMap.GenerateShadowMap(scene);
+                
+        glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+
+        // Создаем цветовую прикрепляемую текстуру
+
+        glBindTexture(GL_TEXTURE_2D, iconTexture.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, iconTexture.GetId(), 0);	// нам нужен только цветовой буфер
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glViewport(0, 0, 100, 100);
+        RenderWithMSAA(scene, camera);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+
+        // Создаем цветовую прикрепляемую текстуру
+
+        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture.GetId(), 0);	// нам нужен только цветовой буфер
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        this->drawSkybox = drawSkybox;
+
+        this->width = width;
+        this->height = height;
+        
     }
 
     void Renderer::PassiveRender() {
@@ -122,6 +162,7 @@ namespace Chotra {
         shadowMap.GenerateShadowMap(scene);
 
         if (enableMSAA) {
+            glViewport(0, 0, width, height);
             RenderWithMSAA(scene, camera);
         }
         else {
@@ -169,10 +210,10 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, ssrUvMap);
         quads[1]->RenderQuad();
-
-        glBindTexture(GL_TEXTURE_2D, gViewNormal);
-        quads[2]->RenderQuad();
         /*
+        glBindTexture(GL_TEXTURE_2D, iconTexture.GetId());
+        quads[2]->RenderQuad();
+        
           glBindTexture(GL_TEXTURE_2D, lDiffuse.GetId());
           quads[3]->RenderQuad();
 
@@ -250,7 +291,7 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferMSAA);
 
         // 2. Рендерим сцену как обычно, но используем при этом сгенерированную карту глубины/тени
-        glViewport(0, 0, width, height);
+        //glViewport(0, 0, width, height);
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);

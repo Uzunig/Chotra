@@ -27,6 +27,7 @@ namespace Chotra {
         static std::string GetTexturePath(unsigned int i);
 
         static unsigned int AddMaterial(std::string path);
+        static void SetGeometryIcon(unsigned int i, unsigned int icon);
         static void ChangeMaterialSource(unsigned int i, std::string path);
         static void ChangeComponentIndex(unsigned int i, std::string componentsName, int chosed);
         static std::shared_ptr<Material> GetMaterial(unsigned int i);
@@ -37,6 +38,7 @@ namespace Chotra {
         static unsigned int AddGeometry(std::string path);
         static void ChangeGeometrySource(unsigned int i, std::string path);
         static std::string GetGeometryName(unsigned int i);
+        static unsigned int GetGeometryIcon(unsigned int);
         static std::string GetGeometryPath(unsigned int i);
         static unsigned int GetGeometriesCount();
         static unsigned int GetGeometryVerticesCount(unsigned int i);

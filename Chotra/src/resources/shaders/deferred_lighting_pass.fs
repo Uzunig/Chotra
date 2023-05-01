@@ -33,7 +33,7 @@ void main()
 
     vec3 specular = reflectedColor * (F * brdf.x + brdf.y);
     vec3 ambient = (kD * diffuse + specular) * ao;
-    vec3 color = mix(ambient + Lo, preColor, roughness * dist);
+    vec3 color = mix(ambient + Lo, preColor, dist);
     //vec3 color1 = mix(color, preColor, dist);
     vec3 result = mix(preColor, color, reflectedUv.a);
 

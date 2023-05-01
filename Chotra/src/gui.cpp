@@ -409,7 +409,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(10, 50));
 
             ImGui::PushID(i);
-            ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+            ImTextureID my_tex_id = (void*)ResourceManager::GetGeometryIcon(i);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
@@ -576,6 +576,8 @@ namespace Chotra {
 
                         s = PathToRelative(s);
                         ResourceManager::AddGeometry(s);
+                        unsigned int icon = MakeGeometryIcon(ResourceManager::GetGeometriesCount() - 1);
+                        ResourceManager::SetGeometryIcon(ResourceManager::GetGeometriesCount() - 1, icon);
                     }
                 }
 
@@ -593,7 +595,7 @@ namespace Chotra {
                     ImGui::SetCursorPos(ImVec2(100 * i + 10, 18));
 
                     ImGui::PushID(i);
-                    ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+                    ImTextureID my_tex_id = (void*)ResourceManager::GetGeometryIcon(i);
                     ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
 
 
@@ -712,10 +714,26 @@ namespace Chotra {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
+    void Gui::UpdateAllIcons() {
+        for (unsigned int i = 0; i < ResourceManager::GetGeometriesCount(); ++i) {
+            unsigned int icon = MakeGeometryIcon(i);
+            ResourceManager::SetGeometryIcon(i, icon);
+        }
+    }
+
+    unsigned int Gui::MakeGeometryIcon(unsigned int i) {
+        ResourceManager::miniScene->sceneObjects[0].ChangeGeometryIndex(i);
+        ResourceManager::miniScene->sceneObjects[0].ChangeMaterialIndex(0);
+        ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
+        p_mainWindow->renderer->MiniRender(ResourceManager::miniScene, ResourceManager::miniCamera, iconTexture);
+        return iconTexture.GetId();
+    }
+
     void Gui::AddGeometry() {
 
         ResourceManager::AddGeometry("resources/models/default.obj");
         selected = 200 + ResourceManager::GetGeometriesCount() - 1;
+        
     }
 
     void Gui::AddMaterial() {
@@ -753,7 +771,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
 
             ImGui::PushID(i);
-            ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+            ImTextureID my_tex_id = (void*)ResourceManager::GetGeometryIcon(i);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 

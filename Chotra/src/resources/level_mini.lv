@@ -12,7 +12,7 @@ SceneObject  object_0   OBJModel     0        0          0.0  0.0  0.0    0.0 0.
 
                 Name                  Geometry  Materiale        Position              Angle          Scale        Velocity         rVelocity       Visible       Color    Brightness
 
-SceneSun         sun       OBJModel     0           0     -2.0 1.0 -2.0          0.0 0.0 0.0     0.01 0.01 0.01    0.0 0.0 0.0      0.0 0.0 0.0          1      1.0 1.0 1.0        20000
+SceneSun         sun       OBJModel     0           0           0.0 1.0 2.0          0.0 0.0 0.0     0.01 0.01 0.01    0.0 0.0 0.0      0.0 0.0 0.0          1      1.0 1.0 1.0        2
 
 
 

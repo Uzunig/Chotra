@@ -110,6 +110,11 @@ namespace Chotra {
         return index;
     }
 
+    void ResourceManager::SetGeometryIcon(unsigned int i, unsigned int icon) {
+
+        geometries[i]->icon = icon;
+    }
+
     void ResourceManager::ChangeGeometrySource(unsigned int i, std::string path) {
 
         for (int i = 0; i < geometries.size(); ++i) {
@@ -125,6 +130,10 @@ namespace Chotra {
 
     std::string ResourceManager::GetGeometryName(unsigned int i) {
         return geometries[i]->name;
+    }
+
+    unsigned int ResourceManager::GetGeometryIcon(unsigned int i) {
+        return geometries[i]->icon;
     }
 
     std::string ResourceManager::GetGeometryPath(unsigned int i) {
@@ -145,7 +154,6 @@ namespace Chotra {
 
     void ResourceManager::MakeScene(std::string path) {
         scene = std::make_shared<Scene>(path);
-
     }
 
 

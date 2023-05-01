@@ -27,7 +27,7 @@ namespace Chotra {
     public:
 
         ShadowMap shadowMap;
-
+                
         std::vector<std::shared_ptr<Quad>> quads;
         std::shared_ptr<GaussianBlurer> gaussianBlurer;
 
@@ -71,7 +71,7 @@ namespace Chotra {
         bool enableMSAA = true;
         int samplesNumber = 16;
         bool perspectiveProjection;    
-        float backgroundColor[4] = { 0.2f, 0.2f, 0.3f, 1.0f };
+        float backgroundColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
         bool drawSkybox = true;
         bool bloom = true;
         float exposure = 1.0f;
@@ -93,7 +93,7 @@ namespace Chotra {
         float accuracySSR = 0.05f; // 0.05f
                 
         ScreenTexture screenTexture; 
-                
+                  
         unsigned int gBuffer;           // G-Buffer
         unsigned int gPosition; //TExtures
         unsigned int gViewPosition; 
@@ -120,6 +120,8 @@ namespace Chotra {
         ScreenTexture lRoughAo;
 
         // Framebuffer with MSAA
+        unsigned int miniFramebufferMSAA;
+
         unsigned int framebufferMSAA;
         unsigned int textureColorBufferMultiSampled;
         unsigned int rboMSAA;
@@ -158,14 +160,14 @@ namespace Chotra {
                 
         void Init();
         void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
-        void MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
+        void MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera, ScreenTexture& icon);
         void ForwardRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void DeferredRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void PassiveRender();
 
         void SetupDebuggingQuads();
         void DrawDebuggingQuads();
-                       
+        
         void ConfigureFramebufferMSAA();
         void RenderWithMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
 
