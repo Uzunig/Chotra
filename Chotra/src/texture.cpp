@@ -17,7 +17,7 @@ namespace Chotra {
         }
     }
 
-    unsigned int Texture::GetId() {
+    unsigned int& Texture::GetId() {
         return id;
     }
 

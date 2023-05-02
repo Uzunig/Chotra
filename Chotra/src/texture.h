@@ -10,7 +10,7 @@ namespace Chotra {
         Texture();
         virtual ~Texture();
         void DeleteTexture();
-        unsigned int GetId();
+        unsigned int& GetId();
         int GetWidth();
         int GetHeight();
        

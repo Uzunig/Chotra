@@ -12,12 +12,15 @@ namespace Chotra {
     Scene::Scene(std::string path) {
 
         LoadSceneFromFile(path);
-
-        environment = std::make_shared<Environment>("resources/hdr/Sky.hdr", sceneSuns[0]);
     }
 
     Scene::~Scene() {
 
+    }
+
+    void Scene::AddEnvironment(std::string path) {
+
+        environment = std::make_shared<Environment>(path, sceneSuns[0]);
     }
 
     void Scene::AddSceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
@@ -232,6 +235,11 @@ namespace Chotra {
                         AddSceneSun(geometryIndex, materialIndex, name, position, angle,
                             scale, velocity, rVelocity, visible, color, intensity);
                     }
+
+                } else if (s == "Environment") {
+                    std::string environment_path;
+                    level_file >> environment_path;
+                    AddEnvironment(environment_path);
 
                 }
             }

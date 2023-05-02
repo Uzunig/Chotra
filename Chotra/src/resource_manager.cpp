@@ -45,7 +45,7 @@ namespace Chotra {
         *textures[i] = tex;
     }
 
-    unsigned int ResourceManager::GetTextureId(unsigned int i) {
+    unsigned int& ResourceManager::GetTextureId(unsigned int i) {
         return textures[i]->GetId();
     }
 
@@ -65,6 +65,11 @@ namespace Chotra {
         unsigned int index = materials.size(); //for create unique name suffix
         materials.push_back(std::make_shared<Material>(path, std::to_string(index)));
         return index;
+    }
+
+    void ResourceManager::SetMaterialIcon(unsigned int i, unsigned int icon) {
+
+        materials[i]->icon = icon;
     }
 
     void ResourceManager::ChangeMaterialSource(unsigned int i, std::string path) {
@@ -89,6 +94,10 @@ namespace Chotra {
 
     std::string ResourceManager::GetMaterialName(unsigned int i) {
         return materials[i]->name;
+    }
+
+    unsigned int& ResourceManager::GetMaterialIcon(unsigned int i) {
+        return materials[i]->icon;
     }
 
     std::string ResourceManager::GetMaterialPath(unsigned int i) {
@@ -132,7 +141,7 @@ namespace Chotra {
         return geometries[i]->name;
     }
 
-    unsigned int ResourceManager::GetGeometryIcon(unsigned int i) {
+    unsigned int& ResourceManager::GetGeometryIcon(unsigned int i) {
         return geometries[i]->icon;
     }
 

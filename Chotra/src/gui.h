@@ -59,7 +59,10 @@ namespace Chotra {
         void Render();
 
         void UpdateAllIcons();
-        unsigned int MakeGeometryIcon(unsigned int i);
+        void MakeGeometryIcon(unsigned int i);
+        void DeleteGeometryIcon(unsigned int i);
+        void MakeMaterialIcon(unsigned int i);
+        void DeleteMaterialIcon(unsigned int i);
 
         void AddGeometry();
         void AddMaterial();

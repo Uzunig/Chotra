@@ -295,7 +295,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(10, 70));
 
             ImGui::PushID(i);
-            ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+            ImTextureID my_tex_id = (void*)ResourceManager::GetGeometryIcon(ResourceManager::scene->sceneObjects[i].geometryIndex);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
@@ -331,7 +331,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(10, 180));
 
             ImGui::PushID(i);
-            my_tex_id = (void*)ResourceManager::GetTextureId(0);
+            my_tex_id = (void*)ResourceManager::GetMaterialIcon(ResourceManager::scene->sceneObjects[i].materialIndex);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
@@ -402,6 +402,9 @@ namespace Chotra {
 
                     s = PathToRelative(s);
                     ResourceManager::ChangeGeometrySource(i, s);
+                    DeleteGeometryIcon(i);
+                    MakeGeometryIcon(i);
+
                 }
             }
 
@@ -438,6 +441,8 @@ namespace Chotra {
 
                     s = PathToRelative(s);
                     ResourceManager::ChangeMaterialSource(i, s);
+                    DeleteMaterialIcon(i);
+                    MakeMaterialIcon(i);
                 }
             }
 
@@ -445,7 +450,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(10, 50));
 
             ImGui::PushID(i);
-            ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+            ImTextureID my_tex_id = (void*)ResourceManager::GetMaterialIcon(i);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
@@ -483,6 +488,8 @@ namespace Chotra {
                 {
                     chosed = -1;
                     ChangeComponentsIndexModal(i, componentsName);
+                    DeleteMaterialIcon(i);
+                    MakeMaterialIcon(i);
                 }
 
                 ImGui::SetItemAllowOverlap();
@@ -576,8 +583,8 @@ namespace Chotra {
 
                         s = PathToRelative(s);
                         ResourceManager::AddGeometry(s);
-                        unsigned int icon = MakeGeometryIcon(ResourceManager::GetGeometriesCount() - 1);
-                        ResourceManager::SetGeometryIcon(ResourceManager::GetGeometriesCount() - 1, icon);
+                        MakeGeometryIcon(ResourceManager::GetGeometriesCount() - 1);
+                        
                     }
                 }
 
@@ -617,6 +624,7 @@ namespace Chotra {
 
                         s = PathToRelative(s);
                         ResourceManager::AddMaterial(s);
+                        MakeMaterialIcon(ResourceManager::GetMaterialsCount() - 1);
                     }
                 }
 
@@ -635,7 +643,7 @@ namespace Chotra {
                     ImGui::SetCursorPos(ImVec2(100 * i + 10, 18));
 
                     ImGui::PushID(i);
-                    ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+                    ImTextureID my_tex_id = (void*)ResourceManager::GetMaterialIcon(i);
                     ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
 
 
@@ -716,17 +724,38 @@ namespace Chotra {
 
     void Gui::UpdateAllIcons() {
         for (unsigned int i = 0; i < ResourceManager::GetGeometriesCount(); ++i) {
-            unsigned int icon = MakeGeometryIcon(i);
-            ResourceManager::SetGeometryIcon(i, icon);
+            MakeGeometryIcon(i);
+            
+        }
+
+        for (unsigned int i = 0; i < ResourceManager::GetMaterialsCount(); ++i) {
+            MakeMaterialIcon(i);
+
         }
     }
 
-    unsigned int Gui::MakeGeometryIcon(unsigned int i) {
+    void Gui::MakeGeometryIcon(unsigned int i) {
         ResourceManager::miniScene->sceneObjects[0].ChangeGeometryIndex(i);
         ResourceManager::miniScene->sceneObjects[0].ChangeMaterialIndex(0);
         ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
         p_mainWindow->renderer->MiniRender(ResourceManager::miniScene, ResourceManager::miniCamera, iconTexture);
-        return iconTexture.GetId();
+        ResourceManager::SetGeometryIcon(i, iconTexture.GetId());
+    }
+
+    void Gui::DeleteGeometryIcon(unsigned int i) {
+        glDeleteTextures(1, &ResourceManager::GetGeometryIcon(i));
+    }
+
+    void Gui::MakeMaterialIcon(unsigned int i) {
+        ResourceManager::miniScene->sceneObjects[0].ChangeMaterialIndex(i);
+        ResourceManager::miniScene->sceneObjects[0].ChangeGeometryIndex(0);
+        ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
+        p_mainWindow->renderer->MiniRender(ResourceManager::miniScene, ResourceManager::miniCamera, iconTexture);
+        ResourceManager::SetMaterialIcon(i, iconTexture.GetId());
+    }
+
+    void Gui::DeleteMaterialIcon(unsigned int i) {
+        glDeleteTextures(1, &ResourceManager::GetMaterialIcon(i));
     }
 
     void Gui::AddGeometry() {
@@ -795,6 +824,7 @@ namespace Chotra {
 
                 s = PathToRelative(s);
                 ResourceManager::AddGeometry(s);
+                MakeGeometryIcon(ResourceManager::GetGeometriesCount() - 1);
             }
         }
 
@@ -830,7 +860,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
 
             ImGui::PushID(i);
-            ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+            ImTextureID my_tex_id = (void*)ResourceManager::GetMaterialIcon(i);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
@@ -854,6 +884,7 @@ namespace Chotra {
 
                 s = PathToRelative(s);
                 ResourceManager::AddMaterial(s);
+                MakeMaterialIcon(ResourceManager::GetMaterialsCount() - 1);
             }
         }
 

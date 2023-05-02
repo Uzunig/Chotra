@@ -1,12 +1,10 @@
 Type                 Path  
+
 ObjModel         resources/models/Model_Ambient/ground.obj
 ObjModel         resources/models/Model_Ambient/panels.obj
 
 Material         resources/models/Model_Ambient/ground.mtl
 Material         resources/models/Model_Ambient/panels.mtl
-
-
-
 
 
 
@@ -27,4 +25,4 @@ SceneSun         sun       OBJModel     0           0     -2.0 1.0 -2.0         
 //SceneLight    light_0    OBJModel     0           0       -25.0 15.0  -30.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0      0.0 0.0 0.0        1      1.0 1.0 1.0        20000
 
 
-
+Environment      resources/hdr/Sky.hdr
