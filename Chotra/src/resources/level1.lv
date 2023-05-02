@@ -14,15 +14,16 @@ SceneObject  object_0   OBJModel     1        1         0.0  0.0  0.0    0.0 0.0
 SceneObject  object_1   OBJModel     2        2         0.0  0.0  0.0    0.0 0.0 0.0    0.2 0.2 0.2    0.0 0.0 0.0     0.0 0.0 0.0          1
 
 
-                Name                  Geometry  Materiale        Position              Angle          Scale        Velocity         rVelocity       Visible       Color    Brightness
+                Name                  Geometry  Materiale        Position                  Angle            Scale          Velocity          rVelocity       Visible    Color    Brightness
 
-SceneSun         sun       OBJModel     0           0     -2.0 1.0 -2.0            0.0 0.0 0.0     0.01 0.01 0.01    0.0 0.0 0.0      0.0 0.0 0.0          1      1.0 1.0 0.8      5
+SceneSun         sun       OBJModel     0           0          -2.0 1.0 -2.0            0.0 0.0 0.0     0.01 0.01 0.01    0.0 0.0 0.0      0.0 0.0 0.0          1      1.0 1.0 1.0      5
 
 
 
                Name                 Geometry  Materiale        Position              Angle          Scale        Velocity         rVelocity       Visible       Color        Brightness
 
 //SceneLight    light_0    OBJModel     0           0       -25.0 15.0  -30.0     0.0 0.0 0.0    1.0 1.0 1.0    0.0 0.0 0.0      0.0 0.0 0.0        1      1.0 1.0 1.0        20000
+
 
 
 Environment      resources/hdr/Sky.hdr

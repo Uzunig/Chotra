@@ -74,11 +74,11 @@ namespace Chotra {
         float backgroundColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
         bool drawSkybox = true;
         bool bloom = true;
-        float exposure = 1.0f;
+        float exposure = 1.75f;
         float backgroundExposure = 2.0f;
         bool gammaCorrection = true;
-        float contrast = 0.0f;
         float brightness = 0.0f;
+        float contrast = 0.6f;
 
         bool showShadows = true;
         float shadowBiasMin = 0.0009f;
