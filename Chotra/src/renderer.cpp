@@ -204,7 +204,7 @@ namespace Chotra {
     }
 
     void Renderer::DrawDebuggingQuads() {
-
+        /*
         //Draw debugging quads
         screenDivideShader.Use();
         glActiveTexture(GL_TEXTURE0);
@@ -213,7 +213,7 @@ namespace Chotra {
         
         glBindTexture(GL_TEXTURE_2D, lScreenTexture.GetId());
         quads[2]->RenderQuad();
-        /*
+        
           glBindTexture(GL_TEXTURE_2D, lDiffuse.GetId());
           quads[3]->RenderQuad();
 
@@ -1041,7 +1041,7 @@ namespace Chotra {
         }
 
         shaderDeferredPreLightingPass.SetVec3("sunPosition", scene->sceneSuns[0]->position);
-        shaderDeferredPreLightingPass.SetVec3("sunColor", scene->sceneSuns[0]->color);
+        shaderDeferredPreLightingPass.SetVec3("sunColor", scene->sceneSuns[0]->color * (float)scene->sceneSuns[0]->brightness);
         shaderDeferredPreLightingPass.SetVec3("camPos", camera->Position);
         shaderDeferredPreLightingPass.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         shaderDeferredPreLightingPass.SetFloat("shadowBiasMin", shadowBiasMin);

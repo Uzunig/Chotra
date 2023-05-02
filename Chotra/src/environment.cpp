@@ -132,7 +132,7 @@ namespace Chotra {
 
 
         sunShader.Use();
-        sunShader.SetVec3("lightColor", sun->color * (float)sun->brightness);
+        sunShader.SetVec3("lightColor", sun->color * (float)(sun->brightness * 100.0));
         sunShader.SetMat4("model", sun->modelMatrix);
 
         // PBR: применяем симуляцию квази Монте-Карло для освещения окружающей среды, чтобы создать префильтрованную (кубическую)карту
