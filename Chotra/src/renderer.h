@@ -77,6 +77,8 @@ namespace Chotra {
         float exposure = 1.0f;
         float backgroundExposure = 2.0f;
         bool gammaCorrection = true;
+        float contrast = 0.0f;
+        float brightness = 0.0f;
 
         bool showShadows = true;
         float shadowBiasMin = 0.0009f;

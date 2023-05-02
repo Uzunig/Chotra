@@ -38,6 +38,6 @@ void main()
     //vec3 color1 = mix(color, preColor, dist);
     vec3 result = mix(preColor, color, reflectedUv.a);
     //vec3 result = color;
-
+    
     FragColor = vec4(result, 1.0);
 }

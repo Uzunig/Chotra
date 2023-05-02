@@ -190,6 +190,8 @@ namespace Chotra {
 
         if (ImGui::CollapsingHeader("Post effects")) {
             ImGui::SliderFloat("Exposure", &p_mainWindow->renderer->exposure, 0.0f, 10.0f);
+            ImGui::SliderFloat("Brightness", &p_mainWindow->renderer->brightness, -3.0f, 3.0f);
+            ImGui::SliderFloat("Contrast", &p_mainWindow->renderer->contrast, -3.0f, 3.0f);
             ImGui::Checkbox("Bloom", &p_mainWindow->renderer->bloom);
             ImGui::Checkbox("Gamma correction", &p_mainWindow->renderer->gammaCorrection);
         }

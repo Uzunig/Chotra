@@ -1119,6 +1119,8 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
         shaderRenderOnScreen.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
+        shaderRenderOnScreen.SetFloat("contrast", contrast);
+        shaderRenderOnScreen.SetFloat("brightness", brightness);
 
         glViewport(0, 0, width, height);
 
