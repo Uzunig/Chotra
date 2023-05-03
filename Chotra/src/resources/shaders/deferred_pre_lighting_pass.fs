@@ -196,7 +196,7 @@ void main()
 
 
 
-    for(int i = 0; i < 1; ++i) 
+    for(int i = 0; i < 4; ++i) 
     {
         // Вычисляем энергетическую яркость каждого источника света
         vec3 L = normalize(lightPositions[i] - WorldPos);

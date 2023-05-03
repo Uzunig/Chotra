@@ -26,19 +26,15 @@ namespace Chotra {
     void Scene::AddSceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
         glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible, float brightness) {
 
-        SceneObject sObj = SceneObject(geometryIndex, materialIndex, name, position, angle, // TO DO: materials 
-            scale, velocity, rVelocity, visible, brightness);
-
-        sceneObjects.push_back(sObj);
+        sceneObjects.push_back(std::make_shared<SceneObject>(geometryIndex, materialIndex, name, position, angle, // TO DO: materials 
+            scale, velocity, rVelocity, visible, brightness));
     }
 
     void Scene::AddSceneLight(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
-        int visible, float brightness, glm::vec3 color, float intensity) {
+        bool visible, float brightness, glm::vec3 color, float intensity) {
 
-        SceneLight sLight = SceneLight(geometryIndex, materialIndex, name, position, angle,
-            scale, velocity, rVelocity, visible, brightness, color, intensity);
-
-        sceneLights.push_back(sLight);
+        sceneLights.push_back(std::make_shared<SceneLight>(geometryIndex, materialIndex, name, position, angle,
+            scale, velocity, rVelocity, visible, brightness, color, intensity));
     }
 
     void Scene::AddSceneSun(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
@@ -56,19 +52,19 @@ namespace Chotra {
         }*/
 
         for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
-            if (sceneObjects[i].visible) {
-                sceneObjects[i].position += sceneObjects[i].velocity * dt;
-                sceneObjects[i].angle += sceneObjects[i].rVelocity * dt;
-                sceneObjects[i].UpdateModelMatrix();
+            if (sceneObjects[i]->visible) {
+                sceneObjects[i]->position += sceneObjects[i]->velocity * dt;
+                sceneObjects[i]->angle += sceneObjects[i]->rVelocity * dt;
+                sceneObjects[i]->UpdateModelMatrix();
             }
         }
 
 
         for (unsigned int i = 0; i < sceneLights.size(); ++i) {
-            if (sceneLights[i].visible) {
-                sceneLights[i].position += sceneLights[i].velocity * dt;
-                sceneLights[i].angle += sceneLights[i].rVelocity * dt;
-                sceneLights[i].UpdateModelMatrix();
+            if (sceneLights[i]->visible) {
+                sceneLights[i]->position += sceneLights[i]->velocity * dt;
+                sceneLights[i]->angle += sceneLights[i]->rVelocity * dt;
+                sceneLights[i]->UpdateModelMatrix();
             }
         }
 
@@ -77,8 +73,8 @@ namespace Chotra {
     void Scene::DrawSceneObjects(Shader& shader) {
         glCullFace(GL_BACK);
         for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
-            if (sceneObjects[i].visible) {
-                sceneObjects[i].Draw(shader);
+            if (sceneObjects[i]->visible) {
+                sceneObjects[i]->Draw(shader);
             }
         }
     }
@@ -86,10 +82,10 @@ namespace Chotra {
     void Scene::DrawSceneLights(Shader& shader) {
 
         for (unsigned int i = 0; i < sceneLights.size(); ++i) {
-            if (sceneLights[i].visible) {
+            if (sceneLights[i]->visible) {
                 shader.Use();
-                shader.SetVec3("lightsColor", sceneLights[i].color * sceneLights[i].intensity);
-                sceneLights[i].Draw(shader);
+                shader.SetVec3("lightsColor", sceneLights[i]->color * sceneLights[i]->intensity);
+                sceneLights[i]->Draw(shader);
             }
         }
 

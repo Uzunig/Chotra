@@ -333,8 +333,8 @@ namespace Chotra {
 
         for (unsigned int i = 0; i < scene->sceneLights.size(); ++i) {
             pbrShader.Use();
-            pbrShader.SetVec3("lightPositions[" + std::to_string(i) + "]", scene->sceneLights[i].position);
-            pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i].color * (float)scene->sceneLights[i].brightness);
+            pbrShader.SetVec3("lightPositions[" + std::to_string(i) + "]", scene->sceneLights[i]->position);
+            pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i]->color * (float)scene->sceneLights[i]->brightness);
         }
 
         scene->DrawSceneObjects(pbrShader);
@@ -401,8 +401,8 @@ namespace Chotra {
 
         for (unsigned int i = 0; i < scene->sceneLights.size(); ++i) {
             pbrShader.Use();
-            pbrShader.SetVec3("lightPositions[" + std::to_string(i) + "]", scene->sceneLights[i].position);
-            pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i].color * (float)scene->sceneLights[i].brightness);
+            pbrShader.SetVec3("lightPositions[" + std::to_string(i) + "]", scene->sceneLights[i]->position);
+            pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i]->color * (float)scene->sceneLights[i]->brightness);
         }
 
         scene->DrawSceneObjects(pbrShader);
@@ -1036,8 +1036,8 @@ namespace Chotra {
 
         for (unsigned int i = 0; i < scene->sceneLights.size(); ++i) {
             shaderDeferredPreLightingPass.Use();
-            shaderDeferredPreLightingPass.SetVec3("lightPositions[" + std::to_string(i) + "]", scene->sceneLights[i].position);
-            shaderDeferredPreLightingPass.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i].color * scene->sceneLights[i].intensity);
+            shaderDeferredPreLightingPass.SetVec3("lightPositions[" + std::to_string(i) + "]", scene->sceneLights[i]->position);
+            shaderDeferredPreLightingPass.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i]->color * scene->sceneLights[i]->intensity);
         }
 
         shaderDeferredPreLightingPass.SetVec3("sunPosition", scene->sceneSuns[0]->position);

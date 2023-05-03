@@ -6,10 +6,13 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 
 #include <string>
+#include <memory>
 
 namespace Chotra {
 
     class Window;
+    class SceneObject;
+    class SceneLight;
    
     class Gui {
     public:
@@ -67,9 +70,10 @@ namespace Chotra {
         void AddGeometry();
         void AddMaterial();
         void AddSceneObject();
+        void AddSceneLight();
 
-        void ChangeGeometryIndexModal(int sceneObjectIndex);
-        void ChangeMaterialIndexModal(int sceneObjectIndex);
+        void ChangeGeometryIndexModal(std::shared_ptr<SceneObject> sceneObject);
+        void ChangeMaterialIndexModal(std::shared_ptr<SceneObject> sceneObject);
         void ChangeComponentsIndexModal(int MaterialIndex, std::string componentsName);
 
         std::string PathToRelative(std::string);
