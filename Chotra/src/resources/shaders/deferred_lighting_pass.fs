@@ -29,7 +29,7 @@ void main()
     const float MAX_REFLECTION_LOD = 7.0;
     float dist = clamp(distance(reflectedUv.xy, TexCoords.xy), 0.0, 1.0);
     //vec3 reflectedColor = texture(lScreenTexture, reflectedUv.xy).rgb;
-    vec3 reflectedColor = textureLod(lScreenTexture, vec2(reflectedUv.x, reflectedUv.y), roughness * MAX_REFLECTION_LOD).rgb;
+    vec3 reflectedColor = textureLod(lScreenTexture, vec2(reflectedUv.x, reflectedUv.y), 0).rgb;
 
     vec3 specular = reflectedColor * (F * brdf.x + brdf.y);
     vec3 ambient = (kD * diffuse + specular) * ao;

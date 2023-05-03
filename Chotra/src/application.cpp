@@ -46,7 +46,7 @@ namespace Chotra {
                 //std::cout << "Key pressed:  " << (char)event.key << std::endl;
 
                 if (event.key == GLFW_KEY_ESCAPE) {
-                    closeMainWindow = true;
+                    //closeMainWindow = true;
                 }
 
                 if (mainWindow->GetPlayerMode()) {

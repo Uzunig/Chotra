@@ -24,6 +24,8 @@ uniform float shadowBiasMin;
 uniform float shadowBiasMax;
 uniform float shadowOpacity;
 
+uniform float brightness;
+
 
 // Освещение
 uniform vec3 lightPositions[7];
@@ -143,6 +145,7 @@ void main()
 {		
     // Свойства материала
     vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(2.2)); //pow 2.2, inverse gamma, if it needs
+    albedo *= brightness;
     float metallic = texture(metallicMap, TexCoords).r;
     float roughness = texture(roughnessMap, TexCoords).r;
     float ao = texture(aoMap, TexCoords).r;

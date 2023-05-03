@@ -92,7 +92,10 @@ namespace Chotra {
 
     void Renderer::Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
 
-        if (!passiveMode) {
+        //if (!passiveMode) {
+            
+                shadowMap.GenerateShadowMap(scene);
+            
             if (renderingMode == 0) {
                 ForwardRender(scene, camera);
 
@@ -101,10 +104,9 @@ namespace Chotra {
                 DeferredRender(scene, camera);
 
             }
-        }
-        else {
+        /* } else {
             PassiveRender();
-        }
+        }*/
     }
 
     void Renderer::MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera, ScreenTexture& iconTexture) {
@@ -158,9 +160,7 @@ namespace Chotra {
     }
 
     void Renderer::ForwardRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
-
-        shadowMap.GenerateShadowMap(scene);
-
+                
         if (enableMSAA) {
             glViewport(0, 0, width, height);
             RenderWithMSAA(scene, camera);
@@ -177,7 +177,6 @@ namespace Chotra {
 
     void Renderer::DeferredRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
 
-        shadowMap.GenerateShadowMap(scene);
         RenderGeometryPass(scene, camera);
 
         GenerateSSAOMap();
@@ -868,7 +867,7 @@ namespace Chotra {
         // Albedo map
         glGenTextures(1, &gAlbedoMap);
         glBindTexture(GL_TEXTURE_2D, gAlbedoMap);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, gAlbedoMap, 0);
@@ -876,7 +875,7 @@ namespace Chotra {
         // Metallic
         glGenTextures(1, &gMetalRoughAoMap);
         glBindTexture(GL_TEXTURE_2D, gMetalRoughAoMap);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, gMetalRoughAoMap, 0);
@@ -919,6 +918,7 @@ namespace Chotra {
         shaderDeferredGeometryPass.SetMat4("view", view);
 
         scene->DrawSceneObjects(shaderDeferredGeometryPass);
+        scene->DrawSceneLights(shaderDeferredGeometryPass);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -1037,11 +1037,11 @@ namespace Chotra {
         for (unsigned int i = 0; i < scene->sceneLights.size(); ++i) {
             shaderDeferredPreLightingPass.Use();
             shaderDeferredPreLightingPass.SetVec3("lightPositions[" + std::to_string(i) + "]", scene->sceneLights[i].position);
-            shaderDeferredPreLightingPass.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i].color * (float)scene->sceneLights[i].brightness);
+            shaderDeferredPreLightingPass.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i].color * scene->sceneLights[i].intensity);
         }
 
         shaderDeferredPreLightingPass.SetVec3("sunPosition", scene->sceneSuns[0]->position);
-        shaderDeferredPreLightingPass.SetVec3("sunColor", scene->sceneSuns[0]->color * (float)scene->sceneSuns[0]->brightness);
+        shaderDeferredPreLightingPass.SetVec3("sunColor", scene->sceneSuns[0]->color * scene->sceneSuns[0]->intensity);
         shaderDeferredPreLightingPass.SetVec3("camPos", camera->Position);
         shaderDeferredPreLightingPass.SetMat4("lightSpaceMatrix", shadowMap.GetLightSpaceMatrix());
         shaderDeferredPreLightingPass.SetFloat("shadowBiasMin", shadowBiasMin);

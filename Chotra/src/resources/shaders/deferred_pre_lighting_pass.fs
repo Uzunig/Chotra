@@ -142,7 +142,7 @@ void main()
     vec3 V = normalize(camPos - WorldPos);
     vec3 R = reflect(-V, N); 
 
-    vec3 albedo = pow(texture(gAlbedoMap, TexCoords).rgb, vec3(2.2)); //pow 2.2, inverse gamma, if it needs
+    vec3 albedo = texture(gAlbedoMap, TexCoords).rgb;
     float metallic = texture(gMetalRoughAoMap, TexCoords).r;
     float roughness = texture(gMetalRoughAoMap, TexCoords).g;
     float ao = texture(gMetalRoughAoMap, TexCoords).b;
@@ -196,7 +196,7 @@ void main()
 
 
 
-    for(int i = 0; i < 0; ++i) 
+    for(int i = 0; i < 1; ++i) 
     {
         // Вычисляем энергетическую яркость каждого источника света
         vec3 L = normalize(lightPositions[i] - WorldPos);
@@ -254,13 +254,7 @@ void main()
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
     vec3 ambient = (kD * diffuse + specular) * ao * ssao; 
-    
-    
 
-    // Shadow calculation from Sun
-//    vec4  FragPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0); // TO DO: Вычислять снаружи 
-  //  float shadow = ShadowCalculation(sunPosition, FragPosLightSpace);  
- 
     vec3 color = ambient + Lo;
         
     lFresnelSchlickRoughness = F;

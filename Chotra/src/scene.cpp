@@ -24,32 +24,36 @@ namespace Chotra {
     }
 
     void Scene::AddSceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
-        glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible) {
+        glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible, float brightness) {
 
         SceneObject sObj = SceneObject(geometryIndex, materialIndex, name, position, angle, // TO DO: materials 
-            scale, velocity, rVelocity, visible);
+            scale, velocity, rVelocity, visible, brightness);
 
         sceneObjects.push_back(sObj);
     }
 
     void Scene::AddSceneLight(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
-        int visible, glm::vec3 color, int brightness) {
+        int visible, float brightness, glm::vec3 color, float intensity) {
 
         SceneLight sLight = SceneLight(geometryIndex, materialIndex, name, position, angle,
-            scale, velocity, rVelocity, visible, color, brightness);
+            scale, velocity, rVelocity, visible, brightness, color, intensity);
 
         sceneLights.push_back(sLight);
     }
 
     void Scene::AddSceneSun(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
-        int visible, glm::vec3 color, int brightness) {
+        int visible, float brightness, glm::vec3 color, float intensity) {
 
         sceneSuns.push_back(std::make_shared<SceneLight>(geometryIndex, materialIndex, name, position, angle,
-            scale, velocity, rVelocity, visible, color, brightness));
+            scale, velocity, rVelocity, visible, brightness, color, intensity));
     }
 
     void Scene::Update(float deltaTime) {
         float dt = deltaTime * 50.0f;
+        /*
+        for (unsigned int i = 1; i < sceneObjects.size(); ++i) {
+            sceneObjects[i].position.y += 0.005 * sin(glfwGetTime());
+        }*/
 
         for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
             if (sceneObjects[i].visible) {
@@ -84,7 +88,7 @@ namespace Chotra {
         for (unsigned int i = 0; i < sceneLights.size(); ++i) {
             if (sceneLights[i].visible) {
                 shader.Use();
-                shader.SetVec3("lightsColor", sceneLights[i].color * (float)sceneLights[i].brightness);
+                shader.SetVec3("lightsColor", sceneLights[i].color * sceneLights[i].intensity);
                 sceneLights[i].Draw(shader);
             }
         }
@@ -145,9 +149,12 @@ namespace Chotra {
                     int visible;
                     level_file >> visible;
 
+                    float brightness;
+                    level_file >> brightness;
+
                     if (meshType == "OBJModel") {
                         AddSceneObject(geometryIndex, materialIndex, name, position, angle, // TO DO: materials 
-                            scale, velocity, rVelocity, visible);
+                            scale, velocity, rVelocity, visible, brightness);
                     }
 
                 }
@@ -182,15 +189,18 @@ namespace Chotra {
                     int visible;
                     level_file >> visible;
 
+                    float brightness;
+                    level_file >> brightness;
+
                     glm::vec3 color;
                     level_file >> color.x >> color.y >> color.z;
 
-                    int intensity;
+                    float intensity;
                     level_file >> intensity;
-
+                                        
                     if (meshType == "OBJModel") {
                         AddSceneLight(geometryIndex, materialIndex, name, position, angle,
-                            scale, velocity, rVelocity, visible, color, intensity);
+                            scale, velocity, rVelocity, visible, brightness, color, intensity);
                     }
 
                 }
@@ -225,15 +235,18 @@ namespace Chotra {
                     int visible;
                     level_file >> visible;
 
+                    float brightness;
+                    level_file >> brightness;
+
                     glm::vec3 color;
                     level_file >> color.x >> color.y >> color.z;
 
-                    int intensity;
+                    float intensity;
                     level_file >> intensity;
-
+                                                            
                     if (meshType == "OBJModel") {
                         AddSceneSun(geometryIndex, materialIndex, name, position, angle,
-                            scale, velocity, rVelocity, visible, color, intensity);
+                            scale, velocity, rVelocity, visible, brightness, color, intensity);
                     }
 
                 } else if (s == "Environment") {

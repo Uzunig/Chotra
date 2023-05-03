@@ -38,11 +38,11 @@ namespace Chotra {
         
         void LoadSceneFromFile(std::string const& path);
         void AddEnvironment(std::string path);
-        void AddSceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position = glm::vec3(0.0f), glm::vec3 angle = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 rVelocity = glm::vec3(0.0f), bool visible = true);
+        void AddSceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position = glm::vec3(0.0f), glm::vec3 angle = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 rVelocity = glm::vec3(0.0f), bool visible = true, float brightness = 1.0);
         void AddSceneLight(unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
-                           int visible, glm::vec3 color, int brightness);
+                           int visible, float brightness, glm::vec3 color, float intensity);
         void AddSceneSun(unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
-            int visible, glm::vec3 color, int brightness);
+            int visible, float brightness, glm::vec3 color, float intensity);
                
         void Update(float dt);
         void DrawSceneObjects(Shader& shader);
