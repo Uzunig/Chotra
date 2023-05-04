@@ -42,7 +42,8 @@ namespace Chotra {
 
         Shader pbrShader;
         //Shader lightsShader;
-                
+        Shader screenShader;
+
         Shader screenDivideShader;
         Shader downSamplingShader;
         Shader combineShader;
@@ -112,6 +113,7 @@ namespace Chotra {
 
         // Framebuffer without MSAA
         unsigned int framebufferPreLighting;
+        unsigned int framebufferPreLightingMip;
         unsigned int rboPreLighting;
         ScreenTexture lScreenTexture;
         ScreenTexture lFresnelSchlickRoughness;

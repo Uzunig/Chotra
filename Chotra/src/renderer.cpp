@@ -23,6 +23,7 @@ namespace Chotra {
         lLo(width, height, GL_RGB16F, GL_RGB),
         lRoughAo(width, height, GL_RGB, GL_RGB),
         pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
+        screenShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_shader.fs"),
         screenDivideShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_divide_shader.fs"),
         downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/downsampling.fs"),
         combineShader("resources/shaders/screen_shader.vs", "resources/shaders/combine.fs"),
@@ -929,12 +930,9 @@ namespace Chotra {
         glGenFramebuffers(1, &framebufferPreLighting);
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferPreLighting);
 
-        glBindTexture(GL_TEXTURE_2D, lScreenTexture.GetId());
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lScreenTexture.GetId(), 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
+        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture.GetId(), 0);
+        
         glBindTexture(GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId());
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId(), 0);
 
@@ -972,6 +970,19 @@ namespace Chotra {
             std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        glGenFramebuffers(1, &framebufferPreLightingMip);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPreLightingMip);
+
+        glBindTexture(GL_TEXTURE_2D, lScreenTexture.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lScreenTexture.GetId(), 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
         // Конфигурация шейдеров
         shaderDeferredPreLightingPass.Use();
@@ -985,6 +996,9 @@ namespace Chotra {
         shaderDeferredPreLightingPass.SetInt("brdfLUT", 6);
         shaderDeferredPreLightingPass.SetInt("shadowMap", 7);
         shaderDeferredPreLightingPass.SetInt("ssaoMap", 8);
+
+        screenShader.Use();
+        screenShader.SetInt("screenTexture", 0);
 
     }
 
@@ -1074,6 +1088,32 @@ namespace Chotra {
             backgroundShader.SetFloat("exposure", backgroundExposure);
             scene->environment->Draw();
         }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPreLightingMip);
+
+        unsigned int maxMipLevels = 8;
+        screenShader.Use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
+
+        for (unsigned int mip = 0; mip < maxMipLevels; ++mip) {
+            // Изменяем размеры фреймбуфера в соответствии с размерами мипмап-карты
+            unsigned int mipWidth = width * std::pow(0.5, mip);
+            unsigned int mipHeight = height * std::pow(0.5, mip);
+
+            glViewport(0, 0, mipWidth, mipHeight);
+
+            for (unsigned int i = 0; i < 6; ++i) {
+                
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lScreenTexture.GetId(), mip);
+
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                
+                // Рендерим прямоугольник
+                quads[0]->RenderQuad();
+            }
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     void Renderer::RenderLightingPass() {
