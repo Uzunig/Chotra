@@ -673,11 +673,11 @@ namespace Chotra {
 
         ImGui::SetNextWindowPos(ImVec2(p_mainWindow->GetWidth() - 350, 950));
         ImGui::SetNextWindowSize(ImVec2(350, p_mainWindow->GetHeight() - 950));
-
+        
         ImGui::Begin("Score");
 
-        ImGui::Text(("fps = " + std::to_string(p_mainWindow->fps)).c_str());
-
+        //ImGui::Text(("fps = " + std::to_string(p_mainWindow->fps)).c_str());
+        
         ImGui::End();
     }
 

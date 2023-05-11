@@ -15,7 +15,6 @@ namespace Chotra {
     Renderer::Renderer(unsigned int& width, unsigned int& height)
         : width(width), height(height), //camera(camera), scene(scene),
         screenTexture(width, height, GL_RGBA16F, GL_RGBA),
-        ssrUvMapMip(width, height, GL_RGBA16F, GL_RGBA),
         lScreenTexture(width, height, GL_RGBA16F, GL_RGBA),
         lFresnelSchlickRoughness(width, height, GL_RGB16F, GL_RGB),
         lDiffuse(width, height, GL_RGB16F, GL_RGB),
@@ -24,7 +23,6 @@ namespace Chotra {
         lLo(width, height, GL_RGB16F, GL_RGB),
         lRoughAo(width, height, GL_RGB, GL_RGB),
         pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
-        screenShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_shader.fs"),
         screenDivideShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_divide_shader.fs"),
         downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/downsampling.fs"),
         combineShader("resources/shaders/screen_shader.vs", "resources/shaders/combine.fs"),
@@ -205,7 +203,7 @@ namespace Chotra {
     }
 
     void Renderer::DrawDebuggingQuads() {
-        
+        /*
         //Draw debugging quads
         screenDivideShader.Use();
         glActiveTexture(GL_TEXTURE0);
@@ -217,7 +215,7 @@ namespace Chotra {
 
           glBindTexture(GL_TEXTURE_2D, ssrUvMapMip.GetId());
           quads[3]->RenderQuad();
-          /*
+          
           glBindTexture(GL_TEXTURE_2D, lkD.GetId());
           quads[4]->RenderQuad();
 
@@ -745,28 +743,12 @@ namespace Chotra {
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        glGenFramebuffers(1, &ssrFBOMip);
-        glBindFramebuffer(GL_FRAMEBUFFER, ssrFBOMip);
-
-        glBindTexture(GL_TEXTURE_2D, ssrUvMapMip.GetId());
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssrUvMapMip.GetId(), 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glGenerateMipmap(GL_TEXTURE_2D);
-                
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+       
         shaderSSR.Use();
         shaderSSR.SetInt("gViewPosition", 0);
         shaderSSR.SetInt("gViewNormal", 1);
         shaderSSR.SetInt("previousMap", 2);
-
-        screenShader.Use();
-        screenShader.SetInt("screenTexture", 0);
-
+                
     }
 
 
@@ -795,30 +777,7 @@ namespace Chotra {
 
         quads[0]->RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, ssrFBOMip);
-
-        unsigned int maxMipLevels = 1;
-        screenShader.Use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, ssrUvMap);
-
-        for (unsigned int mip = 0; mip < maxMipLevels; ++mip) {
-            // Изменяем размеры фреймбуфера в соответствии с размерами мипмап-карты
-            unsigned int mipWidth = width * std::pow(0.5, mip);
-            unsigned int mipHeight = height * std::pow(0.5, mip);
-
-            glViewport(0, 0, mipWidth, mipHeight);
-
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssrUvMapMip.GetId(), mip);
-
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            // Рендерим прямоугольник
-            quads[0]->RenderQuad();
-
-        }
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                
     }
 
 
@@ -1093,7 +1052,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, lRoughAo.GetId());
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, ssrUvMapMip.GetId());
+        glBindTexture(GL_TEXTURE_2D, ssrUvMap);
 
 
         glViewport(0, 0, width, height);

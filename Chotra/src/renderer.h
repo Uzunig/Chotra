@@ -42,7 +42,7 @@ namespace Chotra {
 
         Shader pbrShader;
         //Shader lightsShader;
-        Shader screenShader;
+        
 
         Shader screenDivideShader;
         Shader downSamplingShader;
@@ -150,10 +150,7 @@ namespace Chotra {
 
         unsigned int ssrFBO;
         unsigned int ssrUvMap;
-       
-        unsigned int ssrFBOMip;
-        ScreenTexture ssrUvMapMip;
-         
+                        
         unsigned int quadVAO = 0;
         unsigned int quadVBO;
 
