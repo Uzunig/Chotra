@@ -15,7 +15,8 @@ namespace Chotra {
     Renderer::Renderer(unsigned int& width, unsigned int& height)
         : width(width), height(height), //camera(camera), scene(scene),
         screenTexture(width, height, GL_RGBA16F, GL_RGBA),
-        lScreenTexture(width, height, GL_RGB16F, GL_RGB),
+        ssrUvMapMip(width, height, GL_RGBA16F, GL_RGBA),
+        lScreenTexture(width, height, GL_RGBA16F, GL_RGBA),
         lFresnelSchlickRoughness(width, height, GL_RGB16F, GL_RGB),
         lDiffuse(width, height, GL_RGB16F, GL_RGB),
         lkD(width, height, GL_RGB16F, GL_RGB),
@@ -94,24 +95,24 @@ namespace Chotra {
     void Renderer::Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
 
         //if (!passiveMode) {
-            
-                shadowMap.GenerateShadowMap(scene);
-            
-            if (renderingMode == 0) {
-                ForwardRender(scene, camera);
 
-            }
-            else if (renderingMode == 1) {
-                DeferredRender(scene, camera);
+        shadowMap.GenerateShadowMap(scene);
 
-            }
+        if (renderingMode == 0) {
+            ForwardRender(scene, camera);
+
+        }
+        else if (renderingMode == 1) {
+            DeferredRender(scene, camera);
+
+        }
         /* } else {
             PassiveRender();
         }*/
     }
 
     void Renderer::MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera, ScreenTexture& iconTexture) {
-         
+
         unsigned int width = this->width;
         unsigned int height = this->height;
 
@@ -122,7 +123,7 @@ namespace Chotra {
         this->drawSkybox = false;
 
         shadowMap.GenerateShadowMap(scene);
-                
+
         glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
 
         // Создаем цветовую прикрепляемую текстуру
@@ -152,7 +153,7 @@ namespace Chotra {
 
         this->width = width;
         this->height = height;
-        
+
     }
 
     void Renderer::PassiveRender() {
@@ -161,7 +162,7 @@ namespace Chotra {
     }
 
     void Renderer::ForwardRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
-                
+
         if (enableMSAA) {
             glViewport(0, 0, width, height);
             RenderWithMSAA(scene, camera);
@@ -204,19 +205,19 @@ namespace Chotra {
     }
 
     void Renderer::DrawDebuggingQuads() {
-        /*
+        
         //Draw debugging quads
         screenDivideShader.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, ssrUvMap);
-        quads[1]->RenderQuad();
-        
         glBindTexture(GL_TEXTURE_2D, lScreenTexture.GetId());
-        quads[2]->RenderQuad();
-        
-          glBindTexture(GL_TEXTURE_2D, lDiffuse.GetId());
-          quads[3]->RenderQuad();
+        quads[1]->RenderQuad();
 
+        glBindTexture(GL_TEXTURE_2D, ssrUvMap);
+        quads[2]->RenderQuad();
+
+          glBindTexture(GL_TEXTURE_2D, ssrUvMapMip.GetId());
+          quads[3]->RenderQuad();
+          /*
           glBindTexture(GL_TEXTURE_2D, lkD.GetId());
           quads[4]->RenderQuad();
 
@@ -727,8 +728,7 @@ namespace Chotra {
     void Renderer::ConfigureSSR() {
 
         glGenFramebuffers(1, &ssrFBO);
-        //glGenFramebuffers(1, &ssrBlurFBO);
-
+        
         glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
 
         glGenTextures(1, &ssrUvMap);
@@ -738,38 +738,35 @@ namespace Chotra {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssrUvMap, 0);
-
+                
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cout << "SSR Framebuffer not complete!" << std::endl;
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        /*
-        glBindFramebuffer(GL_FRAMEBUFFER, ssrBlurFBO);
 
-        glGenTextures(1, &ssrMap);
-        glBindTexture(GL_TEXTURE_2D, ssrMap);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glGenFramebuffers(1, &ssrFBOMip);
+        glBindFramebuffer(GL_FRAMEBUFFER, ssrFBOMip);
+
+        glBindTexture(GL_TEXTURE_2D, ssrUvMapMip.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssrUvMapMip.GetId(), 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glGenerateMipmap(GL_TEXTURE_2D);
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssrMap, 0);
-
+                
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "SSR Blur Framebuffer not complete!" << std::endl;
+            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        */
+
         shaderSSR.Use();
         shaderSSR.SetInt("gViewPosition", 0);
         shaderSSR.SetInt("gViewNormal", 1);
         shaderSSR.SetInt("previousMap", 2);
-        /*
-        shaderSSRBlur.Use();
-        shaderSSRBlur.SetInt("ssrInput", 0);
-        */
+
+        screenShader.Use();
+        screenShader.SetInt("screenTexture", 0);
+
     }
 
 
@@ -799,29 +796,29 @@ namespace Chotra {
         quads[0]->RenderQuad();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        /*
-        // Create mips for different roughneses
-        glBindFramebuffer(GL_FRAMEBUFFER, ssrBlurFBO);
-        unsigned int maxMipLevels = 8;
+        glBindFramebuffer(GL_FRAMEBUFFER, ssrFBOMip);
 
+        unsigned int maxMipLevels = 1;
+        screenShader.Use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, ssrUvMap);
 
         for (unsigned int mip = 0; mip < maxMipLevels; ++mip) {
+            // Изменяем размеры фреймбуфера в соответствии с размерами мипмап-карты
             unsigned int mipWidth = width * std::pow(0.5, mip);
             unsigned int mipHeight = height * std::pow(0.5, mip);
 
-            shaderSSRBlur.Use();
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, ssrColorBuffer);
-
             glViewport(0, 0, mipWidth, mipHeight);
 
-            glBindFramebuffer(GL_FRAMEBUFFER, ssrBlurFBO);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssrMap, mip);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssrUvMapMip.GetId(), mip);
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            // Рендерим прямоугольник
             quads[0]->RenderQuad();
+
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        */
     }
 
 
@@ -930,9 +927,9 @@ namespace Chotra {
         glGenFramebuffers(1, &framebufferPreLighting);
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferPreLighting);
 
-        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture.GetId(), 0);
-        
+        glBindTexture(GL_TEXTURE_2D, lScreenTexture.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lScreenTexture.GetId(), 0);
+
         glBindTexture(GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId());
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, lFresnelSchlickRoughness.GetId(), 0);
 
@@ -969,21 +966,7 @@ namespace Chotra {
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        glGenFramebuffers(1, &framebufferPreLightingMip);
-        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPreLightingMip);
-
-        glBindTexture(GL_TEXTURE_2D, lScreenTexture.GetId());
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lScreenTexture.GetId(), 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
+                
         // Конфигурация шейдеров
         shaderDeferredPreLightingPass.Use();
         shaderDeferredPreLightingPass.SetInt("gPosition", 0);
@@ -996,10 +979,7 @@ namespace Chotra {
         shaderDeferredPreLightingPass.SetInt("brdfLUT", 6);
         shaderDeferredPreLightingPass.SetInt("shadowMap", 7);
         shaderDeferredPreLightingPass.SetInt("ssaoMap", 8);
-
-        screenShader.Use();
-        screenShader.SetInt("screenTexture", 0);
-
+                
     }
 
     void Renderer::ConfigureLightingPass() {
@@ -1088,31 +1068,6 @@ namespace Chotra {
             backgroundShader.SetFloat("exposure", backgroundExposure);
             scene->environment->Draw();
         }
-
-        glBindFramebuffer(GL_FRAMEBUFFER, framebufferPreLightingMip);
-
-        unsigned int maxMipLevels = 8;
-        screenShader.Use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
-
-        for (unsigned int mip = 0; mip < maxMipLevels; ++mip) {
-            // Изменяем размеры фреймбуфера в соответствии с размерами мипмап-карты
-            unsigned int mipWidth = width * std::pow(0.5, mip);
-            unsigned int mipHeight = height * std::pow(0.5, mip);
-
-            glViewport(0, 0, mipWidth, mipHeight);
-
-            for (unsigned int i = 0; i < 6; ++i) {
-                
-                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lScreenTexture.GetId(), mip);
-
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                
-                // Рендерим прямоугольник
-                quads[0]->RenderQuad();
-            }
-        }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
@@ -1138,7 +1093,7 @@ namespace Chotra {
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, lRoughAo.GetId());
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, ssrUvMap);
+        glBindTexture(GL_TEXTURE_2D, ssrUvMapMip.GetId());
 
 
         glViewport(0, 0, width, height);
@@ -1147,6 +1102,7 @@ namespace Chotra {
         // Рендерим прямоугольник
         quads[0]->RenderQuad();
 
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
 

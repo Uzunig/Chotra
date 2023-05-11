@@ -5,8 +5,6 @@ in vec2 TexCoords;
 
 uniform sampler2D gViewPosition;
 uniform sampler2D gViewNormal;
-uniform sampler2D previousMap;
-
 uniform mat4 projection;
 uniform mat4 view;
 
@@ -137,10 +135,10 @@ vec4 SSR1(vec4 position, vec3 reflection)
 vec4 SSR2(vec4 position, vec3 reflection)
 {
     float resolution  = 1.0;
-    vec4 outColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+    vec4 outColor = vec4(0.0, 0.0, 0.0, 0.0);
     
     if (position.a != 2.0) {    // TO DO: to optimize!
-        return vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        return vec4(0.0, 0.0, 0.0, 0.0);
     }
         
     vec2 texSize  = textureSize(gViewPosition, 0).xy;
@@ -180,14 +178,14 @@ vec4 SSR2(vec4 position, vec3 reflection)
         vec4 currentFrag = texture(gViewPosition, marchingPositionUV.xy);
                 
         if (currentFrag.a != 2.0) {    // TO DO: to optimize!
-            return vec4(0.0f, 0.0f, 0.0f, 0.0f);
+            return vec4(0.0, 0.0, 0.0, 0.0);
         }
         
         float deltaZ = marchingPosition.z - currentFrag.z;
 
         if (abs(deltaZ) < accuracySSR) {
 			 
-            outColor = vec4(marchingPositionUV.xy, 0.0, 1.0);
+            outColor = vec4(marchingPositionUV.xy, length(marchingPosition - startPosition), 1.0);
             return outColor;
         }    
 

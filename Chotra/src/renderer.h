@@ -113,7 +113,6 @@ namespace Chotra {
 
         // Framebuffer without MSAA
         unsigned int framebufferPreLighting;
-        unsigned int framebufferPreLightingMip;
         unsigned int rboPreLighting;
         ScreenTexture lScreenTexture;
         ScreenTexture lFresnelSchlickRoughness;
@@ -150,9 +149,10 @@ namespace Chotra {
         std::vector<glm::vec3> ssaoKernel;
 
         unsigned int ssrFBO;
-        //unsigned int ssrBlurFBO;
         unsigned int ssrUvMap;
-       // unsigned int ssrMap;
+       
+        unsigned int ssrFBOMip;
+        ScreenTexture ssrUvMapMip;
          
         unsigned int quadVAO = 0;
         unsigned int quadVBO;
