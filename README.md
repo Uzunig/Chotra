@@ -7,9 +7,9 @@ C++, OpenGL, GLFW, GLM, Real-time rendering, Physically Based Rendering, Materia
 
 <p>Dear friends.</p>
 
-<p>Chotra Engien is the outcome of my favorite activity, that I can do in my free time.</p>
+<p>Chotra Engine is the outcome of my favorite activity, that I can do in my free time.</p>
 
-<p>I launched this project with the goal of improving my programming skills. Soon I was joined by a big fan of 3D graphic design and modeling of my eldest son Dmitry. In this way, the engine tries to display scenes created by my designer, as realistic as possible. Today we are trying to better understand the algorithms, improve programming skills and achieve better results.</p>
+<p>I launched this project with the goal of improving my programming skills. Soon I was joined by a big fan of 3D graphic design and modeling by my eldest son Dmitry. In this way, the engine tries to display scenes created by my designer, as realistic as possible. Today we are trying to better understand the algorithms, improve programming skills and achieve better results.</p>
 
 <p>We would like to meet professionals in this workspace and hope to receive feedbacks and guidances.</p>
 
