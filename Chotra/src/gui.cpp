@@ -684,7 +684,7 @@ namespace Chotra {
     void Gui::ShowAssetsBar() {
 
         ImGui::SetNextWindowPos(ImVec2(0, p_mainWindow->GetHeight() - 260));
-        ImGui::SetNextWindowSize(ImVec2(p_mainWindow->GetWidth() - 350, 180));
+        ImGui::SetNextWindowSize(ImVec2(p_mainWindow->GetWidth() - 350, 260));
 
         ImGui::Begin("Assets");
 
