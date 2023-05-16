@@ -1,3 +1,4 @@
+
 Сreate a base class Renderer that will be inherited by other classes (DeferredRender, ForwardRender). Create class RenderManager that will lead all rendering process.
 
 
