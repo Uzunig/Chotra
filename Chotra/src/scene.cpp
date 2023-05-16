@@ -5,77 +5,87 @@
 #include "environment.h"
 #include "shader.h"
 #include "resource_manager.h"
+#include "environment.h"
 
 namespace Chotra {
 
-    Scene::Scene()
-        : environment("resources/hdr/Sky.hdr") {
+    Scene::Scene(std::string path) {
 
-        LoadSceneFromFile("resources/level1.lv");
-
+        LoadSceneFromFile(path);
     }
 
     Scene::~Scene() {
 
     }
 
+    void Scene::AddEnvironment(std::string path) {
+
+        environment = std::make_shared<Environment>(path, sceneSuns[0]);
+    }
+
     void Scene::AddSceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
-        glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible) {
+        glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible, float brightness) {
 
-        SceneObject sObj = SceneObject(geometryIndex, materialIndex, name, position, angle, // TO DO: materials 
-            scale, velocity, rVelocity, visible);
-
-        sceneObjects.push_back(sObj);
+        sceneObjects.push_back(std::make_shared<SceneObject>(geometryIndex, materialIndex, name, position, angle, // TO DO: materials 
+            scale, velocity, rVelocity, visible, brightness));
     }
 
     void Scene::AddSceneLight(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
-        int visible, glm::vec3 color, int brightness) {
+        bool visible, float brightness, glm::vec3 color, float intensity) {
 
-        SceneLight sLight = SceneLight(geometryIndex, materialIndex, name, position, angle,
-            scale, velocity, rVelocity, visible, color, brightness);
+        sceneLights.push_back(std::make_shared<SceneLight>(geometryIndex, materialIndex, name, position, angle,
+            scale, velocity, rVelocity, visible, brightness, color, intensity));
+    }
 
-        sceneLights.push_back(sLight);
+    void Scene::AddSceneSun(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
+        int visible, float brightness, glm::vec3 color, float intensity) {
+
+        sceneSuns.push_back(std::make_shared<SceneLight>(geometryIndex, materialIndex, name, position, angle,
+            scale, velocity, rVelocity, visible, brightness, color, intensity));
     }
 
     void Scene::Update(float deltaTime) {
         float dt = deltaTime * 50.0f;
+        /*
+        for (unsigned int i = 1; i < sceneObjects.size(); ++i) {
+            sceneObjects[i].position.y += 0.005 * sin(glfwGetTime());
+        }*/
 
         for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
-            if (sceneObjects[i].visible) {
-                sceneObjects[i].position += sceneObjects[i].velocity * dt;
-                sceneObjects[i].angle += sceneObjects[i].rVelocity * dt;
-                sceneObjects[i].UpdateModelMatrix();
+            if (sceneObjects[i]->visible) {
+                sceneObjects[i]->position += sceneObjects[i]->velocity * dt;
+                sceneObjects[i]->angle += sceneObjects[i]->rVelocity * dt;
+                sceneObjects[i]->UpdateModelMatrix();
             }
         }
 
 
         for (unsigned int i = 0; i < sceneLights.size(); ++i) {
-            if (sceneLights[i].visible) {
-                sceneLights[i].position += sceneLights[i].velocity * dt;
-                sceneLights[i].angle += sceneLights[i].rVelocity * dt;
-                sceneLights[i].UpdateModelMatrix();
+            if (sceneLights[i]->visible) {
+                sceneLights[i]->position += sceneLights[i]->velocity * dt;
+                sceneLights[i]->angle += sceneLights[i]->rVelocity * dt;
+                sceneLights[i]->UpdateModelMatrix();
             }
         }
 
     }
 
     void Scene::DrawSceneObjects(Shader& shader) {
-
+        glCullFace(GL_BACK);
         for (unsigned int i = 0; i < sceneObjects.size(); ++i) {
-            if (sceneObjects[i].visible) {
-                sceneObjects[i].Draw(shader);
+            if (sceneObjects[i]->visible) {
+                sceneObjects[i]->Draw(shader);
             }
         }
-
     }
 
     void Scene::DrawSceneLights(Shader& shader) {
 
         for (unsigned int i = 0; i < sceneLights.size(); ++i) {
-            if (sceneLights[i].visible) {
+            if (sceneLights[i]->visible) {
                 shader.Use();
-                shader.SetVec3("lightsColor", sceneLights[i].color * (float)sceneLights[i].brightness);
-                sceneLights[i].Draw(shader);
+                shader.SetVec3("lightsColor", sceneLights[i]->color * sceneLights[i]->intensity);
+                sceneLights[i]->Draw(shader);
             }
         }
 
@@ -135,9 +145,12 @@ namespace Chotra {
                     int visible;
                     level_file >> visible;
 
+                    float brightness;
+                    level_file >> brightness;
+
                     if (meshType == "OBJModel") {
                         AddSceneObject(geometryIndex, materialIndex, name, position, angle, // TO DO: materials 
-                            scale, velocity, rVelocity, visible);
+                            scale, velocity, rVelocity, visible, brightness);
                     }
 
                 }
@@ -172,16 +185,71 @@ namespace Chotra {
                     int visible;
                     level_file >> visible;
 
+                    float brightness;
+                    level_file >> brightness;
+
                     glm::vec3 color;
                     level_file >> color.x >> color.y >> color.z;
 
-                    int intensity;
+                    float intensity;
                     level_file >> intensity;
-
+                                        
                     if (meshType == "OBJModel") {
                         AddSceneLight(geometryIndex, materialIndex, name, position, angle,
-                            scale, velocity, rVelocity, visible, color, intensity);
+                            scale, velocity, rVelocity, visible, brightness, color, intensity);
                     }
+
+                }
+                else if (s == "SceneSun") {
+                    std::string name;
+                    level_file >> name;
+
+                    std::string meshType;
+                    level_file >> meshType;
+
+                    unsigned int geometryIndex;
+                    level_file >> geometryIndex;
+
+                    unsigned int materialIndex;
+                    level_file >> materialIndex;
+
+                    glm::vec3 position;
+                    level_file >> position.x >> position.y >> position.z;
+
+                    glm::vec3 angle;
+                    level_file >> angle.x >> angle.y >> angle.z;
+
+                    glm::vec3 scale;
+                    level_file >> scale.x >> scale.y >> scale.z;
+
+                    glm::vec3 velocity;
+                    level_file >> velocity.x >> velocity.y >> velocity.z;
+
+                    glm::vec3 rVelocity;
+                    level_file >> rVelocity.x >> rVelocity.y >> rVelocity.z;
+
+                    int visible;
+                    level_file >> visible;
+
+                    float brightness;
+                    level_file >> brightness;
+
+                    glm::vec3 color;
+                    level_file >> color.x >> color.y >> color.z;
+
+                    float intensity;
+                    level_file >> intensity;
+                                                            
+                    if (meshType == "OBJModel") {
+                        AddSceneSun(geometryIndex, materialIndex, name, position, angle,
+                            scale, velocity, rVelocity, visible, brightness, color, intensity);
+                    }
+
+                } else if (s == "Environment") {
+                    std::string environment_path;
+                    level_file >> environment_path;
+                    AddEnvironment(environment_path);
+
                 }
             }
         }

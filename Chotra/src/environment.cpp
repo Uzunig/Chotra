@@ -2,32 +2,35 @@
 
 #include"stb_image.h"
 
-#include "shader.h"
+
+#include "resource_manager.h"
+#include "scene_light.h"
 
 namespace Chotra {
 
 
-    Environment::Environment(std::string hdri_path) {
+    Environment::Environment(std::string hdri_path, std::shared_ptr<SceneLight> sun) :
+        sunShader("resources/shaders/sun_shader.vs", "resources/shaders/sun_shader.fs"), sun(sun) {
 
         if (LoadHDRi(hdri_path)) {
-            
+
             SetFrameBuffer();
             GenTextures();
             SetCubeMap();
-            
+
             UpdateMaps();
-            
+
         }
 
     }
 
     void Environment::UpdateMaps() {
-                
+
+        SetSkybox();
         SetIrradianceMap();
         SetPrefilterMap();
         SetBrdfLUTTexture();
     }
-
 
     void Environment::SetFrameBuffer() {
 
@@ -41,8 +44,9 @@ namespace Chotra {
     }
 
     void Environment::GenTextures() {
-        
+
         glGenTextures(1, &envCubemap);
+        glGenTextures(1, &skybox);
         glGenTextures(1, &irradianceMap);
         glGenTextures(1, &prefilterMap);
         glGenTextures(1, &brdfLUTTexture);
@@ -94,24 +98,78 @@ namespace Chotra {
         equirectangularToCubemapShader.SetMat4("projection", captureSettings.captureProjection);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, hdrTexture);
-
+        
         glViewport(0, 0, envMapSize, envMapSize);
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         for (unsigned int i = 0; i < 6; ++i) {
-            equirectangularToCubemapShader.SetMat4("view", captureSettings.captureViews[i]);
+
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+            equirectangularToCubemapShader.Use();
+            equirectangularToCubemapShader.SetMat4("view", captureSettings.captureViews[i]);
             RenderCube();
+           
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+
+    void Environment::SetSkybox() {
+
+        // PBR: создаем префильтрованную кубическую карту, и приводим размеры захвата FBO к размерам префильтрованной карты
+        Shader skyboxShader("resources/shaders/cubemap.vs", "resources/shaders/skybox.fs");
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skybox);
+        for (unsigned int i = 0; i < 6; ++i)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, envMapSize, envMapSize, 0, GL_RGB, GL_FLOAT, nullptr);
+        }
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // убеждаемся, что фильтр уменьшения задан как mip_linear
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+        sunShader.Use();
+        sunShader.SetVec3("lightColor", sun->color * (float)(sun->brightness * 100.0));
+        sunShader.SetMat4("model", sun->modelMatrix);
+
+        // PBR: применяем симуляцию квази Монте-Карло для освещения окружающей среды, чтобы создать префильтрованную (кубическую)карту
+        skyboxShader.Use();
+        skyboxShader.SetInt("environmentMap", 0);
+        skyboxShader.SetMat4("projection", captureSettings.captureProjection);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+        glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, envMapSize, envMapSize);
+        glViewport(0, 0, envMapSize, envMapSize);
+
+        for (unsigned int i = 0; i < 6; ++i) {
+            skyboxShader.Use();
+            skyboxShader.SetMat4("view", captureSettings.captureViews[i]);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, skybox, 0);
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            RenderCube();
+
+            sunShader.Use();
+            sunShader.SetMat4("view", captureSettings.captureViews[i]);
+            sunShader.SetMat4("projection", captureSettings.captureProjection);
+            RenderSun();
+        }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
 
     void Environment::SetIrradianceMap() {
 
         // PBR: создаем кубическую карту облученности
         Shader irradianceShader("resources/shaders/cubemap.vs", "resources/shaders/irradiance_convolution.fs");
-                
+
         glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
 
         for (unsigned int i = 0; i < 6; ++i) {
@@ -176,7 +234,8 @@ namespace Chotra {
 
 
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
-        unsigned int maxMipLevels = 5;
+        unsigned int maxMipLevels = 8;
+
 
         for (unsigned int mip = 0; mip < maxMipLevels; ++mip) {
             // Изменяем размеры фреймбуфера в соответствии с размерами мипмап-карты
@@ -204,7 +263,7 @@ namespace Chotra {
 
         // PBR: генерируем 2D LUT-текстуру при помощи используемых уравнений BRDF
         Shader brdfShader("resources/shaders/screen_shader.vs", "resources/shaders/brdf.fs");
-                
+
         // Выделяем необходимое количество памяти для LUT-текстуры
         glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, envMapSize, envMapSize, 0, GL_RG, GL_FLOAT, 0);
@@ -332,7 +391,7 @@ namespace Chotra {
     void Environment::Draw() {
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skybox);
         //glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
         //glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
 
@@ -341,6 +400,19 @@ namespace Chotra {
         RenderCube();
         glCullFace(GL_BACK);
     }
+
+    void Environment::RenderSun() {
+
+        glDisable(GL_DEPTH_TEST);
+        // Отрисовываем меш
+        glBindVertexArray(ResourceManager::GetGeometryVAO(0));
+        glDrawArrays(GL_TRIANGLES, 0, ResourceManager::GetGeometryVerticesCount(0));
+        //glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
+        glBindVertexArray(0);
+        glEnable(GL_DEPTH_TEST);
+
+    }
+
 
 } // namspace Chotra
 

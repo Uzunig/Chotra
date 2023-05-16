@@ -1,17 +1,21 @@
 #version 330 core
-out vec4 FragColor;
+layout (location = 0) out vec3 lScreenTexture;
+layout (location = 1) out vec3 lFresnelSchlickRoughness;
+layout (location = 2) out vec3 lDiffuse;
+layout (location = 3) out vec3 lkD;
+layout (location = 4) out vec3 lBrdf;
+layout (location = 5) out vec3 lLo;
+layout (location = 6) out vec3 lRoughAo;
+
+
+//out vec4 FragColor;
+
 in vec2 TexCoords;
-in vec3 WorldPos;
-in vec3 Normal;
-in vec4 FragPosLightSpace;
 
-
-// Параметры материала
-uniform sampler2D albedoMap;
-uniform sampler2D normalMap;
-uniform sampler2D metallicMap;
-uniform sampler2D roughnessMap;
-uniform sampler2D aoMap;
+uniform sampler2D gPosition;
+uniform sampler2D gNormal;
+uniform sampler2D gAlbedoMap;
+uniform sampler2D gMetalRoughAoMap;
 
 // IBL
 uniform samplerCube irradianceMap;
@@ -22,36 +26,22 @@ uniform sampler2D brdfLUT;
 uniform sampler2D shadowMap;
 uniform float shadowBiasMin;
 uniform float shadowBiasMax;
+uniform mat4 lightSpaceMatrix;
 uniform float shadowOpacity;
 
-uniform float brightness;
-
+uniform sampler2D ssaoMap;
 
 // Освещение
 uniform vec3 lightPositions[7];
 uniform vec3 lightColors[7];
 
+uniform vec3 sunPosition;
+uniform vec3 sunColor;
+
 uniform vec3 camPos;
 
 const float PI = 3.14159265359;
 
-// Простой трюк, чтобы получить касательные нормали в мировом пространстве, чтобы упростить код PBR
-vec3 getNormalFromMap()
-{
-    vec3 tangentNormal = texture(normalMap, TexCoords).xyz * 2.0 - 1.0;
-
-    vec3 Q1  = dFdx(WorldPos);
-    vec3 Q2  = dFdy(WorldPos);
-    vec2 st1 = dFdx(TexCoords);
-    vec2 st2 = dFdy(TexCoords);
-
-    vec3 N   = normalize(Normal);
-    vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
-    vec3 B  = -normalize(cross(N, T));
-    mat3 TBN = mat3(T, B, N);
-
-    return normalize(TBN * tangentNormal);
-}
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
@@ -98,11 +88,12 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }   
 
-float ShadowCalculation(vec4 fragPosLightSpace)
+
+float ShadowCalculation(vec3 lightPosition, vec4 fragPosLightSpace)
 {
     // Выполняем деление перспективы
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-	
+      	
     // Трансформируем в диапазон [0,1]
     projCoords = projCoords * 0.5 + 0.5;
 	
@@ -113,8 +104,10 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     float currentDepth = projCoords.z;
 	
     // Вычисляем смещение (на основе разрешения карты глубины и наклона)
-    vec3 normal = normalize(Normal);
-    vec3 lightDir = normalize(lightPositions[0] - WorldPos);
+    vec3 normal = texture(gNormal, TexCoords).rgb;
+    vec3 WorldPos = texture(gPosition, TexCoords).rgb;
+
+    vec3 lightDir = normalize(lightPosition - WorldPos);
     float bias = max(shadowBiasMax * (1.0 - dot(normal, lightDir)), shadowBiasMin);
 	
     // Проверка нахождения текущего фрагмента в тени
@@ -142,18 +135,19 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 
 void main()
-{		
-    // Свойства материала
-    vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(2.2)); //pow 2.2, inverse gamma, if it needs
-    albedo *= brightness;
-    float metallic = texture(metallicMap, TexCoords).r;
-    float roughness = texture(roughnessMap, TexCoords).r;
-    float ao = texture(aoMap, TexCoords).r;
-    
-    // Входящие данные освещения
-    vec3 N = getNormalFromMap();
+{             
+    // Получаем данные из g-буффера
+    vec3 WorldPos = texture(gPosition, TexCoords).rgb;
+    vec3 N = texture(gNormal, TexCoords).rgb;
     vec3 V = normalize(camPos - WorldPos);
     vec3 R = reflect(-V, N); 
+
+    vec3 albedo = texture(gAlbedoMap, TexCoords).rgb;
+    float metallic = texture(gMetalRoughAoMap, TexCoords).r;
+    float roughness = texture(gMetalRoughAoMap, TexCoords).g;
+    float ao = texture(gMetalRoughAoMap, TexCoords).b;
+    float ssao = texture(ssaoMap, TexCoords).r;
+       
 
     // Вычисляем коэффициент отражения при перпендикулярном угле падения; в случае диэлектрика (например, пластик) - берем значение F0 равным 0.04,
 	// а если металл, то используем цвет альбедо (принцип металличности)    
@@ -162,8 +156,47 @@ void main()
 
     // Уравнение отражения
     vec3 Lo = vec3(0.0);
+    for(int i = 0; i < 1; ++i) 
+    {
+        // Вычисляем энергетическую яркость каждого Солнца
+        vec3 L = normalize(sunPosition * 1000.0 - WorldPos);
+        vec3 H = normalize(V + L);
+        
+        vec3 radiance = sunColor;
 
-    for(int i = 0; i < 0; ++i) 
+        // BRDF Кука-Торренса
+        float NDF = DistributionGGX(N, H, roughness);   
+        float G = GeometrySmith(N, V, L, roughness);    
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);        
+        
+        vec3 nominator = NDF * G * F;
+        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // 0.001 to prevent divide by zero.
+        vec3 specular = nominator / denominator;
+        
+         // kS эквивалентно коэффициенту Френеля
+        vec3 kS = F;
+		
+        // Чтобы выполнялся закон сохранения энергии, сумма энергий диффузной и отраженной составляющих света не может быть больше 1.0 
+		// (кроме тех случаев, когда сама поверхность имеет возможность излучать свет); 
+		// для выполнения данного соотношения диффузная составляющая (kD) должна равняться значению 1.0 - kS
+        vec3 kD = vec3(1.0) - kS;
+		
+        kD *= 1.0 - metallic;	                
+            
+        // Масштабируем освещенность при помощи NdotL
+        float NdotL = max(dot(N, L), 0.0);        
+
+	  // Вычисляем тень 
+        vec4  FragPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0); // TO DO: Вычислять снаружи 
+        float shadow = ShadowCalculation(sunPosition, FragPosLightSpace);  
+        
+        // Добавляем к исходящей энергитической яркости Lo
+        Lo += ((kD * albedo / PI + specular) * radiance * NdotL) * (1.0 - shadow); // обратите внимание, что мы уже умножали BRDF на коэффициент Френеля(kS), поэтому нам не нужно снова умножать на kS
+    }   
+
+
+
+    for(int i = 0; i < 4; ++i) 
     {
         // Вычисляем энергетическую яркость каждого источника света
         vec3 L = normalize(lightPositions[i] - WorldPos);
@@ -194,13 +227,14 @@ void main()
         // Масштабируем освещенность при помощи NdotL
         float NdotL = max(dot(N, L), 0.0);        
 
-	  // Вычисляем тень от каждого источника света кромк Солнца
-        float shadow = ShadowCalculation(FragPosLightSpace);  
-
+	  // Вычисляем тень 
+        vec4  FragPosLightSpace = lightSpaceMatrix * vec4(WorldPos, 1.0); // TO DO: Вычислять снаружи 
+        float shadow = ShadowCalculation(lightPositions[0], FragPosLightSpace);  
+        
         // Добавляем к исходящей энергитической яркости Lo
         Lo += ((kD * albedo / PI + specular) * radiance * NdotL) * (1.0 - shadow); // обратите внимание, что мы уже умножали BRDF на коэффициент Френеля(kS), поэтому нам не нужно снова умножать на kS
     }   
-   
+
     // Фоновая составляющая освещения (теперь мы используем IBL)
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
     
@@ -212,23 +246,23 @@ void main()
     vec3 diffuse = irradiance * albedo;
     
     // Производим выборки из префильтрованной карты LUT-текстуры BRDF и затем объединяем их вместе в соответствии с аппроксимацией разделенной суммы, чтобы получить зеркальную часть IBL
-    const float MAX_REFLECTION_LOD = 4.0;
-    vec3 prefilteredColor = textureLod(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;    
+    const float MAX_REFLECTION_LOD = 7.0;
+    vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+    //vec4 reflectedColor = textureLod(ssrMap, TexCoords, roughness * MAX_REFLECTION_LOD).rgba;
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+       
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-    vec3 ambient = (kD * diffuse + specular) * ao;
-    
-    // Вычисляем тень от Солнца
-    float shadow = ShadowCalculation(FragPosLightSpace);   
- 
-    vec3 color = ambient * (1.0 - shadow * shadowOpacity) + Lo;
+    vec3 ambient = (kD * diffuse + specular) * ao * ssao; 
 
-    // Тональная компрессия HDR
-    //color = color / (color + vec3(1.0));
-    
-	// Гамма-коррекция
-    //color = pow(color, vec3(1.0/2.2)); 
+    vec3 color = ambient + Lo;
+        
+    lFresnelSchlickRoughness = F;
+    lDiffuse = diffuse;
+    lBrdf = vec3(brdf, 0.0);
+    lkD = kD;
+    lLo = Lo;
+    lRoughAo = vec3(roughness, ao * ssao, 0.0);
 
-    FragColor = vec4(color , 1.0);
+    lScreenTexture = color;
 }

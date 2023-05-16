@@ -5,12 +5,20 @@
 #include "material_texture.h"
 #include "material.h"
 #include "obj_model.h"
+#include "scene.h"
+#include "camera.h"
 
 namespace Chotra {
 
     std::vector<std::shared_ptr<MaterialTexture>> ResourceManager::textures;
     std::vector<std::shared_ptr<Material>> ResourceManager::materials;
     std::vector<std::shared_ptr<ObjModel>> ResourceManager::geometries;
+
+    std::shared_ptr<Scene> ResourceManager::scene;
+    std::shared_ptr<Camera> ResourceManager::camera;
+
+    std::shared_ptr<Scene> ResourceManager::miniScene;
+    std::shared_ptr<Camera> ResourceManager::miniCamera;
 
     unsigned int ResourceManager::AddTexture(std::string path) {
                 
@@ -37,7 +45,7 @@ namespace Chotra {
         *textures[i] = tex;
     }
 
-    unsigned int ResourceManager::GetTextureId(unsigned int i) {
+    unsigned int& ResourceManager::GetTextureId(unsigned int i) {
         return textures[i]->GetId();
     }
 
@@ -57,6 +65,11 @@ namespace Chotra {
         unsigned int index = materials.size(); //for create unique name suffix
         materials.push_back(std::make_shared<Material>(path, std::to_string(index)));
         return index;
+    }
+
+    void ResourceManager::SetMaterialIcon(unsigned int i, unsigned int icon) {
+
+        materials[i]->icon = icon;
     }
 
     void ResourceManager::ChangeMaterialSource(unsigned int i, std::string path) {
@@ -83,6 +96,10 @@ namespace Chotra {
         return materials[i]->name;
     }
 
+    unsigned int& ResourceManager::GetMaterialIcon(unsigned int i) {
+        return materials[i]->icon;
+    }
+
     std::string ResourceManager::GetMaterialPath(unsigned int i) {
         return materials[i]->path;
     }
@@ -102,6 +119,11 @@ namespace Chotra {
         return index;
     }
 
+    void ResourceManager::SetGeometryIcon(unsigned int i, unsigned int icon) {
+
+        geometries[i]->icon = icon;
+    }
+
     void ResourceManager::ChangeGeometrySource(unsigned int i, std::string path) {
 
         for (int i = 0; i < geometries.size(); ++i) {
@@ -117,6 +139,10 @@ namespace Chotra {
 
     std::string ResourceManager::GetGeometryName(unsigned int i) {
         return geometries[i]->name;
+    }
+
+    unsigned int& ResourceManager::GetGeometryIcon(unsigned int i) {
+        return geometries[i]->icon;
     }
 
     std::string ResourceManager::GetGeometryPath(unsigned int i) {
@@ -135,5 +161,33 @@ namespace Chotra {
         return geometries[i]->VAO;
     }
 
+    void ResourceManager::MakeScene(std::string path) {
+        scene = std::make_shared<Scene>(path);
+    }
+
+
+    std::shared_ptr<Scene> ResourceManager::GetScene() {
+        return scene;
+    }
+
+    void ResourceManager::UpdateScene(float deltaTime) {
+        scene->Update(deltaTime);
+    }
+
+    void ResourceManager::MakeCamera(glm::vec3 position) {
+        camera = std::make_shared<Camera>(position);
+    }
+
+    std::shared_ptr<Camera> ResourceManager::GetCamera() {
+        return camera;
+    }
+
+    void ResourceManager::MakeMiniScene(std::string path) {
+        miniScene = std::make_shared<Scene>(path);
+    }
+
+    void ResourceManager::MakeMiniCamera(glm::vec3 position) {
+        miniCamera = std::make_shared<Camera>(position);
+    }
 
 } // namespace Chotra

@@ -6,10 +6,13 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 
 #include <string>
+#include <memory>
 
 namespace Chotra {
 
     class Window;
+    class SceneObject;
+    class SceneLight;
    
     class Gui {
     public:
@@ -33,8 +36,8 @@ namespace Chotra {
         float my_tex_w = 80;
         float my_tex_h = 80;
 
-        ImVec2 uv_min = ImVec2(0.0f, 0.0f);                 // Top-left
-        ImVec2 uv_max = ImVec2(1.0f, 1.0f);                 // Lower-right
+        ImVec2 uv_min = ImVec2(0.0f, 1.0f);                 // Top-left
+        ImVec2 uv_max = ImVec2(1.0f, 0.0f);                 // Lower-right
         ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);   // No tint
         ImVec4 border_col = ImVec4(1.0f, 1.0f, 1.0f, 0.5f); // 50% opaque white
                 
@@ -58,12 +61,19 @@ namespace Chotra {
 
         void Render();
 
+        void UpdateAllIcons();
+        void MakeGeometryIcon(unsigned int i);
+        void DeleteGeometryIcon(unsigned int i);
+        void MakeMaterialIcon(unsigned int i);
+        void DeleteMaterialIcon(unsigned int i);
+
         void AddGeometry();
         void AddMaterial();
         void AddSceneObject();
+        void AddSceneLight();
 
-        void ChangeGeometryIndexModal(int sceneObjectIndex);
-        void ChangeMaterialIndexModal(int sceneObjectIndex);
+        void ChangeGeometryIndexModal(std::shared_ptr<SceneObject> sceneObject);
+        void ChangeMaterialIndexModal(std::shared_ptr<SceneObject> sceneObject);
         void ChangeComponentsIndexModal(int MaterialIndex, std::string componentsName);
 
         std::string PathToRelative(std::string);

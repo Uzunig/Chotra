@@ -1,26 +1,18 @@
 <h1><strong>Chotra Engine - Custom real-time rendering engine </strong></h1>   
 <br>
-<h3><strong>C++, OpenGL, GLFW, GLM, ImGui, 
-OBJ-model loading, PBR (Metallic workflow), Lighting, Image Based Lighting, 
-Gamma correction, Post-processing, Multisampling, Bloom ... </strong></h3>
+<h3><strong>
+C++, OpenGL, GLFW, GLM, Real-time rendering, Physically Based Rendering, Materials, OBJ-model loading, Lighting, Image Based Lighting, Postprocessing, Bloom, Shadow mapping, SSAO, SSR, ImGui. </strong></h3>
 <hr>
 
-<a href="https://youtu.be/Fin5xd_LX2M" target="_blank" rel="noopener noreferrer">
-   <img src="icon_engine.png" alt="Chotra Engine">
-</a>
-<hr>
-<br>
-<p>Hi. I'm Igor.</p>
+<p>Dear friends.</p>
 
-<p>First of all, I'd like to express my deep gratitude to the people who are tirelessly providing educational materials for computer graphics programming. These materials allow both beginners and professionals to improve their skills.</p>
+<p>Chotra Engine is the outcome of my favorite activity, that I can do in my free time.</p>
 
-<p>The models for my small projects are kindly supplied by my eldest son Dmitry (a great fan of 3D modeling).</p>
+<p>I launched this project with the goal of improving my programming skills. Soon I was joined by a big fan of 3D graphic design and modeling by my eldest son Dmitry. In this way, the engine tries to display scenes created by my designer, as realistic as possible. Today we are trying to better understand the algorithms, improve programming skills and achieve better results.</p>
 
-<p>I hope my skills will improve soon and my projects will get better, they will have shadows, skeletal animation and many other effects.</p>
+<p>We would like to meet professionals in this workspace and hope to receive feedbacks and guidances.</p>
 
-<p>I'd like to meet and talk with professionals in this workspace. I hope to receive feedbacks and guidances.</p>
-
-<p>Regards, <br>Igor Uzun.</p>
+<p>Regards, <br>Igor.</p>
 <hr>
 <br>
 <h3><strong>My contacts:</strong></h3>

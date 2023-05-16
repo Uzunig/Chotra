@@ -32,9 +32,9 @@ namespace Chotra {
         glm::vec3 velocity;
         glm::vec3 rVelocity;
         bool visible;
-        
+        float brightness;
 
-        SceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position = glm::vec3(0.0f), glm::vec3 angle = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 rVelocity = glm::vec3(0.0f), bool visible = true);
+        SceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position = glm::vec3(0.0f), glm::vec3 angle = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 rVelocity = glm::vec3(0.0f), bool visible = true, float brightness = 1.0);
         
         void ChangeGeometryIndex(unsigned int i);
         void ChangeMaterialIndex(unsigned int i);

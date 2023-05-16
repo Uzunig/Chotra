@@ -3,7 +3,7 @@ layout (location = 0) out vec3 gPosition;
 layout (location = 1) out vec4 gViewPosition;
 layout (location = 2) out vec3 gNormal;
 layout (location = 3) out vec3 gViewNormal;
-layout (location = 4) out vec4 gAlbedoMap;
+layout (location = 4) out vec3 gAlbedoMap;
 layout (location = 5) out vec3 gMetalRoughAoMap;
 
 in vec3 FragPos;
@@ -20,6 +20,8 @@ uniform sampler2D normalMap;
 uniform sampler2D metallicMap;
 uniform sampler2D roughnessMap;
 uniform sampler2D aoMap;
+
+uniform float brightness;
 
 
 // Простой трюк, чтобы получить касательные нормали в мировом пространстве, чтобы упростить код PBR
@@ -52,7 +54,10 @@ void main()
     gViewNormal = getNormalFromMap(ViewNormal);
     //gViewNormal = normalize(ViewNormal);
 
-    gAlbedoMap = texture(albedoMap, TexCoords);
+    vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(2.2)); //pow 2.2, inverse gamma, if it needs
+    albedo *= brightness;
+
+    gAlbedoMap = albedo;
     gMetalRoughAoMap.r = texture(metallicMap, TexCoords).r;
     gMetalRoughAoMap.g = texture(roughnessMap, TexCoords).r;
     gMetalRoughAoMap.b = texture(aoMap, TexCoords).r;		

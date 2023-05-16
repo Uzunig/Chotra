@@ -1,21 +1,13 @@
-Fix roughness.
-Icon creating.
-Add environment assets.
-Chcking for uniqueness of txtures and gometris when adding.
-Render textures, framebuffers, renderbuffers - classify everything
+
 Сreate a base class Renderer that will be inherited by other classes (DeferredRender, ForwardRender). Create class RenderManager that will lead all rendering process.
 
 
 Pass debugging quads from Rederer to GUI
-Checking for uniqueness of adding objects
 To make textures vector and meshes vector using polymorphic classes
 
 
 To pass to JSON format and to make loader for collection files 
 To change vector objModels to vector geometry that containes all types of geometry
 
-prefilterMap: make GUI for SANPLE_COUNT
-Is it necessary to make a colletcion of environments?
 
-//--------------------------------------------------------
-shared_ptr adn polimorphism
+

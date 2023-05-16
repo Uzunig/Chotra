@@ -9,6 +9,7 @@
 #include "camera.h"
 #include "scene.h"
 #include "renderer.h"
+#include "resource_manager.h"
 
 #include "Chotra/Events/event.h"
 
@@ -66,6 +67,7 @@ namespace Chotra {
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
         glEnable(GL_MULTISAMPLE);
+        glfwSwapInterval(0);
 
         glfwSetWindowUserPointer(glfwWindow, &windowData);
 
@@ -138,12 +140,17 @@ namespace Chotra {
         // tell GLFW to captur our mouse
         //glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-        camera = Camera(glm::vec3(0.0f, 5.0f, 25.0f));
-        scene = std::make_unique<Scene>();   
         
-        renderer = std::make_unique<Renderer>(windowData.width, windowData.height, camera, *scene);
+        ResourceManager::MakeMiniCamera(glm::vec3(0.0f, 1.0f, 5.0f));
+        ResourceManager::MakeMiniScene("resources/level_mini.lv");
+
+        ResourceManager::MakeCamera(glm::vec3(0.0f, 5.0f, 25.0f));
+        ResourceManager::MakeScene("resources/level0.lv");  
+                        
+        renderer = std::make_unique<Renderer>(windowData.width, windowData.height);
         renderer->Init();
         gui = std::make_unique<Gui>(this);
+        gui->UpdateAllIcons();
 
         lastMousePosition = glm::vec2(GetWidth() / 2, GetHeight() / 2);
 
@@ -160,10 +167,10 @@ namespace Chotra {
     void Window::OnUpdate(float deltaTime) {
 
         fps = 1 / deltaTime;
-        camera.ProcessKeyboard(deltaTime);
+        ResourceManager::camera->ProcessKeyboard(deltaTime);
         //scene->DemoUpdate(deltaTime);
-        scene->Update(deltaTime);
-        renderer->Render();
+        ResourceManager::UpdateScene(deltaTime);
+        renderer->Render(ResourceManager::GetScene(), ResourceManager::GetCamera());
 
         gui->Show();
         gui->Render();

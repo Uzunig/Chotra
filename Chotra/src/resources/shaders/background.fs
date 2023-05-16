@@ -8,6 +8,7 @@ uniform float exposure;
 void main()
 {	
 
+      //vec3 envColor = textureLod(environmentMap, WorldPos, 4).rgb;
 	vec3 envColor = texture(environmentMap, WorldPos).rgb;
 	
       //envColor = pow(envColor, vec3(2.2)); //inverse gamma, if it needs	

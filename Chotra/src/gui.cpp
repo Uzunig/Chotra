@@ -149,6 +149,14 @@ namespace Chotra {
         ImGui::RadioButton("Forward shading", &p_mainWindow->renderer->renderingMode, 0);
         ImGui::RadioButton("Deferred shading", &p_mainWindow->renderer->renderingMode, 1);
 
+        if (ImGui::CollapsingHeader("Post effects")) {
+            ImGui::SliderFloat("Exposure", &p_mainWindow->renderer->exposure, 0.0f, 10.0f);
+            ImGui::SliderFloat("Brightness", &p_mainWindow->renderer->brightness, -3.0f, 3.0f);
+            ImGui::SliderFloat("Contrast", &p_mainWindow->renderer->contrast, -3.0f, 3.0f);
+            ImGui::Checkbox("Bloom", &p_mainWindow->renderer->bloom);
+            ImGui::Checkbox("Gamma correction", &p_mainWindow->renderer->gammaCorrection);
+        }
+
         if (ImGui::CollapsingHeader("Environment")) {
             ImGui::ColorPicker4("Color", p_mainWindow->renderer->backgroundColor);
             ImGui::Checkbox("Draw skybox", &p_mainWindow->renderer->drawSkybox);
@@ -156,8 +164,8 @@ namespace Chotra {
         }
 
         if (ImGui::CollapsingHeader("Camera settings")) {
-            ImGui::SliderFloat("Speed", &p_mainWindow->camera.MovementSpeed, 3.0f, 30.0f);
-            ImGui::SliderFloat("Zoom", &p_mainWindow->camera.Zoom, 15.0f, 90.0f);
+            ImGui::SliderFloat("Speed", &ResourceManager::camera->MovementSpeed, 3.0f, 30.0f);
+            ImGui::SliderFloat("Zoom", &ResourceManager::camera->Zoom, 15.0f, 90.0f);
             //ImGui::Checkbox("Perspective projection", &renderer->perspectiveProjection);
 
         }
@@ -182,24 +190,19 @@ namespace Chotra {
             if (ImGui::CollapsingHeader("SSR")) {
                 ImGui::SliderFloat("biasSSR", &p_mainWindow->renderer->biasSSR, 0.001f, 20.0f);
                 ImGui::SliderFloat("rayStep", &p_mainWindow->renderer->rayStep, 0.001f, 5.0f);
-                ImGui::SliderInt("iterationCount", &p_mainWindow->renderer->iterationCount, 0, 3000);
-                ImGui::SliderFloat("accuracy", &p_mainWindow->renderer->accuracySSR, 0.001f, 5.0f);
+                ImGui::SliderInt("iterationCount", &p_mainWindow->renderer->iterationCount, 0, 200);
+                ImGui::SliderFloat("accuracy", &p_mainWindow->renderer->accuracySSR, 0.001f, 1.0f);
 
             }
         }
-
-        if (ImGui::CollapsingHeader("Post effects")) {
-            ImGui::SliderFloat("Exposure", &p_mainWindow->renderer->exposure, 0.0f, 10.0f);
-            ImGui::Checkbox("Bloom", &p_mainWindow->renderer->bloom);
-            ImGui::Checkbox("Gamma correction", &p_mainWindow->renderer->gammaCorrection);
-        }
-
+                
         if (ImGui::CollapsingHeader("Shadows")) {
             ImGui::Checkbox("Show shadows", &p_mainWindow->renderer->showShadows);
             if (p_mainWindow->renderer->showShadows) {
 
-                ImGui::SliderFloat("Bias min", &p_mainWindow->renderer->shadowBiasMin, 0.0f, 0.1f);
-                ImGui::SliderFloat("Bias max", &p_mainWindow->renderer->shadowBiasMax, 0.0f, 0.1f);
+                ImGui::SliderFloat("Bias min", &p_mainWindow->renderer->shadowBiasMin, 0.0001f, 0.001f, "%.4f");
+                ImGui::SliderFloat("Bias max", &p_mainWindow->renderer->shadowBiasMax, 0.0001f, 0.001f, "%.4f");
+                ImGui::SliderFloat("Opacity", &p_mainWindow->renderer->shadowOpacity, 0.0f, 1.0f);
 
             }
 
@@ -220,10 +223,10 @@ namespace Chotra {
             if (ImGui::TreeNode("Scene objects"))
             {
 
-                for (int i = 0; i < p_mainWindow->scene->sceneObjects.size(); ++i) {
-                    if (ImGui::Selectable(p_mainWindow->scene->sceneObjects[i].name.c_str(), selected == i)) {
+                for (int i = 0; i < ResourceManager::scene->sceneObjects.size(); ++i) {
+                    if (ImGui::Selectable(ResourceManager::scene->sceneObjects[i]->name.c_str(), selected == i)) {
                         selected = i;
-                        strcpy(str0, p_mainWindow->scene->sceneObjects[i].name.c_str());
+                        strcpy(str0, ResourceManager::scene->sceneObjects[i]->name.c_str());
                     }
                 }
 
@@ -237,10 +240,15 @@ namespace Chotra {
             if (ImGui::TreeNode("Lights"))
             {
 
-                for (int i = 0; i < p_mainWindow->scene->sceneLights.size(); ++i) {
+                for (int i = 0; i < ResourceManager::scene->sceneLights.size(); ++i) {
                     if (ImGui::Selectable(("Light " + std::to_string(i)).c_str(), selected == 100 + i)) {
                         selected = 100 + i;
                     }
+                }
+
+                if (ImGui::Button("Add scene light..")) {
+
+                    AddSceneLight();
                 }
 
                 ImGui::TreePop();
@@ -270,7 +278,7 @@ namespace Chotra {
             int i = selected;
             ImGui::Text("Scene object:");
             ImGui::SameLine();
-            ImGui::Text(p_mainWindow->scene->sceneObjects[i].name.c_str());
+            ImGui::Text(ResourceManager::scene->sceneObjects[i]->name.c_str());
 
             ImGui::SetCursorPos(ImVec2(10, 50));
             ImGui::Text("Geometry:");
@@ -279,7 +287,7 @@ namespace Chotra {
             ImGui::SetNextWindowSize(ImVec2(350, p_mainWindow->GetHeight() - 100));
 
             ImGui::SetCursorPos(ImVec2(10, 70));
-            if (ImGui::Selectable(("##" + ResourceManager::GetGeometryName(p_mainWindow->scene->sceneObjects[i].geometryIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
+            if (ImGui::Selectable(("##" + ResourceManager::GetGeometryName(ResourceManager::scene->sceneObjects[i]->geometryIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
                 p_mainWindow->renderer->passiveMode = true;
                 ImGui::OpenPopup("Geometries");
             }
@@ -287,24 +295,24 @@ namespace Chotra {
             if (ImGui::BeginPopupModal("Geometries", NULL, ImGuiWindowFlags_MenuBar))
             {
                 chosed = -1;
-                ChangeGeometryIndexModal(i);
+                ChangeGeometryIndexModal(ResourceManager::scene->sceneObjects[i]);
             }
 
             ImGui::SetItemAllowOverlap();
             ImGui::SetCursorPos(ImVec2(10, 70));
 
             ImGui::PushID(i);
-            ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+            ImTextureID my_tex_id = (void*)ResourceManager::GetGeometryIcon(ResourceManager::scene->sceneObjects[i]->geometryIndex);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
             ImGui::SetCursorPos(ImVec2(100, 70));
-            ImGui::Text(NameWithoutSuffix(ResourceManager::GetGeometryName(p_mainWindow->scene->sceneObjects[i].geometryIndex)).c_str());
+            ImGui::Text(NameWithoutSuffix(ResourceManager::GetGeometryName(ResourceManager::scene->sceneObjects[i]->geometryIndex)).c_str());
 
             ImGui::SetCursorPos(ImVec2(100, 90));
             ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + 230);
 
-            ImGui::Text(ResourceManager::GetGeometryPath(p_mainWindow->scene->sceneObjects[i].geometryIndex).c_str(), 230);
+            ImGui::Text(ResourceManager::GetGeometryPath(ResourceManager::scene->sceneObjects[i]->geometryIndex).c_str(), 230);
 
             ImGui::PopTextWrapPos();
 
@@ -315,7 +323,7 @@ namespace Chotra {
             ImGui::SetNextWindowSize(ImVec2(350, p_mainWindow->GetHeight() - 100));
 
             ImGui::SetCursorPos(ImVec2(10, 180));
-            if (ImGui::Selectable(("##" + ResourceManager::GetMaterialName(p_mainWindow->scene->sceneObjects[i].materialIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
+            if (ImGui::Selectable(("##" + ResourceManager::GetMaterialName(ResourceManager::scene->sceneObjects[i]->materialIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
                 p_mainWindow->renderer->passiveMode = true;
                 ImGui::OpenPopup("Materials");
             }
@@ -323,71 +331,184 @@ namespace Chotra {
             if (ImGui::BeginPopupModal("Materials", NULL, ImGuiWindowFlags_MenuBar))
             {
                 chosed = -1;
-                ChangeMaterialIndexModal(i);
+                ChangeMaterialIndexModal(ResourceManager::scene->sceneObjects[i]);
             }
 
             ImGui::SetItemAllowOverlap();
             ImGui::SetCursorPos(ImVec2(10, 180));
 
             ImGui::PushID(i);
-            my_tex_id = (void*)ResourceManager::GetTextureId(0);
+            my_tex_id = (void*)ResourceManager::GetMaterialIcon(ResourceManager::scene->sceneObjects[i]->materialIndex);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
             ImGui::SetCursorPos(ImVec2(100, 180));
-            ImGui::Text(NameWithoutSuffix(ResourceManager::GetMaterialName(p_mainWindow->scene->sceneObjects[i].materialIndex)).c_str());
+            ImGui::Text(NameWithoutSuffix(ResourceManager::GetMaterialName(ResourceManager::scene->sceneObjects[i]->materialIndex)).c_str());
 
             ImGui::SetCursorPos(ImVec2(100, 200));
             ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + 230);
-            ImGui::Text(ResourceManager::GetMaterialPath(p_mainWindow->scene->sceneObjects[i].materialIndex).c_str(), 230);
+            ImGui::Text(ResourceManager::GetMaterialPath(ResourceManager::scene->sceneObjects[i]->materialIndex).c_str(), 230);
             ImGui::PopTextWrapPos();
 
             ImGui::SetCursorPos(ImVec2(10, 280));
 
-            ImGui::Checkbox(("visible##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].visible);
-
+            if (ImGui::CollapsingHeader("Appearance")) {
+                ImGui::Checkbox(("visible##" + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->visible);
+                ImGui::InputFloat(("brightness##" + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->brightness, 0.1f, 10000.0f, "%.1f");
+            }
 
             if (ImGui::CollapsingHeader("Position")) {
-                ImGui::InputFloat(("x##P " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].position.x, 0.1f, 1.0f, "%.1f");
-                ImGui::InputFloat(("y##P " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].position.y, 0.1f, 1.0f, "%.1f");
-                ImGui::InputFloat(("z##P " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].position.z, 0.1f, 1.0f, "%.1f");
+                ImGui::InputFloat(("x##P " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->position.x, 0.1f, 1.0f, "%.1f");
+                ImGui::InputFloat(("y##P " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->position.y, 0.1f, 1.0f, "%.1f");
+                ImGui::InputFloat(("z##P " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->position.z, 0.1f, 1.0f, "%.1f");
             }
+
             if (ImGui::CollapsingHeader("Angle")) {
-                ImGui::InputFloat(("x##A " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].angle.x, 0.1f, 180.0f, "%0.1f");
-                ImGui::InputFloat(("y##A " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].angle.y, 0.1f, 180.0f, "%0.1f");
-                ImGui::InputFloat(("z##A " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].angle.z, 0.1f, 180.0f, "%0.1f");
+                ImGui::InputFloat(("x##A " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->angle.x, 0.1f, 180.0f, "%0.1f");
+                ImGui::InputFloat(("y##A " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->angle.y, 0.1f, 180.0f, "%0.1f");
+                ImGui::InputFloat(("z##A " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->angle.z, 0.1f, 180.0f, "%0.1f");
             }
 
             if (ImGui::CollapsingHeader("Scale")) {
-                ImGui::InputFloat(("x##S " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].scale.x, 0.1f, 10.0f, "%.1f");
-                ImGui::InputFloat(("y##S " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].scale.y, 0.1f, 10.0f, "%.1f");
-                ImGui::InputFloat(("z##S " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].scale.z, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("x##S " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->scale.x, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("y##S " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->scale.y, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("z##S " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->scale.z, 0.1f, 10.0f, "%.1f");
             }
 
             if (ImGui::CollapsingHeader("Velocity")) {
-                ImGui::InputFloat(("x##V " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].velocity.x, 0.1f, 10.0f, "%.1f");
-                ImGui::InputFloat(("y##V " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].velocity.y, 0.1f, 10.0f, "%.1f");
-                ImGui::InputFloat(("z##V " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].velocity.z, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("x##V " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->velocity.x, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("y##V " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->velocity.y, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("z##V " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->velocity.z, 0.1f, 10.0f, "%.1f");
             }
 
             if (ImGui::CollapsingHeader("Rotation velocity")) {
-                ImGui::InputFloat(("x##R " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].rVelocity.x, 0.1f, 10.0f, "%.1f");
-                ImGui::InputFloat(("y##R " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].rVelocity.y, 0.1f, 10.0f, "%.1f");
-                ImGui::InputFloat(("z##R " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneObjects[i].rVelocity.z, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("x##R " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->rVelocity.x, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("y##R " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->rVelocity.y, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("z##R " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneObjects[i]->rVelocity.z, 0.1f, 10.0f, "%.1f");
             }
         }
         else if ((selected >= 100) && (selected < 200)) {
             int i = selected - 100;
             ImGui::Text("Light:");
             ImGui::SameLine();
-            ImGui::Text(p_mainWindow->scene->sceneLights[i].name.c_str());
-            ImGui::InputFloat(("x ##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].position.x, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("y ##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].position.y, 0.1f, 1.0f, "%.1f");
-            ImGui::InputFloat(("z ##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].position.z, 0.1f, 1.0f, "%.1f");
-            ImGui::SliderFloat(("r ##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].color.r, 0.005f, 1.0f);
-            ImGui::SliderFloat(("g ##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].color.g, 0.005f, 1.0f);
-            ImGui::SliderFloat(("b ##" + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].color.b, 0.005f, 1.0f);
-            ImGui::SliderInt(("Brightness " + std::to_string(i)).c_str(), &p_mainWindow->scene->sceneLights[i].brightness, 0, 10000);
+            ImGui::Text(ResourceManager::scene->sceneLights[i]->name.c_str());
+
+            ImGui::SetCursorPos(ImVec2(10, 50));
+            ImGui::Text("Geometry:");
+
+            ImGui::SetNextWindowPos(ImVec2(p_mainWindow->GetWidth() - 700, 20));
+            ImGui::SetNextWindowSize(ImVec2(350, p_mainWindow->GetHeight() - 100));
+
+            ImGui::SetCursorPos(ImVec2(10, 70));
+            if (ImGui::Selectable(("##" + ResourceManager::GetGeometryName(ResourceManager::scene->sceneLights[i]->geometryIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
+                p_mainWindow->renderer->passiveMode = true;
+                ImGui::OpenPopup("Geometries");
+            }
+
+            if (ImGui::BeginPopupModal("Geometries", NULL, ImGuiWindowFlags_MenuBar))
+            {
+                chosed = -1;
+                ChangeGeometryIndexModal(ResourceManager::scene->sceneLights[i]);
+            }
+
+            ImGui::SetItemAllowOverlap();
+            ImGui::SetCursorPos(ImVec2(10, 70));
+
+            ImGui::PushID(i);
+            ImTextureID my_tex_id = (void*)ResourceManager::GetGeometryIcon(ResourceManager::scene->sceneLights[i]->geometryIndex);
+            ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
+            ImGui::PopID();
+
+            ImGui::SetCursorPos(ImVec2(100, 70));
+            ImGui::Text(NameWithoutSuffix(ResourceManager::GetGeometryName(ResourceManager::scene->sceneLights[i]->geometryIndex)).c_str());
+
+            ImGui::SetCursorPos(ImVec2(100, 90));
+            ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + 230);
+
+            ImGui::Text(ResourceManager::GetGeometryPath(ResourceManager::scene->sceneLights[i]->geometryIndex).c_str(), 230);
+
+            ImGui::PopTextWrapPos();
+
+            ImGui::SetCursorPos(ImVec2(10, 160));
+            ImGui::Text("Material:");
+
+            ImGui::SetNextWindowPos(ImVec2(p_mainWindow->GetWidth() - 700, 20));
+            ImGui::SetNextWindowSize(ImVec2(350, p_mainWindow->GetHeight() - 100));
+
+            ImGui::SetCursorPos(ImVec2(10, 180));
+            if (ImGui::Selectable(("##" + ResourceManager::GetMaterialName(ResourceManager::scene->sceneLights[i]->materialIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
+                p_mainWindow->renderer->passiveMode = true;
+                ImGui::OpenPopup("Materials");
+            }
+
+            if (ImGui::BeginPopupModal("Materials", NULL, ImGuiWindowFlags_MenuBar))
+            {
+                chosed = -1;
+                ChangeMaterialIndexModal(ResourceManager::scene->sceneLights[i]);
+            }
+
+            ImGui::SetItemAllowOverlap();
+            ImGui::SetCursorPos(ImVec2(10, 180));
+
+            ImGui::PushID(i);
+            my_tex_id = (void*)ResourceManager::GetMaterialIcon(ResourceManager::scene->sceneLights[i]->materialIndex);
+            ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
+            ImGui::PopID();
+
+            ImGui::SetCursorPos(ImVec2(100, 180));
+            ImGui::Text(NameWithoutSuffix(ResourceManager::GetMaterialName(ResourceManager::scene->sceneLights[i]->materialIndex)).c_str());
+
+            ImGui::SetCursorPos(ImVec2(100, 200));
+            ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + 230);
+            ImGui::Text(ResourceManager::GetMaterialPath(ResourceManager::scene->sceneLights[i]->materialIndex).c_str(), 230);
+            ImGui::PopTextWrapPos();
+
+            ImGui::SetCursorPos(ImVec2(10, 280));
+
+            if (ImGui::CollapsingHeader("Appearance")) {
+                ImGui::Checkbox(("visible##" + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->visible);
+                ImGui::InputFloat(("brightness##" + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->brightness, 0.1f, 10000.0f, "%.1f");
+            }
+
+            if (ImGui::CollapsingHeader("Light color")) {
+                float lightColor[3] = { ResourceManager::scene->sceneLights[i]->color.r, ResourceManager::scene->sceneLights[i]->color.g, ResourceManager::scene->sceneLights[i]->color.b };
+                ImGui::ColorPicker3("Color", lightColor);
+                ResourceManager::scene->sceneLights[i]->color.r = lightColor[0];
+                ResourceManager::scene->sceneLights[i]->color.g = lightColor[1];
+                ResourceManager::scene->sceneLights[i]->color.b = lightColor[2];
+                ImGui::InputFloat(("intensity##" + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->intensity, 0.1f, 10000.0f, "%.1f");
+            }
+
+            if (ImGui::CollapsingHeader("Position")) {
+                ImGui::InputFloat(("x##P " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->position.x, 0.1f, 1.0f, "%.1f");
+                ImGui::InputFloat(("y##P " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->position.y, 0.1f, 1.0f, "%.1f");
+                ImGui::InputFloat(("z##P " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->position.z, 0.1f, 1.0f, "%.1f");
+            }
+
+            if (ImGui::CollapsingHeader("Angle")) {
+                ImGui::InputFloat(("x##A " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->angle.x, 0.1f, 180.0f, "%0.1f");
+                ImGui::InputFloat(("y##A " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->angle.y, 0.1f, 180.0f, "%0.1f");
+                ImGui::InputFloat(("z##A " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->angle.z, 0.1f, 180.0f, "%0.1f");
+            }
+
+            if (ImGui::CollapsingHeader("Scale")) {
+                ImGui::InputFloat(("x##S " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->scale.x, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("y##S " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->scale.y, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("z##S " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->scale.z, 0.1f, 10.0f, "%.1f");
+            }
+
+            if (ImGui::CollapsingHeader("Velocity")) {
+                ImGui::InputFloat(("x##V " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->velocity.x, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("y##V " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->velocity.y, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("z##V " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->velocity.z, 0.1f, 10.0f, "%.1f");
+            }
+
+            if (ImGui::CollapsingHeader("Rotation velocity")) {
+                ImGui::InputFloat(("x##R " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->rVelocity.x, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("y##R " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->rVelocity.y, 0.1f, 10.0f, "%.1f");
+                ImGui::InputFloat(("z##R " + std::to_string(i)).c_str(), &ResourceManager::scene->sceneLights[i]->rVelocity.z, 0.1f, 10.0f, "%.1f");
+            }
+            
         }
         else if ((selected >= 200) && (selected < 300)) {
             int i = selected - 200;
@@ -401,6 +522,9 @@ namespace Chotra {
 
                     s = PathToRelative(s);
                     ResourceManager::ChangeGeometrySource(i, s);
+                    DeleteGeometryIcon(i);
+                    MakeGeometryIcon(i);
+
                 }
             }
 
@@ -408,7 +532,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(10, 50));
 
             ImGui::PushID(i);
-            ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+            ImTextureID my_tex_id = (void*)ResourceManager::GetGeometryIcon(i);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
@@ -437,6 +561,8 @@ namespace Chotra {
 
                     s = PathToRelative(s);
                     ResourceManager::ChangeMaterialSource(i, s);
+                    DeleteMaterialIcon(i);
+                    MakeMaterialIcon(i);
                 }
             }
 
@@ -444,7 +570,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(10, 50));
 
             ImGui::PushID(i);
-            ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+            ImTextureID my_tex_id = (void*)ResourceManager::GetMaterialIcon(i);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
@@ -482,6 +608,8 @@ namespace Chotra {
                 {
                     chosed = -1;
                     ChangeComponentsIndexModal(i, componentsName);
+                    DeleteMaterialIcon(i);
+                    MakeMaterialIcon(i);
                 }
 
                 ImGui::SetItemAllowOverlap();
@@ -545,18 +673,18 @@ namespace Chotra {
 
         ImGui::SetNextWindowPos(ImVec2(p_mainWindow->GetWidth() - 350, 950));
         ImGui::SetNextWindowSize(ImVec2(350, p_mainWindow->GetHeight() - 950));
-
+        
         ImGui::Begin("Score");
 
-        ImGui::Text(("fps = " + std::to_string(p_mainWindow->fps)).c_str());
-
+        //ImGui::Text(("fps = " + std::to_string(p_mainWindow->fps)).c_str());
+        
         ImGui::End();
     }
 
     void Gui::ShowAssetsBar() {
 
         ImGui::SetNextWindowPos(ImVec2(0, p_mainWindow->GetHeight() - 260));
-        ImGui::SetNextWindowSize(ImVec2(p_mainWindow->GetWidth() - 350, 180));
+        ImGui::SetNextWindowSize(ImVec2(p_mainWindow->GetWidth() - 350, 260));
 
         ImGui::Begin("Assets");
 
@@ -575,6 +703,8 @@ namespace Chotra {
 
                         s = PathToRelative(s);
                         ResourceManager::AddGeometry(s);
+                        MakeGeometryIcon(ResourceManager::GetGeometriesCount() - 1);
+                        
                     }
                 }
 
@@ -592,7 +722,7 @@ namespace Chotra {
                     ImGui::SetCursorPos(ImVec2(100 * i + 10, 18));
 
                     ImGui::PushID(i);
-                    ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+                    ImTextureID my_tex_id = (void*)ResourceManager::GetGeometryIcon(i);
                     ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
 
 
@@ -614,6 +744,7 @@ namespace Chotra {
 
                         s = PathToRelative(s);
                         ResourceManager::AddMaterial(s);
+                        MakeMaterialIcon(ResourceManager::GetMaterialsCount() - 1);
                     }
                 }
 
@@ -632,7 +763,7 @@ namespace Chotra {
                     ImGui::SetCursorPos(ImVec2(100 * i + 10, 18));
 
                     ImGui::PushID(i);
-                    ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+                    ImTextureID my_tex_id = (void*)ResourceManager::GetMaterialIcon(i);
                     ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
 
 
@@ -711,10 +842,47 @@ namespace Chotra {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
+    void Gui::UpdateAllIcons() {
+        for (unsigned int i = 0; i < ResourceManager::GetGeometriesCount(); ++i) {
+            MakeGeometryIcon(i);
+            
+        }
+
+        for (unsigned int i = 0; i < ResourceManager::GetMaterialsCount(); ++i) {
+            MakeMaterialIcon(i);
+
+        }
+    }
+
+    void Gui::MakeGeometryIcon(unsigned int i) {
+        ResourceManager::miniScene->sceneObjects[0]->ChangeGeometryIndex(i);
+        ResourceManager::miniScene->sceneObjects[0]->ChangeMaterialIndex(0);
+        ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
+        p_mainWindow->renderer->MiniRender(ResourceManager::miniScene, ResourceManager::miniCamera, iconTexture);
+        ResourceManager::SetGeometryIcon(i, iconTexture.GetId());
+    }
+
+    void Gui::DeleteGeometryIcon(unsigned int i) {
+        glDeleteTextures(1, &ResourceManager::GetGeometryIcon(i));
+    }
+
+    void Gui::MakeMaterialIcon(unsigned int i) {
+        ResourceManager::miniScene->sceneObjects[0]->ChangeMaterialIndex(i);
+        ResourceManager::miniScene->sceneObjects[0]->ChangeGeometryIndex(0);
+        ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
+        p_mainWindow->renderer->MiniRender(ResourceManager::miniScene, ResourceManager::miniCamera, iconTexture);
+        ResourceManager::SetMaterialIcon(i, iconTexture.GetId());
+    }
+
+    void Gui::DeleteMaterialIcon(unsigned int i) {
+        glDeleteTextures(1, &ResourceManager::GetMaterialIcon(i));
+    }
+
     void Gui::AddGeometry() {
 
         ResourceManager::AddGeometry("resources/models/default.obj");
         selected = 200 + ResourceManager::GetGeometriesCount() - 1;
+        
     }
 
     void Gui::AddMaterial() {
@@ -725,13 +893,22 @@ namespace Chotra {
 
     void Gui::AddSceneObject() {
 
-        std::string nameNumber = "_" + std::to_string(p_mainWindow->scene->sceneObjects.size());
-        p_mainWindow->scene->AddSceneObject(0, 0, "sceneObject" + nameNumber);
-        selected = p_mainWindow->scene->sceneObjects.size() - 1;
-        strcpy(str0, p_mainWindow->scene->sceneObjects[selected].name.c_str());
+        std::string nameNumber = "_" + std::to_string(ResourceManager::scene->sceneObjects.size());
+        ResourceManager::scene->AddSceneObject(0, 0, "sceneObject" + nameNumber);
+        selected = ResourceManager::scene->sceneObjects.size() - 1;
+        strcpy(str0, ResourceManager::scene->sceneObjects[selected]->name.c_str());
     }
 
-    void Gui::ChangeGeometryIndexModal(int sceneObjectIndex) {
+    void Gui::AddSceneLight() {
+
+        std::string nameNumber = "_" + std::to_string(ResourceManager::scene->sceneLights.size());
+        ResourceManager::scene->AddSceneLight(0, 0, "sceneLight" + nameNumber);
+        selected = ResourceManager::scene->sceneLights.size() - 1;
+        strcpy(str0, ResourceManager::scene->sceneLights[selected]->name.c_str());
+        selected = 100 + selected;
+    }
+
+    void Gui::ChangeGeometryIndexModal(std::shared_ptr<SceneObject> sceneObject) {
 
         ImGuiIO& io = ImGui::GetIO();
 
@@ -743,7 +920,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
             if (ImGui::Selectable(("##" + ResourceManager::GetGeometryPath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
-                p_mainWindow->scene->sceneObjects[sceneObjectIndex].ChangeGeometryIndex(chosed);
+                sceneObject->ChangeGeometryIndex(chosed);
                 p_mainWindow->renderer->passiveMode = false;
                 ImGui::CloseCurrentPopup();
             }
@@ -752,7 +929,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
 
             ImGui::PushID(i);
-            ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+            ImTextureID my_tex_id = (void*)ResourceManager::GetGeometryIcon(i);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
@@ -776,6 +953,7 @@ namespace Chotra {
 
                 s = PathToRelative(s);
                 ResourceManager::AddGeometry(s);
+                MakeGeometryIcon(ResourceManager::GetGeometriesCount() - 1);
             }
         }
 
@@ -790,7 +968,7 @@ namespace Chotra {
 
     }
 
-    void Gui::ChangeMaterialIndexModal(int sceneObjectIndex) {
+    void Gui::ChangeMaterialIndexModal(std::shared_ptr<SceneObject> sceneObject) {
 
         ImGuiIO& io = ImGui::GetIO();
 
@@ -802,7 +980,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
             if (ImGui::Selectable(("##" + ResourceManager::GetTexturePath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
-                p_mainWindow->scene->sceneObjects[sceneObjectIndex].ChangeMaterialIndex(chosed);
+                sceneObject->ChangeMaterialIndex(chosed);
                 p_mainWindow->renderer->passiveMode = false;
                 ImGui::CloseCurrentPopup();
             }
@@ -811,7 +989,7 @@ namespace Chotra {
             ImGui::SetCursorPos(ImVec2(5, 10 + 90 * i));
 
             ImGui::PushID(i);
-            ImTextureID my_tex_id = (void*)ResourceManager::GetTextureId(0);
+            ImTextureID my_tex_id = (void*)ResourceManager::GetMaterialIcon(i);
             ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
             ImGui::PopID();
 
@@ -835,6 +1013,7 @@ namespace Chotra {
 
                 s = PathToRelative(s);
                 ResourceManager::AddMaterial(s);
+                MakeMaterialIcon(ResourceManager::GetMaterialsCount() - 1);
             }
         }
 

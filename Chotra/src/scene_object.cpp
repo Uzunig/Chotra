@@ -10,9 +10,9 @@
 namespace Chotra {
 
     SceneObject::SceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
-        glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible)
+        glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible, float brightness)
         : geometryIndex(geometryIndex), materialIndex(materialIndex), name(name), position(position), angle(angle),
-        scale(scale), velocity(velocity), rVelocity(rVelocity), visible(visible) {
+        scale(scale), velocity(velocity), rVelocity(rVelocity), visible(visible), brightness(brightness) {
 
         UpdateModelMatrix();
     }
@@ -29,7 +29,7 @@ namespace Chotra {
 
         shader.Use();
         shader.SetMat4("model", modelMatrix);
-        //mesh.Draw(shader);
+        shader.SetFloat("brightness", brightness);
         
         unsigned int j = 0;
         for (std::map<std::string, unsigned int>::iterator it = ResourceManager::GetMaterial(materialIndex)->components.begin(); it != ResourceManager::GetMaterial(materialIndex)->components.end(); ++it) {
