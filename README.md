@@ -9,7 +9,6 @@
 <h3><strong>
 C++, OpenGL, GLFW, GLM, Real-time rendering, Physically Based Rendering, Materials, OBJ-model loading, Lighting, Image Based Lighting, Postprocessing, Bloom, Shadow mapping, SSAO, SSR, ImGui. </strong></h3>
 <hr>
-<br>
 
 <p>Dear friends.</p>
 
