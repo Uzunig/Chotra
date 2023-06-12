@@ -1,3 +1,5 @@
+<p><img src="Logo_png.png" width="100" 
+   height="100" alt="Logo"></p>
 
 <h1><strong>Chotra Engine - Custom real-time rendering engine </strong></h1>   
 <p><a href="https://www.linkedin.com/posts/igor-uzun_c-opengl-glfw-glm-imgui-real-time-activity-7068134556163276800-ata5?utm_source=share&utm_medium=member_android&lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BrqdU8tTwQAud%2FzUqqqss%2Bg%3D%3D">Presentation</a></p>
