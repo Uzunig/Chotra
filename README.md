@@ -1,4 +1,10 @@
-<h1><strong>Chotra Engine - Custom real-time rendering engine </strong></h1>   
+<img src="Logo_png.png" width="100" 
+   height="100" alt="Logo">
+
+<h1><strong>Chotra Engine - Custom real-time rendering engine </strong></h1> 
+
+<p><a href="sample.html">Presentation</a></p>
+  
 <br>
 <h3><strong>
 C++, OpenGL, GLFW, GLM, Real-time rendering, Physically Based Rendering, Materials, OBJ-model loading, Lighting, Image Based Lighting, Postprocessing, Bloom, Shadow mapping, SSAO, SSR, ImGui. </strong></h3>
