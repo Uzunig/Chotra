@@ -1,6 +1,7 @@
 
 <h1><strong>Chotra Engine - Custom real-time rendering engine </strong></h1>   
-<p><a href="https://www.linkedin.com/posts/igor-uzun_c-opengl-glfw-glm-imgui-real-time-activity-7068134556163276800-ata5?utm_source=share&utm_medium=member_android&lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BrqdU8tTwQAud%2FzUqqqss%2Bg%3D%3D">Presentation</a></p>
+
+<p><a href="https://www.linkedin.com/posts/igor-uzun_c-opengl-glfw-glm-imgui-real-time-activity-7068134556163276800-ata5?utm_source=share&utm_medium=member_android&lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BrqdU8tTwQAud%2FzUqqqss%2Bg%3D%3D" target="_blank">Presentation</a></p>
 
 <br>
 <h3><strong>
@@ -20,7 +21,7 @@ C++, OpenGL, GLFW, GLM, Real-time rendering, Physically Based Rendering, Materia
 <br>
 <h3><strong>My contacts:</strong></h3>
 <p><a href="mailto:igordmitriev@gmail.com">igordmitriev.uzun@gmail.com</a></p>
-<p><a href="https://www.linkedin.com/in/igor-uzun">LinkedIn</a></p>
-<p><a href="https://www.github.com/Uzunig">GitHub</a></p>
+<p><a href="https://www.linkedin.com/in/igor-uzun" target="_blank">LinkedIn</a></p>
+<p><a href="https://www.github.com/Uzunig" target="_blank">GitHub</a></p>
 
 
