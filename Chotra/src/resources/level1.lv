@@ -1,17 +1,19 @@
 Type                 Path  
 
 ObjModel         resources/models/Model_Ambient/ground.obj
-ObjModel         resources/models/Model_Ambient/panels.obj
+ObjModel         resources/models/Tuning/Tire/tire.obj
+ObjModel         resources/models/Tuning/wheel_1/wheel_1.obj
 
 Material         resources/models/Model_Ambient/ground.mtl
-Material         resources/models/Model_Ambient/panels.mtl
-
+Material         resources/models/Tuning/Tire/tire.mtl
+Material         resources/models/Tuning/wheel_1/wheel_1.mtl
 
 
                  Name               Geometry  Materiale         Position          Angle          Scale        Velocity         rVelocity       Visible    Brightness
                          
 SceneObject    object_0   OBJModel      1        1           0.0  0.0  0.0    0.0 0.0 0.0    0.5 0.5 0.5     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0  
-SceneObject    object_1   OBJModel      2        2           0.0  0.0  0.0    0.0 0.0 0.0    0.2 0.2 0.2     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+SceneObject    object_1   OBJModel      2        2           0.0  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+SceneObject    object_2   OBJModel      3        3           0.0  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
 
 
                 Name                  Geometry  Materiale        Position         Angle          Scale          Velocity        rVelocity       Visible     Brightness    Color             Intensity 

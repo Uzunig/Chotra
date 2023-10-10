@@ -218,21 +218,22 @@ namespace Chotra {
 
         ImGui::Begin("Scene configuration");
 
-        if (ImGui::TreeNode("Scene collection")) {
-
-            if (ImGui::TreeNode("Scene objects"))
-            {
-
-                for (int i = 0; i < ResourceManager::scene->sceneObjects.size(); ++i) {
-                    if (ImGui::Selectable(ResourceManager::scene->sceneObjects[i]->name.c_str(), selected == i)) {
-                        selected = i;
-                        strcpy(str0, ResourceManager::scene->sceneObjects[i]->name.c_str());
+        if (ImGui::TreeNode("Scene")) {
+            if (ImGui::TreeNode("Collections")) {
+                if (ImGui::TreeNode("Scene objects"))
+                {
+                    for (int i = 0; i < ResourceManager::scene->sceneObjects.size(); ++i) {
+                        if (ImGui::Selectable(ResourceManager::scene->sceneObjects[i]->name.c_str(), selected == i)) {
+                            selected = i;
+                            strcpy(str0, ResourceManager::scene->sceneObjects[i]->name.c_str());
+                        }
                     }
-                }
 
-                if (ImGui::Button("Add scene object..")) {
+                    if (ImGui::Button("Add scene object..")) {
 
-                    AddSceneObject();
+                        AddSceneObject();
+                    }
+                    ImGui::TreePop();
                 }
                 ImGui::TreePop();
             }
