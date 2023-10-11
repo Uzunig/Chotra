@@ -3,17 +3,63 @@ Type                 Path
 ObjModel         resources/models/Model_Ambient/ground.obj
 ObjModel         resources/models/Tuning/Tire/tire.obj
 ObjModel         resources/models/Tuning/wheel_1/wheel_1.obj
+ObjModel         resources/models/Tuning/wheel_2/wheel_2.obj
 
 Material         resources/models/Model_Ambient/ground.mtl
 Material         resources/models/Tuning/Tire/tire.mtl
 Material         resources/models/Tuning/wheel_1/wheel_1.mtl
+Material         resources/models/Tuning/wheel_2/wheel_2.mtl
+Material         resources/models/Tuning/wheel_1/wheel_1.1.mtl
+Material         resources/models/Tuning/wheel_2/wheel_2.1.mtl
+Material         resources/models/Tuning/wheel_1/wheel_1.2.mtl
+Material         resources/models/Tuning/wheel_2/wheel_2.2.mtl
 
 
                  Name               Geometry  Materiale         Position          Angle          Scale        Velocity         rVelocity       Visible    Brightness
-                         
-SceneObject    object_0   OBJModel      1        1           0.0  0.0  0.0    0.0 0.0 0.0    0.5 0.5 0.5     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0  
-SceneObject    object_1   OBJModel      2        2           0.0  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
-SceneObject    object_2   OBJModel      3        3           0.0  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+
+SceneObject    object_0   OBJModel      1        1             0.0  0.0  0.0    0.0 0.0 0.0    0.5 0.5 0.5     0.0 0.0 0.0     0.0 0.0 0.0          1          1.0  
+
+BeginCollection wheel_1                                        0.0  0.5  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0     0.3 0.1 0.0          1          1.0   
+
+  SceneObject    tire       OBJModel      2        2           -1.2  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+  SceneObject    wheel_2    OBJModel      3        3           -1.2  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+
+EndCollection wheel_1
+
+BeginCollection wheel_2                                        0.0  0.5  0.0    0.0 60.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.3 0.1 0.0          1          1.0
+
+  SceneObject    tire       OBJModel      2        2           -1.2  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+  SceneObject    wheel_2    OBJModel      4        4           -1.2  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+
+EndCollection  wheel_2
+
+BeginCollection wheel_3                                        0.0  0.5  0.0    0.0 120.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.3 0.1 0.0          1          1.0
+
+  SceneObject    tire       OBJModel      2        2           -1.2  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+  SceneObject    wheel_2    OBJModel      3        5           -1.2  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+
+EndCollection  wheel_3
+
+BeginCollection wheel_4                                        0.0  0.5  0.0    0.0 180.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.3 0.1 0.0          1          1.0
+
+  SceneObject    tire       OBJModel      2        2           -1.2  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+  SceneObject    wheel_2    OBJModel      4        6           -1.2  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+
+EndCollection  wheel_4
+
+BeginCollection wheel_5                                        0.0  0.5  0.0    0.0 240.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.3 0.1 0.0          1          1.0
+
+  SceneObject    tire       OBJModel      2        2           -1.2  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+  SceneObject    wheel_2    OBJModel      3        7           -1.2  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+
+EndCollection  wheel_5
+  
+BeginCollection wheel_6                                        0.0  0.5  0.0    0.0 300.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.3 0.1 0.0          1          1.0
+
+  SceneObject    tire       OBJModel      2        2           -1.2  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+  SceneObject    wheel_2    OBJModel      4        8           -1.2  0.0  0.0    0.0 0.0 0.0    1.0 1.0 1.0     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0
+
+EndCollection  wheel_6
 
 
                 Name                  Geometry  Materiale        Position         Angle          Scale          Velocity        rVelocity       Visible     Brightness    Color             Intensity 
