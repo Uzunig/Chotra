@@ -20,10 +20,10 @@ add_library(Chotra STATIC
 	src/blur.cpp
 	src/blur.h
 
-      src/gui.cpp
+        src/gui.cpp
 	src/gui.h
 
-      src/material.cpp
+        src/material.cpp
 	src/material.h
 
 	src/material_texture.cpp
@@ -35,13 +35,13 @@ add_library(Chotra STATIC
 	src/obj_model.cpp
 	src/obj_model.h
 
-      src/windows_platform_utils.cpp
+        src/windows_platform_utils.cpp
 	src/platform_utils.h
 
 	src/renderer.cpp
 	src/renderer.h
 
-      src/resource_manager.cpp
+        src/resource_manager.cpp
 	src/resource_manager.h
 
 	src/scene.cpp
@@ -49,6 +49,9 @@ add_library(Chotra STATIC
 
 	src/scene_object.cpp
 	src/scene_object.h
+
+	src/scene_collection.cpp
+	src/scene_collection.h	
 
 	src/scene_light.cpp
 	src/scene_light.h
@@ -71,8 +74,8 @@ add_library(Chotra STATIC
 	src/quad.cpp
 	src/quad.h
 
-      src/window.h
-      src/window.cpp
+        src/window.h
+        src/window.cpp
 )
 
 target_include_directories(Chotra PUBLIC includes)

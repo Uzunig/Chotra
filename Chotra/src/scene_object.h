@@ -28,6 +28,7 @@ namespace Chotra {
         glm::vec3 position;
         glm::vec3 angle;
         glm::vec3 scale;
+        glm::mat4 parentMatrix;
         glm::mat4 modelMatrix;
         glm::vec3 velocity;
         glm::vec3 rVelocity;

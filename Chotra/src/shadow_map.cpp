@@ -58,7 +58,8 @@ namespace Chotra {
             glEnable(GL_CULL_FACE);
             glCullFace(GL_FRONT);
 
-            scene->DrawSceneObjects(simpleDepthShader);
+            //scene->DrawSceneObjects(simpleDepthShader);
+            scene->DrawSceneCollection(simpleDepthShader, scene->rootCollection);
 
             glCullFace(GL_BACK);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
