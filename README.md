@@ -1,6 +1,6 @@
 <p>
-    <img src="logo\Logo_png.png" width="300"
-         height="300" alt="Logo">
+    <img src="logo\Logo_png.png" width="267"
+         height="267" alt="Logo">
 </p>
 
 <h1><strong>Chotra Engine - Custom real-time rendering engine </strong></h1>
