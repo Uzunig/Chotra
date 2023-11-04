@@ -13,7 +13,8 @@
         <img src="logo\img2.png" width="267"
              height="137" alt="Logo">
     </a>
-
+</p>
+<p>
     <a href="https://www.linkedin.com/posts/igor-uzun_after-a-short-pause-back-to-my-favorite-activity-7117918831917826048-2UPr?utm_source=share&utm_medium=member_desktop" target="_blank">
         <img src="logo\img1.png" width="267"
              height="137" alt="Logo">
