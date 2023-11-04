@@ -1,5 +1,5 @@
 <p>
-    <img src="logo\Logo_png.png" width="267"
+    <img src="logo/Logo_png.png" width="267"
          height="267" alt="Logo">
 </p>
 
@@ -10,13 +10,13 @@
 
 <p>
     <a href="https://www.linkedin.com/posts/igor-uzun_c-opengl-glfw-glm-imgui-real-time-activity-7068134556163276800-ata5?utm_source=share&utm_medium=member_android&lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BrqdU8tTwQAud%2FzUqqqss%2Bg%3D%3D" target="_blank">
-        <img src="logo\img2.png" width="267"
+        <img src="logo/img2.png" width="267"
              height="137" alt="Logo">
     </a>
 </p>
 <p>
     <a href="https://www.linkedin.com/posts/igor-uzun_after-a-short-pause-back-to-my-favorite-activity-7117918831917826048-2UPr?utm_source=share&utm_medium=member_desktop" target="_blank">
-        <img src="logo\img1.png" width="267"
+        <img src="logo/img1.png" width="267"
              height="137" alt="Logo">
     </a>
 </p>
