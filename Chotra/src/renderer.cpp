@@ -337,7 +337,8 @@ namespace Chotra {
             pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i]->color * (float)scene->sceneLights[i]->brightness);
         }
 
-        scene->DrawSceneObjects(pbrShader);
+        //scene->DrawSceneObjects(pbrShader);
+        scene->DrawSceneCollection(pbrShader, scene->rootCollection);
 
 
         //scene.DrawSceneLights(lightsShader);
@@ -405,7 +406,8 @@ namespace Chotra {
             pbrShader.SetVec3("lightColors[" + std::to_string(i) + "]", scene->sceneLights[i]->color * (float)scene->sceneLights[i]->brightness);
         }
 
-        scene->DrawSceneObjects(pbrShader);
+        //scene->DrawSceneObjects(pbrShader);
+        scene->DrawSceneCollection(pbrShader, scene->rootCollection);
 
         /*
         lightsShader.Use();
@@ -874,7 +876,8 @@ namespace Chotra {
         shaderDeferredGeometryPass.SetMat4("projection", projection);
         shaderDeferredGeometryPass.SetMat4("view", view);
 
-        scene->DrawSceneObjects(shaderDeferredGeometryPass);
+        //scene->DrawSceneObjects(shaderDeferredGeometryPass);
+        scene->DrawSceneCollection(shaderDeferredGeometryPass, scene->rootCollection);
         scene->DrawSceneLights(shaderDeferredGeometryPass);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -12,7 +12,7 @@ namespace Chotra {
     SceneObject::SceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle,
         glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity, bool visible, float brightness)
         : geometryIndex(geometryIndex), materialIndex(materialIndex), name(name), position(position), angle(angle),
-        scale(scale), velocity(velocity), rVelocity(rVelocity), visible(visible), brightness(brightness) {
+        scale(scale), velocity(velocity), rVelocity(rVelocity), visible(visible), brightness(brightness), parentMatrix(glm::mat4(1.0)) {
 
         UpdateModelMatrix();
     }
@@ -55,8 +55,7 @@ namespace Chotra {
     }
 
     void SceneObject::UpdateModelMatrix() {
-        modelMatrix = glm::mat4(1.0f);
-        modelMatrix = glm::translate(modelMatrix, position);
+        modelMatrix = glm::translate(parentMatrix, position);
 
         modelMatrix = modelMatrix * (glm::rotate(glm::mat4(1.0f), glm::radians(angle.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
             glm::rotate(glm::mat4(1.0f), glm::radians(angle.x), glm::vec3(1.0f, 0.0f, 0.0f)) *

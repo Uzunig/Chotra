@@ -1,0 +1,8 @@
+# Blender 3.6.4 MTL File: 'None'
+# www.blender.org
+
+map_Kd Textures/albedo1.png
+map_Bump Textures/Normal_normal.png
+map_Pm Textures/metallic.png
+map_Pr Textures/roughness.png
+map_AO Textures/ao.png

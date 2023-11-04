@@ -23,14 +23,16 @@ namespace Chotra {
     class SceneObject;
     class Environment;
     class Sun;
+    class SceneCollection;
 
     class Scene {
     public:
-                    
-        std::vector<std::shared_ptr<SceneObject>> sceneObjects;
+        
+        std::shared_ptr<SceneCollection> rootCollection;
+        //std::vector<std::shared_ptr<SceneObject>> sceneObjects;
         std::vector<std::shared_ptr<SceneLight>> sceneLights;
         std::vector<std::shared_ptr<SceneLight>> sceneSuns;
-                
+                                
         std::shared_ptr<Environment> environment;
 
         Scene(std::string path);
@@ -38,15 +40,16 @@ namespace Chotra {
         
         void LoadSceneFromFile(std::string const& path);
         void AddEnvironment(std::string path);
-        void AddSceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position = glm::vec3(0.0f), glm::vec3 angle = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 rVelocity = glm::vec3(0.0f), 
-            bool visible = true, float brightness = 1.0);
+        //void AddSceneObject(unsigned int geometryIndex, unsigned int materialIndex, std::string name, glm::vec3 position = glm::vec3(0.0f), glm::vec3 angle = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 rVelocity = glm::vec3(0.0f), 
+          //  bool visible = true, float brightness = 1.0);
         void AddSceneLight(unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position = glm::vec3(0.0f), glm::vec3 angle = glm::vec3(0.0f), glm::vec3 scale = glm::vec3(1.0f), glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 rVelocity = glm::vec3(0.0f), 
             bool visible = true, float brightness = 100.0, glm::vec3 color = glm::vec3(1.0f), float intensity = 100.0);
         void AddSceneSun(unsigned int meshIndex, unsigned int materialIndex, std::string name, glm::vec3 position, glm::vec3 angle, glm::vec3 scale, glm::vec3 velocity, glm::vec3 rVelocity,
             int visible, float brightness, glm::vec3 color, float intensity);
                
         void Update(float dt);
-        void DrawSceneObjects(Shader& shader);
+        void UpdateCollection(float dt, std::shared_ptr<SceneCollection> currentCollection);
+        void DrawSceneCollection(Shader& shader, std::shared_ptr<SceneCollection> currentCollecton);
         void DrawSceneLights(Shader& shader);
           
 

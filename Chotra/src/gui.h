@@ -13,6 +13,7 @@ namespace Chotra {
     class Window;
     class SceneObject;
     class SceneLight;
+    class SceneCollection;
    
     class Gui {
     public:
@@ -42,6 +43,7 @@ namespace Chotra {
         ImVec4 border_col = ImVec4(1.0f, 1.0f, 1.0f, 0.5f); // 50% opaque white
                 
         char str0[128];
+        std::shared_ptr<SceneCollection> selectedCollection;
         int selected = -1;
         int subSelected = -1;
         std::string componentsName = "";
@@ -53,6 +55,7 @@ namespace Chotra {
         void Show();
         void ShowTopBar();
         void ShowToolsBar();
+        void ShowCollection(std::shared_ptr<SceneCollection> currentCollection);
         void ShowCollectionBar();
         void ShowPropertiesBar();
         void ShowScoreBar();

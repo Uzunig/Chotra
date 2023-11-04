@@ -1,13 +1,32 @@
-<p><img src="Logo_png.png" width="300" 
-   height="300" alt="Logo"></p>
+<p>
+    <img src="logo\Logo_png.png" width="300"
+         height="300" alt="Logo">
+</p>
 
-<h1><strong>Chotra Engine - Custom real-time rendering engine </strong></h1>   
+<h1><strong>Chotra Engine - Custom real-time rendering engine </strong></h1>
 
-<p><a href="https://www.linkedin.com/posts/igor-uzun_c-opengl-glfw-glm-imgui-real-time-activity-7068134556163276800-ata5?utm_source=share&utm_medium=member_android&lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BrqdU8tTwQAud%2FzUqqqss%2Bg%3D%3D" target="_blank">Presentation</a></p>
+
+<h3><strong>Demo videos: </strong></h3>
+
+<p>
+    <a href="https://www.linkedin.com/posts/igor-uzun_c-opengl-glfw-glm-imgui-real-time-activity-7068134556163276800-ata5?utm_source=share&utm_medium=member_android&lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BrqdU8tTwQAud%2FzUqqqss%2Bg%3D%3D" target="_blank">
+        <img src="logo\img2.png" width="267"
+             height="137" alt="Logo">
+    </a>
+
+    <a href="https://www.linkedin.com/posts/igor-uzun_after-a-short-pause-back-to-my-favorite-activity-7117918831917826048-2UPr?utm_source=share&utm_medium=member_desktop" target="_blank">
+        <img src="logo\img1.png" width="267"
+             height="137" alt="Logo">
+    </a>
+</p>
+
 
 <br>
-<h3><strong>
-C++, OpenGL, GLFW, GLM, Real-time rendering, Physically Based Rendering, Materials, OBJ-model loading, Lighting, Image Based Lighting, Postprocessing, Bloom, Shadow mapping, SSAO, SSR, ImGui. </strong></h3>
+<h3>
+    <strong>
+        C++, OpenGL, GLFW, GLM, Real-time rendering, Physically Based Rendering, Materials, OBJ-model loading, Lighting, Image Based Lighting, Postprocessing, Bloom, Shadow mapping, SSAO, SSR, ImGui.
+    </strong>
+</h3>
 <hr>
 
 <p>Dear friends.</p>
