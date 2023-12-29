@@ -29,19 +29,19 @@ namespace Chotra {
                 
         mainWindow = std::make_unique<Window>("Chotra Engine", 1920, 1080); //1920 1080
                 
-        eventDispatcher.addEventListener<WindowResizeEvent>(
+        eventDispatcher.addEventDistener<WindowResizeEvent>(
             [&](WindowResizeEvent& event) {
                 //std::cout << "Window resized to  " << event.width << " " << event.height << std::endl;
 
             });
 
-        eventDispatcher.addEventListener<WindowCloseEvent>(
+        eventDispatcher.addEventDistener<WindowCloseEvent>(
             [&](WindowCloseEvent& event) {
                 //std::cout << "Window close " << std::endl;
                 closeMainWindow = true;
             });
 
-        eventDispatcher.addEventListener<KeyPressedEvent>(
+        eventDispatcher.addEventDistener<KeyPressedEvent>(
             [&](KeyPressedEvent& event) {
                 //std::cout << "Key pressed:  " << (char)event.key << std::endl;
 
@@ -63,7 +63,7 @@ namespace Chotra {
             });
 
         // TODO: Register of pressed keys
-        eventDispatcher.addEventListener<KeyReleasedEvent>(
+        eventDispatcher.addEventDistener<KeyReleasedEvent>(
             [&](KeyReleasedEvent& event) {
                 //std::cout << "Key released:  " << (char)event.key << std::endl;
                 if (mainWindow->GetPlayerMode()) {
@@ -82,14 +82,14 @@ namespace Chotra {
                 }
             });
 
-        eventDispatcher.addEventListener<MouseRightButtonPressedEvent>(
+        eventDispatcher.addEventDistener<MouseRightButtonPressedEvent>(
             [&](MouseRightButtonPressedEvent& event) {
                 //std::cout << "Mouse right button pressed:  " << std::endl;
                 mainWindow->SetPlayerMode(true);
 
             });
 
-        eventDispatcher.addEventListener<MouseRightButtonReleasedEvent>(
+        eventDispatcher.addEventDistener<MouseRightButtonReleasedEvent>(
             [&](MouseRightButtonReleasedEvent& event) {
                 //std::cout << "Mouse right button released:  " << std::endl;
                 mainWindow->SetPlayerMode(false);
@@ -101,7 +101,7 @@ namespace Chotra {
 
             });
 
-        eventDispatcher.addEventListener<MouseMovedEvent>(
+        eventDispatcher.addEventDistener<MouseMovedEvent>(
             [&](MouseMovedEvent& event) {
                 //std::cout << "Mouse moved to  " << event.x << " " << event.y << std::endl;
 

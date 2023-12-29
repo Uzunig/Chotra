@@ -35,7 +35,7 @@ namespace Chotra {
     public:
         template<typename EventType>
 
-        void addEventListener(std::function<void(EventType&)> callback) {
+        void addEventDistener(std::function<void(EventType&)> callback) {
             auto baseCallback = [func = std::move(callback)](Event& e) {
                 if (e.GetEventType() == EventType::eventType) {
                     func(static_cast<EventType&>(e));
