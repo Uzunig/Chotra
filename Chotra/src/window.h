@@ -36,19 +36,19 @@ namespace Chotra {
         Window& operator=(Window&&) = delete;
 
         void OnUpdate(float deltaTime);
-        unsigned int GetWidth() { return windowData.width; }
-        unsigned int GetHeight() { return windowData.height; }
+        unsigned int GetWidth() const;
+        unsigned int GetHeight() const;
 
         void SetEventCallbackFn(const EventCallbackFn& callback);
 
         void SetPlayerMode(bool playerMode);
-        bool GetPlayerMode();
+        bool GetPlayerMode() const;
 
         void SetFirstMouse(bool firstMouse);
-        bool GetFirstMouse();
-                
-        //Camera camera;
-        //std::unique_ptr<Scene> scene;
+        bool GetFirstMouse() const;
+
+        GLFWwindow* GetGlfwWindow();
+
         std::unique_ptr<Renderer> renderer;
         std::unique_ptr<class Gui> gui;
 
@@ -67,8 +67,10 @@ namespace Chotra {
             EventCallbackFn eventCallbackFn;
         };
 
-        int Init();
+        void Init();
         void Shutdown();
+
+        void SetCallbacks();
 
         GLFWwindow* glfwWindow = nullptr;
         WindowData windowData;

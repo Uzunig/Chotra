@@ -2,9 +2,14 @@ cmake_minimum_required(VERSION 3.5)
 
 project(Chotra)
 
-add_library(Chotra STATIC
-	includes/Chotra/application.h
-	includes/Chotra/Events/event.h      
+add_executable(Chotra
+	src/main.cpp	
+
+	src/application.h
+	src/event.h 
+	
+	src/glfw_context.cpp
+	src/glfw_context.h
 	
 	src/application.cpp
 	
@@ -20,10 +25,10 @@ add_library(Chotra STATIC
 	src/blur.cpp
 	src/blur.h
 
-        src/gui.cpp
+    src/gui.cpp
 	src/gui.h
 
-        src/material.cpp
+    src/material.cpp
 	src/material.h
 
 	src/material_texture.cpp
@@ -35,13 +40,13 @@ add_library(Chotra STATIC
 	src/obj_model.cpp
 	src/obj_model.h
 
-        src/windows_platform_utils.cpp
+    src/windows_platform_utils.cpp
 	src/platform_utils.h
 
 	src/renderer.cpp
 	src/renderer.h
 
-        src/resource_manager.cpp
+    src/resource_manager.cpp
 	src/resource_manager.h
 
 	src/scene.cpp
@@ -74,8 +79,8 @@ add_library(Chotra STATIC
 	src/quad.cpp
 	src/quad.h
 
-        src/window.h
-        src/window.cpp
+    src/window.h
+    src/window.cpp
 )
 
 target_include_directories(Chotra PUBLIC includes)

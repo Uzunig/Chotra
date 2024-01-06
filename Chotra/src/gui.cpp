@@ -3,7 +3,7 @@
 
 #include "window.h"
 #include "platform_utils.h"
-#include "Chotra/application.h"
+#include "application.h"
 #include "scene_object.h"
 #include "scene_collection.h"
 #include "scene_light.h"
@@ -26,6 +26,11 @@ namespace Chotra {
     }
 
     void Gui::Init() {
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui_ImplOpenGL3_Init();
+        ImGui_ImplGlfw_InitForOpenGL(p_mainWindow->GetGlfwWindow(), true);
 
         if (no_titlebar)        window_flags |= ImGuiWindowFlags_NoTitleBar;
         if (no_scrollbar)       window_flags |= ImGuiWindowFlags_NoScrollbar;
