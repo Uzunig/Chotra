@@ -79,7 +79,7 @@ namespace Chotra {
         ShowAssetsBar();
         ShowPropertiesBar();
         ShowScoreBar();
-        //ShowDebuggingQuads(); // TO DO: There is a broblem with Hdr (likely) and y-orientation. To resolve. 
+        //ShowDebuggingQuads(); // TO DO: There is a problem with Hdr (likely) and y-orientation. To resolve. 
 
     }
 

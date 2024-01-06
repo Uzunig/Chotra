@@ -29,6 +29,7 @@ namespace Chotra {
     void Application::Init() {
 
         if (GetCurrentDirectoryA(256, mainDir)) {}
+        std::cout << mainDir << std::endl;
 
         mainWindow = std::make_unique<Window>("Chotra Engine", 1920, 1080); //1920 1080
         eventDispatcher = std::make_unique<EventDispatcher>();

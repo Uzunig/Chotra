@@ -39,20 +39,18 @@ namespace Chotra {
         unsigned int GetWidth() const;
         unsigned int GetHeight() const;
 
-        void SetEventCallbackFn(const EventCallbackFn& callback);
-
         void SetPlayerMode(bool playerMode);
         bool GetPlayerMode() const;
 
         void SetFirstMouse(bool firstMouse);
         bool GetFirstMouse() const;
 
+        void SetEventCallbackFn(const EventCallbackFn& callback);
+
         GLFWwindow* GetGlfwWindow();
 
         std::unique_ptr<Renderer> renderer;
         std::unique_ptr<class Gui> gui;
-
-            
 
         glm::vec2 lastMousePosition;
         

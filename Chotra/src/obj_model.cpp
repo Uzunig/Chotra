@@ -28,7 +28,7 @@ namespace Chotra {
         std::ifstream obj_file(path);
 
         if (!obj_file) {
-            std::cout << "The OBJ file could not open for writing!" << std::endl;
+            std::cout << "The OBJ file could not open!" << std::endl;
 
         }
         else {
