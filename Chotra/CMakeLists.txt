@@ -43,6 +43,9 @@ add_executable(Chotra
     src/windows_platform_utils.cpp
 	src/platform_utils.h
 
+	src/rendering_settings.cpp
+	src/rendering_settings.h
+	
 	src/renderer.cpp
 	src/renderer.h
 

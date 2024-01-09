@@ -92,7 +92,7 @@ namespace Chotra {
 
         std::ifstream mtl_file(directory + mtl_filename);
         if (!mtl_file) {
-            std::cout << "The MTL file could not open for writing!" << std::endl;
+            std::cout << "The MTL file could not open!" << std::endl;
         }
         else {
             mtl_file.close();

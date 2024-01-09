@@ -6,13 +6,17 @@
 
 #include "glfw_context.h"
 #include "window.h"
+#include "gui.h"
+#include "camera.h"
+#include "scene.h"
+#include "renderer.h"
 #include "resource_manager.h"
-
 
 namespace Chotra {
 
     Application::Application()
-        : glfwContext(GLFWContext::GetInstance()) {
+        : width(1920), hight(1080),
+        glfwContext(GLFWContext::GetInstance()) {
 
         Init();
     }
@@ -31,8 +35,20 @@ namespace Chotra {
         if (GetCurrentDirectoryA(256, mainDir)) {}
         std::cout << mainDir << std::endl;
 
-        mainWindow = std::make_unique<Window>("Chotra Engine", 1920, 1080); //1920 1080
+        mainWindow = std::make_shared<Window>("Chotra Engine", width, hight); //1920 1080
         eventDispatcher = std::make_unique<EventDispatcher>();
+
+        ResourceManager::MakeMiniCamera(glm::vec3(0.0f, 1.0f, 5.0f));
+        ResourceManager::MakeMiniScene("resources/level_mini.lv");
+
+        ResourceManager::MakeCamera(glm::vec3(0.0f, 1.0f, 5.0f));
+        ResourceManager::MakeScene("resources/level1.lv");
+
+        renderer = std::make_shared<Renderer>(width, hight);
+        //renderer->Init();
+        gui = std::make_shared<Gui>(mainWindow, renderer);
+        //gui->UpdateAllIcons();
+
         SetupEvents();
     }
 
@@ -157,6 +173,15 @@ namespace Chotra {
     }
 
     void Application::OnUpdate(float deltaTime) {
+
+        fps = 1 / deltaTime;
+        ResourceManager::camera->ProcessKeyboard(deltaTime);
+        //scene->DemoUpdate(deltaTime);
+        ResourceManager::UpdateScene(deltaTime);
+        renderer->Render(ResourceManager::GetScene(), ResourceManager::GetCamera());
+
+        gui->Show();
+        gui->Render();
 
         mainWindow->OnUpdate(deltaTime);
 

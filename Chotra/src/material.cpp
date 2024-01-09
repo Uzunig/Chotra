@@ -17,11 +17,8 @@ namespace Chotra {
         std::ifstream mtl_file(path);
         if (!mtl_file) {
             std::cout << "The MTL file could not open!" << std::endl;
-
         }
         else {
-
-            
             this->path = path;
 
             while (mtl_file) {

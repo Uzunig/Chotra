@@ -12,8 +12,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "camera.h"
-
 
 namespace Chotra {
 
@@ -27,7 +25,7 @@ namespace Chotra {
 
         using EventCallbackFn = std::function<void(Event&)>;
 
-        Window(std::string title, unsigned int width, unsigned int height);
+        Window(std::string title, unsigned int& width, unsigned int& height);
         ~Window();
     
         Window(const Window&) = delete;
@@ -49,19 +47,17 @@ namespace Chotra {
 
         GLFWwindow* GetGlfwWindow();
 
-        std::unique_ptr<Renderer> renderer;
-        std::unique_ptr<class Gui> gui;
+       // std::unique_ptr<Renderer> renderer;
+        //std::unique_ptr<class Gui> gui;
 
         glm::vec2 lastMousePosition;
-        
-        int fps = 0;
 
     private:
 
         struct WindowData {
             std::string title;
-            unsigned int width;
-            unsigned int height;
+            unsigned int& width;
+            unsigned int& hight;
             EventCallbackFn eventCallbackFn;
         };
 

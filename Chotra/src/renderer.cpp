@@ -54,6 +54,8 @@ namespace Chotra {
 
         ConfigureBloom();
 
+        Init();
+
     }
 
     void Renderer::Init() {

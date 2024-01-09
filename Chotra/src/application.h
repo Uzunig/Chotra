@@ -28,21 +28,25 @@ namespace Chotra {
         static std::string GetMainDir();
 
     private:
-        
+        unsigned int width;
+        unsigned int hight;
+
         class GLFWContext& glfwContext;
-        std::unique_ptr<class Window> mainWindow;
+        std::shared_ptr<class Window> mainWindow;
+        std::shared_ptr<class Renderer> renderer;
+        std::shared_ptr<class Gui> gui;
 
         std::unique_ptr<EventDispatcher> eventDispatcher;
         bool closeMainWindow = false;
 
         virtual void Init();
         virtual void SetupEvents();
-
+                
         float currentTime = 0.0f;
         float deltaTime = 0.0f;
         float lastFrame = 0.0f;
-          
 
+        int fps = 0;
     };
 
 

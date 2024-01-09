@@ -5,12 +5,6 @@
 
 
 #include "platform_utils.h"
-#include "gui.h"
-#include "camera.h"
-#include "scene.h"
-#include "renderer.h"
-#include "resource_manager.h"
-
 #include "event.h"
 
 
@@ -18,8 +12,8 @@ namespace Chotra {
 
     static int selected = -1;
 
-    Window::Window(std::string title, unsigned int width, unsigned int height)
-        : windowData({ title, width, height }) {
+    Window::Window(std::string title, unsigned int& width, unsigned int& hight)
+        : windowData({ title, width, hight }) {
 
         Init();
 
@@ -35,7 +29,7 @@ namespace Chotra {
         glfwWindowHint(GLFW_SAMPLES, 4);
 
         /* Create a windowed mode window and its OpenGL context */
-        glfwWindow = glfwCreateWindow(windowData.width, windowData.height, windowData.title.c_str(), NULL, NULL);
+        glfwWindow = glfwCreateWindow(windowData.width, windowData.hight, windowData.title.c_str(), NULL, NULL);
 
         if (!glfwWindow) {
             glfwTerminate();
@@ -64,7 +58,7 @@ namespace Chotra {
 
         //glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-        
+        /*
         ResourceManager::MakeMiniCamera(glm::vec3(0.0f, 1.0f, 5.0f));
         ResourceManager::MakeMiniScene("resources/level_mini.lv");
 
@@ -74,7 +68,7 @@ namespace Chotra {
         renderer = std::make_unique<Renderer>(windowData.width, windowData.height);
         renderer->Init();
         gui = std::make_unique<Gui>(this);
-        gui->UpdateAllIcons();
+        gui->UpdateAllIcons();*/
 
         lastMousePosition = glm::vec2(GetWidth() / 2, GetHeight() / 2);
     }
@@ -86,13 +80,13 @@ namespace Chotra {
 
     void Window::SetCallbacks() {
         glfwSetWindowSizeCallback(glfwWindow,
-            [](GLFWwindow* window, int width, int height) {
+            [](GLFWwindow* window, int width, int hight) {
 
                 WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
                 data.width = width;
-                data.height = height;
+                data.hight = hight;
 
-                WindowResizeEvent event(width, height);
+                WindowResizeEvent event(width, hight);
                 data.eventCallbackFn(event);
             }
         );
@@ -154,7 +148,7 @@ namespace Chotra {
 
 
     void Window::OnUpdate(float deltaTime) {
-
+        /*
         fps = 1 / deltaTime;
         ResourceManager::camera->ProcessKeyboard(deltaTime);
         //scene->DemoUpdate(deltaTime);
@@ -162,7 +156,7 @@ namespace Chotra {
         renderer->Render(ResourceManager::GetScene(), ResourceManager::GetCamera());
 
         gui->Show();
-        gui->Render();
+        gui->Render();*/
 
         glfwSwapBuffers(glfwWindow);
         glfwPollEvents();
@@ -175,7 +169,7 @@ namespace Chotra {
 
     unsigned int Window::GetHeight() const
     {
-        return windowData.height;
+        return windowData.hight;
     }
 
     void Window::SetEventCallbackFn(const EventCallbackFn& callback) {
