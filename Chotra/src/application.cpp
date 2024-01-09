@@ -1,18 +1,24 @@
+#include "application.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <iostream>
 
-#include "Chotra/application.h"
-
+#include "glfw_context.h"
 #include "window.h"
+#include "gui.h"
+#include "camera.h"
+#include "scene.h"
+#include "renderer.h"
 #include "resource_manager.h"
-
 
 namespace Chotra {
 
-    Application::Application() {
+    Application::Application()
+        : width(1920), hight(1080),
+        glfwContext(GLFWContext::GetInstance()) {
 
+        Init();
     }
 
     Application::~Application() {
@@ -20,30 +26,47 @@ namespace Chotra {
     }
 
     std::string Application::GetMainDir() {
+
         return mainDir;
     }
 
-    int Application::Start() {
+    void Application::Init() {
 
         if (GetCurrentDirectoryA(256, mainDir)) {}
-                
-        mainWindow = std::make_unique<Window>("Chotra Engine", 1920, 1080); //1920 1080
-                
-        eventDispatcher.addEventListener<WindowResizeEvent>(
+        std::cout << mainDir << std::endl;
+
+        mainWindow = std::make_shared<Window>("Chotra Engine", width, hight); //1920 1080
+        eventDispatcher = std::make_unique<EventDispatcher>();
+
+        ResourceManager::MakeMiniCamera(glm::vec3(0.0f, 1.0f, 5.0f));
+        ResourceManager::MakeMiniScene("resources/level_mini.lv");
+
+        ResourceManager::MakeCamera(glm::vec3(0.0f, 1.0f, 5.0f));
+        ResourceManager::MakeScene("resources/level1.lv");
+
+        renderer = std::make_shared<Renderer>(width, hight);
+        //renderer->Init();
+        gui = std::make_shared<Gui>(mainWindow, renderer);
+        //gui->UpdateAllIcons();
+
+        SetupEvents();
+    }
+
+    void Application::SetupEvents()
+    {
+        eventDispatcher->addEventListener<WindowResizeEvent>(
             [&](WindowResizeEvent& event) {
-                //std::cout << "Window resized to  " << event.width << " " << event.height << std::endl;
 
             });
 
-        eventDispatcher.addEventListener<WindowCloseEvent>(
+        eventDispatcher->addEventListener<WindowCloseEvent>(
             [&](WindowCloseEvent& event) {
-                //std::cout << "Window close " << std::endl;
+
                 closeMainWindow = true;
             });
 
-        eventDispatcher.addEventListener<KeyPressedEvent>(
+        eventDispatcher->addEventListener<KeyPressedEvent>(
             [&](KeyPressedEvent& event) {
-                //std::cout << "Key pressed:  " << (char)event.key << std::endl;
 
                 if (event.key == GLFW_KEY_ESCAPE) {
                     //closeMainWindow = true;
@@ -52,46 +75,52 @@ namespace Chotra {
                 if (mainWindow->GetPlayerMode()) {
                     if (event.key == GLFW_KEY_W) {
                         ResourceManager::camera->movementDirection.z += 1.0f;
-                    } else if (event.key == GLFW_KEY_S) {
+                    }
+                    else if (event.key == GLFW_KEY_S) {
                         ResourceManager::camera->movementDirection.z -= 1.0f;
-                    } else if (event.key == GLFW_KEY_A) {
+                    }
+                    else if (event.key == GLFW_KEY_A) {
                         ResourceManager::camera->movementDirection.x -= 1.0f;
-                    } else if (event.key == GLFW_KEY_D) {
+                    }
+                    else if (event.key == GLFW_KEY_D) {
                         ResourceManager::camera->movementDirection.x += 1.0f;
                     }
                 }
             });
 
         // TODO: Register of pressed keys
-        eventDispatcher.addEventListener<KeyReleasedEvent>(
+        eventDispatcher->addEventListener<KeyReleasedEvent>(
             [&](KeyReleasedEvent& event) {
-                //std::cout << "Key released:  " << (char)event.key << std::endl;
+
                 if (mainWindow->GetPlayerMode()) {
                     if (event.key == GLFW_KEY_W) {
                         ResourceManager::camera->movementDirection.z -= 1.0f;
 
-                    } else if (event.key == GLFW_KEY_S) {
+                    }
+                    else if (event.key == GLFW_KEY_S) {
                         ResourceManager::camera->movementDirection.z += 1.0f;
 
-                    } else if (event.key == GLFW_KEY_A) {
+                    }
+                    else if (event.key == GLFW_KEY_A) {
                         ResourceManager::camera->movementDirection.x += 1.0f;
 
-                    } else if (event.key == GLFW_KEY_D) {
+                    }
+                    else if (event.key == GLFW_KEY_D) {
                         ResourceManager::camera->movementDirection.x -= 1.0f;
                     }
                 }
             });
 
-        eventDispatcher.addEventListener<MouseRightButtonPressedEvent>(
+        eventDispatcher->addEventListener<MouseRightButtonPressedEvent>(
             [&](MouseRightButtonPressedEvent& event) {
-                //std::cout << "Mouse right button pressed:  " << std::endl;
+
                 mainWindow->SetPlayerMode(true);
 
             });
 
-        eventDispatcher.addEventListener<MouseRightButtonReleasedEvent>(
+        eventDispatcher->addEventListener<MouseRightButtonReleasedEvent>(
             [&](MouseRightButtonReleasedEvent& event) {
-                //std::cout << "Mouse right button released:  " << std::endl;
+
                 mainWindow->SetPlayerMode(false);
                 mainWindow->SetFirstMouse(true);
                 ResourceManager::camera->movementDirection.z = 0.0f;
@@ -101,9 +130,8 @@ namespace Chotra {
 
             });
 
-        eventDispatcher.addEventListener<MouseMovedEvent>(
+        eventDispatcher->addEventListener<MouseMovedEvent>(
             [&](MouseMovedEvent& event) {
-                //std::cout << "Mouse moved to  " << event.x << " " << event.y << std::endl;
 
                 if (mainWindow->GetPlayerMode()) {
                     if (mainWindow->GetFirstMouse())
@@ -126,9 +154,13 @@ namespace Chotra {
 
         mainWindow->SetEventCallbackFn(
             [&](Event& event) {
-                eventDispatcher.Dispatch(event);
+                eventDispatcher->Dispatch(event);
             });
 
+    }
+
+    void Application::Run()
+    {
         while (!closeMainWindow) {
 
             currentTime = glfwGetTime();
@@ -136,13 +168,22 @@ namespace Chotra {
             lastFrame = currentTime;
 
             OnUpdate(deltaTime);
-            mainWindow->OnUpdate(deltaTime);
         }
         mainWindow = nullptr;
-        return 0;
     }
 
     void Application::OnUpdate(float deltaTime) {
+
+        fps = 1 / deltaTime;
+        ResourceManager::camera->ProcessKeyboard(deltaTime);
+        //scene->DemoUpdate(deltaTime);
+        ResourceManager::UpdateScene(deltaTime);
+        renderer->Render(ResourceManager::GetScene(), ResourceManager::GetCamera());
+
+        gui->Show();
+        gui->Render();
+
+        mainWindow->OnUpdate(deltaTime);
 
     }
 } // namspace Chotra

@@ -16,6 +16,8 @@
 #include "quad.h"
 #include "shadow_map.h"
 #include "screen_texture.h"
+#include "rendering_settings.h"
+
 
 namespace Chotra {
 
@@ -23,7 +25,7 @@ namespace Chotra {
     class Camera;
     class GaussianBlurer;
             
-    class Renderer {
+    class Renderer : public RenderingSettings {
     public:
 
         ShadowMap shadowMap;
@@ -33,9 +35,6 @@ namespace Chotra {
 
         glm::mat4 projection;
         glm::mat4 view;
-
-        //Camera& camera;
-        //Scene& scene;
                                        
         unsigned int& width;
         unsigned int& height;
@@ -65,12 +64,12 @@ namespace Chotra {
 
         Shader shaderRenderOnScreen;
 
-             
+         /*
         int renderingMode = 1;
         bool passiveMode = false;
 
         bool enableMSAA = true;
-        int samplesNumber = 16;
+        int samplesNumber = 4;
         bool perspectiveProjection;    
         float backgroundColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
         bool drawSkybox = true;
@@ -94,6 +93,7 @@ namespace Chotra {
         float rayStep = 0.014f; // 0,014f
         int iterationCount = 6; // 1400
         float accuracySSR = 0.05f; // 0.05f
+        */
                 
         ScreenTexture screenTexture; 
                   

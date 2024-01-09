@@ -10,6 +10,7 @@
 
 namespace Chotra {
 
+    class Renderer;
     class Window;
     class SceneObject;
     class SceneLight;
@@ -17,8 +18,8 @@ namespace Chotra {
    
     class Gui {
     public:
-        
-        Window* p_mainWindow;
+        std::shared_ptr<Renderer> p_renderer;
+        std::shared_ptr<Window> p_mainWindow;
         
         bool* p_open = NULL;
         bool no_titlebar = false;
@@ -49,7 +50,7 @@ namespace Chotra {
         std::string componentsName = "";
         int chosed = -1;
         
-        Gui(Window* p_mainWindow);
+        Gui(std::shared_ptr<Window> p_mainWindow, std::shared_ptr<Renderer> p_renderer);
         void Init();
         void Update();
         void Show();

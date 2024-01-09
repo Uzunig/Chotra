@@ -54,6 +54,8 @@ namespace Chotra {
 
         ConfigureBloom();
 
+        Init();
+
     }
 
     void Renderer::Init() {
@@ -212,7 +214,7 @@ namespace Chotra {
 
         glBindTexture(GL_TEXTURE_2D, ssrUvMap);
         quads[2]->RenderQuad();
-
+        
           glBindTexture(GL_TEXTURE_2D, ssrUvMapMip.GetId());
           quads[3]->RenderQuad();
           

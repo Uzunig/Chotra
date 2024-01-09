@@ -16,12 +16,9 @@ namespace Chotra {
         name = path.substr(path.find_last_of('/') + 1, path.length()) + "##" + suffix;
         std::ifstream mtl_file(path);
         if (!mtl_file) {
-            std::cout << "The MTL file could not open for writing!" << std::endl;
-
+            std::cout << "The MTL file could not open!" << std::endl;
         }
         else {
-
-            
             this->path = path;
 
             while (mtl_file) {

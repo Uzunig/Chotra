@@ -11,7 +11,7 @@
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 
-#include "Chotra/application.h"
+#include "application.h"
 
 #define GLFEW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>

@@ -1,9 +1,10 @@
 
 #include "gui.h"
 
+
 #include "window.h"
 #include "platform_utils.h"
-#include "Chotra/application.h"
+#include "application.h"
 #include "scene_object.h"
 #include "scene_collection.h"
 #include "scene_light.h"
@@ -18,14 +19,19 @@
 namespace Chotra {
 
 
-    Gui::Gui(Window* p_mainWindow)
-        : p_mainWindow(p_mainWindow) {
+    Gui::Gui(std::shared_ptr<Window> p_mainWindow, std::shared_ptr<Renderer> p_renderer)
+        : p_renderer(p_renderer), p_mainWindow(p_mainWindow) {
 
         Init();
-
+        UpdateAllIcons();
     }
 
     void Gui::Init() {
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui_ImplOpenGL3_Init();
+        ImGui_ImplGlfw_InitForOpenGL(p_mainWindow->GetGlfwWindow(), true);
 
         if (no_titlebar)        window_flags |= ImGuiWindowFlags_NoTitleBar;
         if (no_scrollbar)       window_flags |= ImGuiWindowFlags_NoScrollbar;
@@ -74,7 +80,7 @@ namespace Chotra {
         ShowAssetsBar();
         ShowPropertiesBar();
         ShowScoreBar();
-        //ShowDebuggingQuads(); // TO DO: There is a broblem with Hdr (likely) and y-orientation. To resolve. 
+        //ShowDebuggingQuads(); // TO DO: There is a problem with Hdr (likely) and y-orientation. To resolve. 
 
     }
 
@@ -147,21 +153,21 @@ namespace Chotra {
         ImGui::SetNextWindowSize(ImVec2(350, 0));
 
         ImGui::Begin("Rendering options");
-        ImGui::RadioButton("Forward shading", &p_mainWindow->renderer->renderingMode, 0);
-        ImGui::RadioButton("Deferred shading", &p_mainWindow->renderer->renderingMode, 1);
+        ImGui::RadioButton("Forward shading", &p_renderer->renderingMode, 0);
+        ImGui::RadioButton("Deferred shading", &p_renderer->renderingMode, 1);
 
         if (ImGui::CollapsingHeader("Post effects")) {
-            ImGui::SliderFloat("Exposure", &p_mainWindow->renderer->exposure, 0.0f, 10.0f);
-            ImGui::SliderFloat("Brightness", &p_mainWindow->renderer->brightness, -3.0f, 3.0f);
-            ImGui::SliderFloat("Contrast", &p_mainWindow->renderer->contrast, -3.0f, 3.0f);
-            ImGui::Checkbox("Bloom", &p_mainWindow->renderer->bloom);
-            ImGui::Checkbox("Gamma correction", &p_mainWindow->renderer->gammaCorrection);
+            ImGui::SliderFloat("Exposure", &p_renderer->exposure, 0.0f, 10.0f);
+            ImGui::SliderFloat("Brightness", &p_renderer->brightness, -3.0f, 3.0f);
+            ImGui::SliderFloat("Contrast", &p_renderer->contrast, -3.0f, 3.0f);
+            ImGui::Checkbox("Bloom", &p_renderer->bloom);
+            ImGui::Checkbox("Gamma correction", &p_renderer->gammaCorrection);
         }
 
         if (ImGui::CollapsingHeader("Environment")) {
-            ImGui::ColorPicker4("Color", p_mainWindow->renderer->backgroundColor);
-            ImGui::Checkbox("Draw skybox", &p_mainWindow->renderer->drawSkybox);
-            ImGui::SliderFloat("Background exposure", &p_mainWindow->renderer->backgroundExposure, 0.0f, 10.0f);
+            ImGui::ColorPicker4("Color", p_renderer->backgroundColor);
+            ImGui::Checkbox("Draw skybox", &p_renderer->drawSkybox);
+            ImGui::SliderFloat("Background exposure", &p_renderer->backgroundExposure, 0.0f, 10.0f);
         }
 
         if (ImGui::CollapsingHeader("Camera settings")) {
@@ -172,38 +178,38 @@ namespace Chotra {
         }
 
 
-        if (p_mainWindow->renderer->renderingMode == 0) {
+        if (p_renderer->renderingMode == 0) {
 
-            if (ImGui::Checkbox("MSAA", &p_mainWindow->renderer->enableMSAA)) {
+            if (ImGui::Checkbox("MSAA", &p_renderer->enableMSAA)) {
                 //add input samplesNumber
             }
         }
 
-        if (p_mainWindow->renderer->renderingMode == 1) {
+        if (p_renderer->renderingMode == 1) {
 
             if (ImGui::CollapsingHeader("SSAO")) {
-                ImGui::SliderInt("Kernel size", &p_mainWindow->renderer->kernelSizeSSAO, 0, 64);
-                ImGui::SliderFloat("radius SSAO", &p_mainWindow->renderer->radiusSSAO, 0.1f, 1.0f);
-                ImGui::SliderFloat("distanceBias", &p_mainWindow->renderer->biasSSAO, 0.001f, 1.0f);
+                ImGui::SliderInt("Kernel size", &p_renderer->kernelSizeSSAO, 0, 64);
+                ImGui::SliderFloat("radius SSAO", &p_renderer->radiusSSAO, 0.1f, 1.0f);
+                ImGui::SliderFloat("distanceBias", &p_renderer->biasSSAO, 0.001f, 1.0f);
 
             }
 
             if (ImGui::CollapsingHeader("SSR")) {
-                ImGui::SliderFloat("biasSSR", &p_mainWindow->renderer->biasSSR, 0.001f, 20.0f);
-                ImGui::SliderFloat("rayStep", &p_mainWindow->renderer->rayStep, 0.001f, 5.0f);
-                ImGui::SliderInt("iterationCount", &p_mainWindow->renderer->iterationCount, 0, 200);
-                ImGui::SliderFloat("accuracy", &p_mainWindow->renderer->accuracySSR, 0.001f, 1.0f);
+                ImGui::SliderFloat("biasSSR", &p_renderer->biasSSR, 0.001f, 20.0f);
+                ImGui::SliderFloat("rayStep", &p_renderer->rayStep, 0.001f, 5.0f);
+                ImGui::SliderInt("iterationCount", &p_renderer->iterationCount, 0, 200);
+                ImGui::SliderFloat("accuracy", &p_renderer->accuracySSR, 0.001f, 1.0f);
 
             }
         }
 
         if (ImGui::CollapsingHeader("Shadows")) {
-            ImGui::Checkbox("Show shadows", &p_mainWindow->renderer->showShadows);
-            if (p_mainWindow->renderer->showShadows) {
+            ImGui::Checkbox("Show shadows", &p_renderer->showShadows);
+            if (p_renderer->showShadows) {
 
-                ImGui::SliderFloat("Bias min", &p_mainWindow->renderer->shadowBiasMin, 0.0001f, 0.001f, "%.4f");
-                ImGui::SliderFloat("Bias max", &p_mainWindow->renderer->shadowBiasMax, 0.0001f, 0.001f, "%.4f");
-                ImGui::SliderFloat("Opacity", &p_mainWindow->renderer->shadowOpacity, 0.0f, 1.0f);
+                ImGui::SliderFloat("Bias min", &p_renderer->shadowBiasMin, 0.0001f, 0.001f, "%.4f");
+                ImGui::SliderFloat("Bias max", &p_renderer->shadowBiasMax, 0.0001f, 0.001f, "%.4f");
+                ImGui::SliderFloat("Opacity", &p_renderer->shadowOpacity, 0.0f, 1.0f);
 
             }
 
@@ -294,7 +300,7 @@ namespace Chotra {
 
             ImGui::SetCursorPos(ImVec2(10, 70));
             if (ImGui::Selectable(("##" + ResourceManager::GetGeometryName(selectedCollection->sceneObjects[i]->geometryIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
-                p_mainWindow->renderer->passiveMode = true;
+                p_renderer->passiveMode = true;
                 ImGui::OpenPopup("Geometries");
             }
 
@@ -330,7 +336,7 @@ namespace Chotra {
 
             ImGui::SetCursorPos(ImVec2(10, 180));
             if (ImGui::Selectable(("##" + ResourceManager::GetMaterialName(selectedCollection->sceneObjects[i]->materialIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
-                p_mainWindow->renderer->passiveMode = true;
+                p_renderer->passiveMode = true;
                 ImGui::OpenPopup("Materials");
             }
 
@@ -407,7 +413,7 @@ namespace Chotra {
 
             ImGui::SetCursorPos(ImVec2(10, 70));
             if (ImGui::Selectable(("##" + ResourceManager::GetGeometryName(ResourceManager::scene->sceneLights[i]->geometryIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
-                p_mainWindow->renderer->passiveMode = true;
+                p_renderer->passiveMode = true;
                 ImGui::OpenPopup("Geometries");
             }
 
@@ -443,7 +449,7 @@ namespace Chotra {
 
             ImGui::SetCursorPos(ImVec2(10, 180));
             if (ImGui::Selectable(("##" + ResourceManager::GetMaterialName(ResourceManager::scene->sceneLights[i]->materialIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
-                p_mainWindow->renderer->passiveMode = true;
+                p_renderer->passiveMode = true;
                 ImGui::OpenPopup("Materials");
             }
 
@@ -838,7 +844,7 @@ namespace Chotra {
         ImGui::SetNextWindowPos(ImVec2(0, 30));
         ImGui::SetNextWindowSize(ImVec2(width, height));
 
-        ImTextureID my_tex_id = (void*)p_mainWindow->renderer->gPosition;
+        ImTextureID my_tex_id = (void*)p_renderer->gPosition;
         ImGui::Image(my_tex_id, ImVec2(width, height), uv_min, uv_max, tint_col, border_col);
 
     }
@@ -851,12 +857,10 @@ namespace Chotra {
     void Gui::UpdateAllIcons() {
         for (unsigned int i = 0; i < ResourceManager::GetGeometriesCount(); ++i) {
             MakeGeometryIcon(i);
-
         }
 
         for (unsigned int i = 0; i < ResourceManager::GetMaterialsCount(); ++i) {
             MakeMaterialIcon(i);
-
         }
     }
 
@@ -864,7 +868,7 @@ namespace Chotra {
         ResourceManager::miniScene->rootCollection->sceneObjects[0]->ChangeGeometryIndex(i);
         ResourceManager::miniScene->rootCollection->sceneObjects[0]->ChangeMaterialIndex(0);
         ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
-        p_mainWindow->renderer->MiniRender(ResourceManager::miniScene, ResourceManager::miniCamera, iconTexture);
+        p_renderer->MiniRender(ResourceManager::miniScene, ResourceManager::miniCamera, iconTexture);
         ResourceManager::SetGeometryIcon(i, iconTexture.GetId());
     }
 
@@ -876,7 +880,7 @@ namespace Chotra {
         ResourceManager::miniScene->rootCollection->sceneObjects[0]->ChangeMaterialIndex(i);
         ResourceManager::miniScene->rootCollection->sceneObjects[0]->ChangeGeometryIndex(0);
         ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
-        p_mainWindow->renderer->MiniRender(ResourceManager::miniScene, ResourceManager::miniCamera, iconTexture);
+        p_renderer->MiniRender(ResourceManager::miniScene, ResourceManager::miniCamera, iconTexture);
         ResourceManager::SetMaterialIcon(i, iconTexture.GetId());
     }
 
@@ -927,7 +931,7 @@ namespace Chotra {
             if (ImGui::Selectable(("##" + ResourceManager::GetGeometryPath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
                 sceneObject->ChangeGeometryIndex(chosed);
-                p_mainWindow->renderer->passiveMode = false;
+                p_renderer->passiveMode = false;
                 ImGui::CloseCurrentPopup();
             }
 
@@ -967,7 +971,7 @@ namespace Chotra {
         ImGui::SetItemDefaultFocus();
         if (ImGui::Button("Cancel", ImVec2(120, 0))) {
             ImGui::CloseCurrentPopup();
-            p_mainWindow->renderer->passiveMode = false;
+            p_renderer->passiveMode = false;
         }
 
         ImGui::EndPopup();
@@ -987,7 +991,7 @@ namespace Chotra {
             if (ImGui::Selectable(("##" + ResourceManager::GetTexturePath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
                 sceneObject->ChangeMaterialIndex(chosed);
-                p_mainWindow->renderer->passiveMode = false;
+                p_renderer->passiveMode = false;
                 ImGui::CloseCurrentPopup();
             }
 
@@ -1027,7 +1031,7 @@ namespace Chotra {
         ImGui::SetItemDefaultFocus();
         if (ImGui::Button("Cancel", ImVec2(120, 0))) {
             ImGui::CloseCurrentPopup();
-            p_mainWindow->renderer->passiveMode = false;
+            p_renderer->passiveMode = false;
         }
 
         ImGui::EndPopup();
@@ -1046,7 +1050,7 @@ namespace Chotra {
             if (ImGui::Selectable(("##" + ResourceManager::GetTexturePath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
                 ResourceManager::ChangeComponentIndex(materialIndex, componentsName, chosed);
-                p_mainWindow->renderer->passiveMode = false;
+                p_renderer->passiveMode = false;
                 ImGui::CloseCurrentPopup();
             }
 
@@ -1082,7 +1086,7 @@ namespace Chotra {
         ImGui::SetItemDefaultFocus();
         if (ImGui::Button("Cancel", ImVec2(120, 0))) {
             ImGui::CloseCurrentPopup();
-            p_mainWindow->renderer->passiveMode = false;
+            p_renderer->passiveMode = false;
         }
 
         ImGui::EndPopup();

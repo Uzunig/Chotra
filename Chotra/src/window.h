@@ -12,8 +12,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "camera.h"
-
 
 namespace Chotra {
 
@@ -27,7 +25,7 @@ namespace Chotra {
 
         using EventCallbackFn = std::function<void(Event&)>;
 
-        Window(std::string title, unsigned int width, unsigned int height);
+        Window(std::string title, unsigned int& width, unsigned int& height);
         ~Window();
     
         Window(const Window&) = delete;
@@ -36,39 +34,37 @@ namespace Chotra {
         Window& operator=(Window&&) = delete;
 
         void OnUpdate(float deltaTime);
-        unsigned int GetWidth() { return windowData.width; }
-        unsigned int GetHeight() { return windowData.height; }
+        unsigned int GetWidth() const;
+        unsigned int GetHeight() const;
+
+        void SetPlayerMode(bool playerMode);
+        bool GetPlayerMode() const;
+
+        void SetFirstMouse(bool firstMouse);
+        bool GetFirstMouse() const;
 
         void SetEventCallbackFn(const EventCallbackFn& callback);
 
-        void SetPlayerMode(bool playerMode);
-        bool GetPlayerMode();
+        GLFWwindow* GetGlfwWindow();
 
-        void SetFirstMouse(bool firstMouse);
-        bool GetFirstMouse();
-                
-        //Camera camera;
-        //std::unique_ptr<Scene> scene;
-        std::unique_ptr<Renderer> renderer;
-        std::unique_ptr<class Gui> gui;
-
-            
+       // std::unique_ptr<Renderer> renderer;
+        //std::unique_ptr<class Gui> gui;
 
         glm::vec2 lastMousePosition;
-        
-        int fps = 0;
 
     private:
 
         struct WindowData {
             std::string title;
-            unsigned int width;
-            unsigned int height;
+            unsigned int& width;
+            unsigned int& hight;
             EventCallbackFn eventCallbackFn;
         };
 
-        int Init();
+        void Init();
         void Shutdown();
+
+        void SetCallbacks();
 
         GLFWwindow* glfwWindow = nullptr;
         WindowData windowData;
