@@ -4,41 +4,32 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <vector>
 #include <random>
 #include <memory>
 
 #include "shader.h"
 #include "quad.h"
-#include "shadow_map.h"
+//#include "shadow_map.h"
 #include "screen_texture.h"
 #include "rendering_settings.h"
+#include "base_renderer.h"
 
 
 namespace Chotra {
 
-    class Scene;
-    class Camera;
     class GaussianBlurer;
             
-    class Renderer : public RenderingSettings {
+    class Renderer : public BaseRenderer {
     public:
 
-        ShadowMap shadowMap;
                 
         std::vector<std::shared_ptr<Quad>> quads;
         std::shared_ptr<GaussianBlurer> gaussianBlurer;
 
-        glm::mat4 projection;
-        glm::mat4 view;
+        //glm::mat4 projection;
+        //glm::mat4 view;
                                        
-        unsigned int& width;
-        unsigned int& height;
-
         Shader pbrShader;
         //Shader lightsShader;
         
@@ -126,7 +117,7 @@ namespace Chotra {
        
 
         
-        Renderer(unsigned int& width, unsigned int& height);
+        Renderer(unsigned int& width, unsigned int& hight);
                 
         void Init();
         void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);

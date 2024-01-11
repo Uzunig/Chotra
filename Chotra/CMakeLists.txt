@@ -49,6 +49,9 @@ add_executable(Chotra
 	src/renderer.cpp
 	src/renderer.h
 
+	src/base_renderer.cpp
+	src/base_renderer.h
+
     src/resource_manager.cpp
 	src/resource_manager.h
 

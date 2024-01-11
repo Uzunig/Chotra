@@ -2,8 +2,6 @@
 
 #include "shader.h"
 #include "environment.h"
-#include "camera.h"
-#include "scene.h"
 #include "scene_light.h"
 #include "scene_object.h"
 #include "quad.h"
@@ -12,8 +10,8 @@
 
 namespace Chotra {
 
-    Renderer::Renderer(unsigned int& width, unsigned int& height)
-        : width(width), height(height), //camera(camera), scene(scene),
+    Renderer::Renderer(unsigned int& width, unsigned int& hight)
+        : BaseRenderer(width, hight),
         screenTexture(width, height, GL_RGBA16F, GL_RGBA),
         lScreenTexture(width, height, GL_RGBA16F, GL_RGBA),
         lFresnelSchlickRoughness(width, height, GL_RGB16F, GL_RGB),
@@ -38,9 +36,6 @@ namespace Chotra {
         shaderDeferredLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred_lighting_pass.fs"),
         shaderRenderOnScreen("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") {
 
-
-
-        shadowMap.ConfigureShadowMap(width, height);
         ConfigureFramebuffer();
         ConfigureFramebufferMSAA();
 
@@ -60,13 +55,12 @@ namespace Chotra {
 
     void Renderer::Init() {
         {
-            //Creating screed quad
+            //Creating screen quad
             quads.push_back(std::make_shared<Quad>());
 
             SetupDebuggingQuads();
         }
 
-        // Активируем шейдер и передаем матрицы
         pbrShader.Use();
         pbrShader.SetInt("irradianceMap", 5);
         pbrShader.SetInt("prefilterMap", 6);
@@ -94,6 +88,7 @@ namespace Chotra {
 
     void Renderer::Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
 
+        BaseRenderer::Render(scene, camera);
         //if (!passiveMode) {
 
         shadowMap.GenerateShadowMap(scene);
@@ -139,8 +134,6 @@ namespace Chotra {
         RenderWithMSAA(scene, camera);
 
         glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
-
-        // Создаем цветовую прикрепляемую текстуру
 
         glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture.GetId(), 0);	// нам нужен только цветовой буфер
@@ -296,14 +289,14 @@ namespace Chotra {
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
-
+        /*
         if (perspectiveProjection) {
             projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 500.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
         }
-        view = camera->GetViewMatrix();
+        view = camera->GetViewMatrix();*/
 
         pbrShader.Use();
         pbrShader.SetMat4("projection", projection);
@@ -370,14 +363,14 @@ namespace Chotra {
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
-
+        /*
         if (perspectiveProjection) {
             projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 500.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
         }
-        view = camera->GetViewMatrix();
+        view = camera->GetViewMatrix();*/
 
         pbrShader.Use();
         pbrShader.SetMat4("projection", projection);
@@ -865,14 +858,14 @@ namespace Chotra {
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
-
+        /*
         if (perspectiveProjection) {
             projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.01f, 500.0f);
         }
         else {
             projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
         }
-        view = camera->GetViewMatrix();
+        view = camera->GetViewMatrix();*/
 
         shaderDeferredGeometryPass.Use();
         shaderDeferredGeometryPass.SetMat4("projection", projection);
