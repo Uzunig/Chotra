@@ -10,8 +10,6 @@
 
 #include "shader.h"
 #include "quad.h"
-//#include "shadow_map.h"
-#include "screen_texture.h"
 #include "rendering_settings.h"
 #include "base_renderer.h"
 
@@ -25,10 +23,7 @@ namespace Chotra {
 
                 
         std::vector<std::shared_ptr<Quad>> quads;
-        std::shared_ptr<GaussianBlurer> gaussianBlurer;
-
-        //glm::mat4 projection;
-        //glm::mat4 view;
+        //std::shared_ptr<GaussianBlurer> gaussianBlurer;
                                        
         Shader pbrShader;
         //Shader lightsShader;
@@ -53,9 +48,9 @@ namespace Chotra {
         Shader shaderDeferredPreLightingPass;
         Shader shaderDeferredLightingPass;
 
-        Shader shaderRenderOnScreen;
+        //Shader shaderRenderOnScreen;
                 
-        ScreenTexture screenTexture; 
+        //ScreenTexture screenTexture; 
                   
         unsigned int gBuffer;           // G-Buffer
         unsigned int gPosition; //TExtures

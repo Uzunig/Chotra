@@ -12,7 +12,7 @@ namespace Chotra {
 
     Renderer::Renderer(unsigned int& width, unsigned int& hight)
         : BaseRenderer(width, hight),
-        screenTexture(width, height, GL_RGBA16F, GL_RGBA),
+        //screenTexture(width, height, GL_RGBA16F, GL_RGBA),
         lScreenTexture(width, height, GL_RGBA16F, GL_RGBA),
         lFresnelSchlickRoughness(width, height, GL_RGB16F, GL_RGB),
         lDiffuse(width, height, GL_RGB16F, GL_RGB),
@@ -33,8 +33,9 @@ namespace Chotra {
         shaderSSRBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssr_blur.fs"),
         shaderDeferredGeometryPass("resources/shaders/deferred_geometry_pass.vs", "resources/shaders/deferred_geometry_pass.fs"),
         shaderDeferredPreLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred_pre_lighting_pass.fs"),
-        shaderDeferredLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred_lighting_pass.fs"),
-        shaderRenderOnScreen("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") {
+        shaderDeferredLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred_lighting_pass.fs")
+        //shaderRenderOnScreen("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") 
+        {
 
         ConfigureFramebuffer();
         ConfigureFramebufferMSAA();
@@ -80,15 +81,15 @@ namespace Chotra {
 
         screenDivideShader.Use();
         screenDivideShader.SetInt("screenTexture", 0);
-
+        /*
         shaderRenderOnScreen.Use();
-        shaderRenderOnScreen.SetInt("screenTexture", 0);
+        shaderRenderOnScreen.SetInt("screenTexture", 0);*/
 
     }
 
     void Renderer::Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
 
-        BaseRenderer::Render(scene, camera);
+        BaseRenderer::SetupRender(scene, camera);
         //if (!passiveMode) {
 
         shadowMap.GenerateShadowMap(scene);
@@ -289,14 +290,6 @@ namespace Chotra {
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
-        /*
-        if (perspectiveProjection) {
-            projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 500.0f);
-        }
-        else {
-            projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-        }
-        view = camera->GetViewMatrix();*/
 
         pbrShader.Use();
         pbrShader.SetMat4("projection", projection);
@@ -363,14 +356,6 @@ namespace Chotra {
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
-        /*
-        if (perspectiveProjection) {
-            projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.1f, 500.0f);
-        }
-        else {
-            projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-        }
-        view = camera->GetViewMatrix();*/
 
         pbrShader.Use();
         pbrShader.SetMat4("projection", projection);
@@ -858,14 +843,6 @@ namespace Chotra {
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
-        /*
-        if (perspectiveProjection) {
-            projection = glm::perspective(glm::radians(camera->Zoom), (float)width / (float)height, 0.01f, 500.0f);
-        }
-        else {
-            projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-        }
-        view = camera->GetViewMatrix();*/
 
         shaderDeferredGeometryPass.Use();
         shaderDeferredGeometryPass.SetMat4("projection", projection);
@@ -1068,19 +1045,17 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shaderRenderOnScreen.Use();
+        shaderRenderToScreen.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
-        shaderRenderOnScreen.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
-        shaderRenderOnScreen.SetFloat("contrast", contrast);
-        shaderRenderOnScreen.SetFloat("brightness", brightness);
+        shaderRenderToScreen.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
+        shaderRenderToScreen.SetFloat("contrast", contrast);
+        shaderRenderToScreen.SetFloat("brightness", brightness);
 
         glViewport(0, 0, width, height);
 
         // Рендерим прямоугольник
         quads[0]->RenderQuad();
-
-
     }
 
     unsigned int Renderer::CreateGeometryIcon(unsigned int i) {
