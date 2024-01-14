@@ -107,13 +107,13 @@ namespace Chotra {
 
     void Renderer::MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera, ScreenTexture& iconTexture) {
 
-        unsigned int width = this->width;
-        unsigned int height = this->height;
+        const unsigned int width = this->width;
+        const unsigned int height = this->height;
 
         this->width = 100;
         this->height = 100;
 
-        bool drawSkybox = this->drawSkybox;
+        const bool drawSkybox = this->drawSkybox;
         this->drawSkybox = false;
 
         RendererBase::SetMatrices(camera);
