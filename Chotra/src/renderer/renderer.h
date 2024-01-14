@@ -20,14 +20,9 @@ namespace Chotra {
             
     class Renderer : public RendererBase {
     public:
-
-                
-        //std::vector<std::shared_ptr<Quad>> quads;
-        //std::shared_ptr<GaussianBlurer> gaussianBlurer;
-                                       
+                           
         Shader pbrShader;
         //Shader lightsShader;
-        
 
         Shader screenDivideShader;
         Shader downSamplingShader;
@@ -47,10 +42,6 @@ namespace Chotra {
         Shader shaderDeferredGeometryPass;
         Shader shaderDeferredPreLightingPass;
         Shader shaderDeferredLightingPass;
-
-        //Shader shaderRenderOnScreen;
-                
-        //ScreenTexture screenTexture; 
                   
         unsigned int gBuffer;           // G-Buffer
         unsigned int gPosition; //TExtures
@@ -114,12 +105,11 @@ namespace Chotra {
         
         Renderer(unsigned int& width, unsigned int& hight);
                 
-        void Init();
-        void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
+        void ConfigureShaders();
+        virtual void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) override;
         void MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera, ScreenTexture& icon);
         void ForwardRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void DeferredRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
-        void PassiveRender();
         
         void ConfigureFramebufferMSAA();
         void RenderWithMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
@@ -143,8 +133,6 @@ namespace Chotra {
         void ConfigureLightingPass();
         void RenderPreLightingPass(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void RenderLightingPass();
-
-        //void RenderToScreen();
 
         unsigned int CreateGeometryIcon(unsigned int i);
 

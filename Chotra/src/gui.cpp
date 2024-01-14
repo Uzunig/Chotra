@@ -300,7 +300,7 @@ namespace Chotra {
 
             ImGui::SetCursorPos(ImVec2(10, 70));
             if (ImGui::Selectable(("##" + ResourceManager::GetGeometryName(selectedCollection->sceneObjects[i]->geometryIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
-                p_renderer->passiveMode = true;
+
                 ImGui::OpenPopup("Geometries");
             }
 
@@ -336,7 +336,7 @@ namespace Chotra {
 
             ImGui::SetCursorPos(ImVec2(10, 180));
             if (ImGui::Selectable(("##" + ResourceManager::GetMaterialName(selectedCollection->sceneObjects[i]->materialIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
-                p_renderer->passiveMode = true;
+                
                 ImGui::OpenPopup("Materials");
             }
 
@@ -413,7 +413,7 @@ namespace Chotra {
 
             ImGui::SetCursorPos(ImVec2(10, 70));
             if (ImGui::Selectable(("##" + ResourceManager::GetGeometryName(ResourceManager::scene->sceneLights[i]->geometryIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
-                p_renderer->passiveMode = true;
+                
                 ImGui::OpenPopup("Geometries");
             }
 
@@ -449,7 +449,7 @@ namespace Chotra {
 
             ImGui::SetCursorPos(ImVec2(10, 180));
             if (ImGui::Selectable(("##" + ResourceManager::GetMaterialName(ResourceManager::scene->sceneLights[i]->materialIndex)).c_str(), selected == i, 0, ImVec2(330, 82))) {
-                p_renderer->passiveMode = true;
+                
                 ImGui::OpenPopup("Materials");
             }
 
@@ -865,27 +865,22 @@ namespace Chotra {
     }
 
     void Gui::MakeGeometryIcon(unsigned int i) {
-        ResourceManager::miniScene->rootCollection->sceneObjects[0]->ChangeGeometryIndex(i);
-        ResourceManager::miniScene->rootCollection->sceneObjects[0]->ChangeMaterialIndex(0);
-        ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
-        p_renderer->MiniRender(ResourceManager::miniScene, ResourceManager::miniCamera, iconTexture);
-        ResourceManager::SetGeometryIcon(i, iconTexture.GetId());
+
+        ResourceManager::MakeGeometryIcon(i);
     }
 
     void Gui::DeleteGeometryIcon(unsigned int i) {
-        glDeleteTextures(1, &ResourceManager::GetGeometryIcon(i));
+
+        ResourceManager::DeleteGeometryIcon(i);
     }
 
     void Gui::MakeMaterialIcon(unsigned int i) {
-        ResourceManager::miniScene->rootCollection->sceneObjects[0]->ChangeMaterialIndex(i);
-        ResourceManager::miniScene->rootCollection->sceneObjects[0]->ChangeGeometryIndex(0);
-        ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
-        p_renderer->MiniRender(ResourceManager::miniScene, ResourceManager::miniCamera, iconTexture);
-        ResourceManager::SetMaterialIcon(i, iconTexture.GetId());
+        ResourceManager::MakeMaterialIcon(i);
+       
     }
 
     void Gui::DeleteMaterialIcon(unsigned int i) {
-        glDeleteTextures(1, &ResourceManager::GetMaterialIcon(i));
+        ResourceManager::DeleteMaterialIcon(i);
     }
 
     void Gui::AddGeometry() {
@@ -931,7 +926,7 @@ namespace Chotra {
             if (ImGui::Selectable(("##" + ResourceManager::GetGeometryPath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
                 sceneObject->ChangeGeometryIndex(chosed);
-                p_renderer->passiveMode = false;
+                
                 ImGui::CloseCurrentPopup();
             }
 
@@ -970,8 +965,8 @@ namespace Chotra {
         ImGui::SameLine();
         ImGui::SetItemDefaultFocus();
         if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+ 
             ImGui::CloseCurrentPopup();
-            p_renderer->passiveMode = false;
         }
 
         ImGui::EndPopup();
@@ -991,7 +986,7 @@ namespace Chotra {
             if (ImGui::Selectable(("##" + ResourceManager::GetTexturePath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
                 sceneObject->ChangeMaterialIndex(chosed);
-                p_renderer->passiveMode = false;
+                
                 ImGui::CloseCurrentPopup();
             }
 
@@ -1030,8 +1025,8 @@ namespace Chotra {
         ImGui::SameLine();
         ImGui::SetItemDefaultFocus();
         if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            
             ImGui::CloseCurrentPopup();
-            p_renderer->passiveMode = false;
         }
 
         ImGui::EndPopup();
@@ -1050,7 +1045,7 @@ namespace Chotra {
             if (ImGui::Selectable(("##" + ResourceManager::GetTexturePath(i)).c_str(), chosed == i, 0, ImVec2(ImGui::GetWindowWidth() - 20, 82))) {
                 chosed = i;
                 ResourceManager::ChangeComponentIndex(materialIndex, componentsName, chosed);
-                p_renderer->passiveMode = false;
+                
                 ImGui::CloseCurrentPopup();
             }
 
@@ -1085,8 +1080,8 @@ namespace Chotra {
         ImGui::SameLine();
         ImGui::SetItemDefaultFocus();
         if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            
             ImGui::CloseCurrentPopup();
-            p_renderer->passiveMode = false;
         }
 
         ImGui::EndPopup();

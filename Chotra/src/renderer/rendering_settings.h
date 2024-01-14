@@ -7,7 +7,6 @@ namespace Chotra {
     {
     public:
         int renderingMode = 1;
-        bool passiveMode = false;
 
         bool enableMSAA = true;
         int samplesNumber = 4;

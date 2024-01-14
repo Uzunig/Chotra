@@ -12,7 +12,6 @@ namespace Chotra {
 
     Renderer::Renderer(unsigned int& width, unsigned int& hight)
         : RendererBase(width, hight),
-        //screenTexture(width, height, GL_RGBA16F, GL_RGBA),
         lScreenTexture(width, height, GL_RGBA16F, GL_RGBA),
         lFresnelSchlickRoughness(width, height, GL_RGB16F, GL_RGB),
         lDiffuse(width, height, GL_RGB16F, GL_RGB),
@@ -34,7 +33,6 @@ namespace Chotra {
         shaderDeferredGeometryPass("resources/shaders/deferred_geometry_pass.vs", "resources/shaders/deferred_geometry_pass.fs"),
         shaderDeferredPreLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred_pre_lighting_pass.fs"),
         shaderDeferredLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred_lighting_pass.fs")
-        //shaderRenderOnScreen("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") 
         {
 
         ConfigureFramebuffer();
@@ -50,15 +48,11 @@ namespace Chotra {
 
         ConfigureBloom();
 
-        Init();
+        ConfigureShaders();
 
     }
 
-    void Renderer::Init() {
-        {
-
-            
-        }
+    void Renderer::ConfigureShaders() {
 
         pbrShader.Use();
         pbrShader.SetInt("irradianceMap", 5);
@@ -79,10 +73,6 @@ namespace Chotra {
 
         screenDivideShader.Use();
         screenDivideShader.SetInt("screenTexture", 0);
-        /*
-        shaderRenderOnScreen.Use();
-        shaderRenderOnScreen.SetInt("screenTexture", 0);*/
-
     }
 
     void Renderer::Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
@@ -117,9 +107,6 @@ namespace Chotra {
         this->drawSkybox = false;
 
         RendererBase::SetMatrices(camera);
-        //const glm::mat4 projection = this->projection;
-        //this->projection = glm::perspective(glm::radians(camera->Zoom), (float)this->width / (float)this->height, 0.1f, 500.0f);
-
         shadowMap.GenerateShadowMap(scene);
 
         glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
@@ -149,12 +136,6 @@ namespace Chotra {
         this->height = height;
 
         this->drawSkybox = drawSkybox;
-        //this->projection = projection;
-    }
-
-    void Renderer::PassiveRender() {
-
-        RenderToScreen();
     }
 
     void Renderer::ForwardRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
@@ -470,7 +451,6 @@ namespace Chotra {
 
     void Renderer::RenderBloom() {
 
-        // 3. Теперь рендерим прямоугольник с визуальными эффектами сцены, представленными текстурным изображением
         glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -478,8 +458,8 @@ namespace Chotra {
 
         screenDivideShader.Use();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId()); // теперь в качестве текстуры прямоугольника используем преобразованный прикрепленный цветовой объект 
-        // Отрисовываем прямоугольник сцены
+        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId()); 
+
         screenQuad->RenderQuad();
 
         bool horizontal = true;
@@ -1007,25 +987,6 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-/*
-    void Renderer::RenderToScreen() {
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shaderRenderToScreen.Use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
-        shaderRenderToScreen.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
-        shaderRenderToScreen.SetFloat("contrast", contrast);
-        shaderRenderToScreen.SetFloat("brightness", brightness);
-
-        glViewport(0, 0, width, height);
-
-        // Рендерим прямоугольник
-        quads[0]->RenderQuad();
-    }
-    */
     unsigned int Renderer::CreateGeometryIcon(unsigned int i) {
         return 0;
     }

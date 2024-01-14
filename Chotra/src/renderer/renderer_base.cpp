@@ -6,11 +6,12 @@ namespace Chotra {
     RendererBase::RendererBase(unsigned int& width, unsigned int& height)
         : width(width), height(height)
         , screenTexture(width, height, GL_RGBA16F, GL_RGBA) 
-        , shaderRenderToScreen("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") {
+        , renderToScreenShader("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") {
 
         shadowMap.ConfigureShadowMap(width, height);
-        shaderRenderToScreen.Use();
-        shaderRenderToScreen.SetInt("screenTexture", 0);
+
+        renderToScreenShader.Use();
+        renderToScreenShader.SetInt("screenTexture", 0);
 
         screenQuad = std::make_shared<Quad>();
         SetupDebuggingQuads();
@@ -26,12 +27,12 @@ namespace Chotra {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shaderRenderToScreen.Use();
+        renderToScreenShader.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
-        shaderRenderToScreen.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
-        shaderRenderToScreen.SetFloat("contrast", contrast);
-        shaderRenderToScreen.SetFloat("brightness", brightness);
+        renderToScreenShader.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
+        renderToScreenShader.SetFloat("contrast", contrast);
+        renderToScreenShader.SetFloat("brightness", brightness);
 
         glViewport(0, 0, width, height);
 

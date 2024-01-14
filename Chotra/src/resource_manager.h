@@ -17,6 +17,7 @@ namespace Chotra {
     class ObjModel;
     class Scene;
     class Camera;
+    class Renderer;
 
     class ResourceManager {
     public:
@@ -27,6 +28,8 @@ namespace Chotra {
         static std::string GetTexturePath(unsigned int i);
 
         static unsigned int AddMaterial(std::string path);
+        static void MakeMaterialIcon(unsigned int i);
+        static void DeleteMaterialIcon(unsigned int i);
         static void SetMaterialIcon(unsigned int i, unsigned int icon);
         static void ChangeMaterialSource(unsigned int i, std::string path);
         static void ChangeComponentIndex(unsigned int i, std::string componentsName, int chosed);
@@ -37,6 +40,8 @@ namespace Chotra {
         static std::string GetMaterialPath(unsigned int i);
 
         static unsigned int AddGeometry(std::string path);
+        static void MakeGeometryIcon(unsigned int i);
+        static void DeleteGeometryIcon(unsigned int i);
         static void SetGeometryIcon(unsigned int i, unsigned int icon);
         static void ChangeGeometrySource(unsigned int i, std::string path);
         static std::string GetGeometryName(unsigned int i);
@@ -54,10 +59,7 @@ namespace Chotra {
         static std::shared_ptr<Camera> GetCamera();
 
         static void MakeMiniScene(std::string path);
-               
         static void MakeMiniCamera(glm::vec3 position);
-       
-
 
         static std::shared_ptr<Scene> scene;
         static std::shared_ptr<Camera> camera;
@@ -65,13 +67,14 @@ namespace Chotra {
         static std::shared_ptr<Scene> miniScene;
         static std::shared_ptr<Camera> miniCamera;
 
+        static std::shared_ptr<Renderer> p_renderer; //For rendering Igcons of GUI
+
     private:
                 
         static std::vector<std::shared_ptr<MaterialTexture>> textures;
         static std::vector<std::shared_ptr<Material>> materials;
         static std::vector<std::shared_ptr<ObjModel>> geometries;
 
-        
     };
 
 

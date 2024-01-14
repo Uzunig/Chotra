@@ -5,8 +5,11 @@
 #include "material_texture.h"
 #include "material.h"
 #include "obj_model.h"
+#include "scene_collection.h"
 #include "scene.h"
 #include "camera.h"
+#include "screen_texture.h"
+#include "renderer/renderer.h"
 
 namespace Chotra {
 
@@ -19,6 +22,8 @@ namespace Chotra {
 
     std::shared_ptr<Scene> ResourceManager::miniScene;
     std::shared_ptr<Camera> ResourceManager::miniCamera;
+
+    std::shared_ptr<Renderer> ResourceManager::p_renderer;
 
     unsigned int ResourceManager::AddTexture(std::string path) {
                 
@@ -65,6 +70,20 @@ namespace Chotra {
         unsigned int index = materials.size(); //for create unique name suffix
         materials.push_back(std::make_shared<Material>(path, std::to_string(index)));
         return index;
+    }
+
+    void ResourceManager::MakeMaterialIcon(unsigned int i) {
+
+        miniScene->rootCollection->sceneObjects[0]->ChangeMaterialIndex(i);
+        miniScene->rootCollection->sceneObjects[0]->ChangeGeometryIndex(0);
+        ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
+        p_renderer->MiniRender(miniScene, miniCamera, iconTexture);
+        SetMaterialIcon(i, iconTexture.GetId());
+    }
+
+    void ResourceManager::DeleteMaterialIcon(unsigned int i) {
+
+        glDeleteTextures(1, &ResourceManager::GetMaterialIcon(i));
     }
 
     void ResourceManager::SetMaterialIcon(unsigned int i, unsigned int icon) {
@@ -117,6 +136,20 @@ namespace Chotra {
         unsigned int index = geometries.size(); //for create unique name suffix
         geometries.push_back(std::make_shared<ObjModel>(path, std::to_string(index)));
         return index;
+    }
+
+    void ResourceManager::MakeGeometryIcon(unsigned int i) {
+
+        miniScene->rootCollection->sceneObjects[0]->ChangeGeometryIndex(i);
+        miniScene->rootCollection->sceneObjects[0]->ChangeMaterialIndex(0);
+        ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
+        p_renderer->MiniRender(miniScene, miniCamera, iconTexture);
+        SetGeometryIcon(i, iconTexture.GetId());
+    }
+
+    void ResourceManager::DeleteGeometryIcon(unsigned int i) {
+
+        glDeleteTextures(1, &GetGeometryIcon(i));
     }
 
     void ResourceManager::SetGeometryIcon(unsigned int i, unsigned int icon) {

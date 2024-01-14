@@ -18,14 +18,15 @@ namespace Chotra {
 
     public:
         RendererBase(unsigned int& width, unsigned int& height);
-        virtual void SetMatrices(std::shared_ptr<Camera> camera);
+        virtual void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) = 0;
+        
 
     protected:
         unsigned int& width;
         unsigned int& height;
 
         ScreenTexture screenTexture;
-        Shader shaderRenderToScreen;
+        Shader renderToScreenShader;
 
         ShadowMap shadowMap;
 
@@ -37,12 +38,12 @@ namespace Chotra {
 
         void RenderToScreen();
 
-        void SetupDebuggingQuads();
-        void DrawDebuggingQuads();
-
+        void SetMatrices(std::shared_ptr<Camera> camera);
         void SetProjectionMatrix(std::shared_ptr<Camera> camera);
         void SetViewMatrix(std::shared_ptr<Camera> camera);
 
+        void SetupDebuggingQuads();
+        void DrawDebuggingQuads();
     };
 
 } // namespace Chotra
