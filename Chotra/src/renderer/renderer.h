@@ -11,18 +11,18 @@
 #include "shader.h"
 #include "quad.h"
 #include "rendering_settings.h"
-#include "base_renderer.h"
+#include "renderer_base.h"
 
 
 namespace Chotra {
 
     class GaussianBlurer;
             
-    class Renderer : public BaseRenderer {
+    class Renderer : public RendererBase {
     public:
 
                 
-        std::vector<std::shared_ptr<Quad>> quads;
+        //std::vector<std::shared_ptr<Quad>> quads;
         //std::shared_ptr<GaussianBlurer> gaussianBlurer;
                                        
         Shader pbrShader;
@@ -120,9 +120,6 @@ namespace Chotra {
         void ForwardRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void DeferredRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void PassiveRender();
-
-        void SetupDebuggingQuads();
-        void DrawDebuggingQuads();
         
         void ConfigureFramebufferMSAA();
         void RenderWithMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
@@ -147,7 +144,7 @@ namespace Chotra {
         void RenderPreLightingPass(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void RenderLightingPass();
 
-        void RenderToScreen();
+        //void RenderToScreen();
 
         unsigned int CreateGeometryIcon(unsigned int i);
 

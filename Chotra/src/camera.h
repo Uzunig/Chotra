@@ -33,6 +33,7 @@ namespace Chotra {
         Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
             float yaw = -90.f, float pitch = -10.0f);
 
+        glm::mat4 GetProjectionMatrix(const unsigned int& width, const unsigned int& height);
         glm::mat4 GetViewMatrix();
         void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
         void ProcessKeyboard(float deltaTime);

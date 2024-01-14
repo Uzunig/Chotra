@@ -10,14 +10,15 @@
 #include "scene.h"
 #include "screen_texture.h"
 #include "rendering_settings.h"
+#include "quad.h"
 
 namespace Chotra {
              
-    class BaseRenderer : public RenderingSettings {
+    class RendererBase : public RenderingSettings {
 
     public:
-        BaseRenderer(unsigned int& width, unsigned int& height);
-        virtual void SetupRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
+        RendererBase(unsigned int& width, unsigned int& height);
+        virtual void SetMatrices(std::shared_ptr<Camera> camera);
 
     protected:
         unsigned int& width;
@@ -30,6 +31,14 @@ namespace Chotra {
 
         glm::mat4 projection;
         glm::mat4 view;
+
+        std::shared_ptr<Quad> screenQuad;
+        std::vector<std::shared_ptr<Quad>> debuggingQuads;
+
+        void RenderToScreen();
+
+        void SetupDebuggingQuads();
+        void DrawDebuggingQuads();
 
         void SetProjectionMatrix(std::shared_ptr<Camera> camera);
         void SetViewMatrix(std::shared_ptr<Camera> camera);

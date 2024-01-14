@@ -12,6 +12,11 @@ namespace Chotra {
         updateCameraVectors();
     }
 
+    glm::mat4 Camera::GetProjectionMatrix(const unsigned int& width, const unsigned int& height)
+    {
+        return glm::perspective(glm::radians(Zoom), (float)width / (float)height, 0.1f, 500.0f);
+    }
+
     // Возвращает матрицу вида, вычисленную с использованием углов Эйлера и LookAt-матрицы 
     glm::mat4 Camera::GetViewMatrix() {
         return glm::lookAt(Position, Position + Front, Up);

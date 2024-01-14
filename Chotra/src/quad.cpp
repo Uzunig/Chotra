@@ -1,14 +1,15 @@
 #include "quad.h"
 
 namespace Chotra {
+    
+    Quad::Quad() {
+        SetupQuad();
+    }
 
     Quad::Quad(unsigned int X, unsigned int Y) {
         SetupQuad(X, Y);
     }
 
-    Quad::Quad() {
-        SetupQuad();
-    }
 
     void Quad::SetupQuad() {
         if (quadVAO == 0)

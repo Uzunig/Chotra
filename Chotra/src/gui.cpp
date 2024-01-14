@@ -11,7 +11,7 @@
 #include "material.h"
 #include "obj_model.h"
 #include "scene.h"
-#include "renderer.h"
+#include "renderer/renderer.h"
 #include "camera.h"
 #include "material_texture.h"
 #include "resource_manager.h"

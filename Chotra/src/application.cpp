@@ -9,7 +9,7 @@
 #include "gui.h"
 #include "camera.h"
 #include "scene.h"
-#include "renderer.h"
+#include "renderer/renderer.h"
 #include "resource_manager.h"
 
 namespace Chotra {
