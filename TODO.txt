@@ -1,6 +1,11 @@
+Problems:
+Class renderer structure.
 
+
+TO DO:
 Сreate a base class Renderer that will be inherited by other classes (DeferredRender, ForwardRender). Create class RenderManager that will lead all rendering process.
 
+Optimize class Quad
 
 Pass debugging quads from Rederer to GUI
 To make textures vector and meshes vector using polymorphic classes

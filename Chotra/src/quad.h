@@ -8,8 +8,8 @@ namespace Chotra {
 
     class Quad {
     public:
-        Quad(unsigned int X, unsigned int Y);
         Quad();
+        Quad(unsigned int X, unsigned int Y);
 
         void SetupQuad();
         void SetupQuad(unsigned int X, unsigned int Y);

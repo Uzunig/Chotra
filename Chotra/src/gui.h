@@ -18,6 +18,11 @@ namespace Chotra {
    
     class Gui {
     public:
+        Gui(std::shared_ptr<Window> p_mainWindow, std::shared_ptr<Renderer> p_renderer);
+        void Show();
+        void Render();
+
+    private:
         std::shared_ptr<Renderer> p_renderer;
         std::shared_ptr<Window> p_mainWindow;
         
@@ -50,10 +55,8 @@ namespace Chotra {
         std::string componentsName = "";
         int chosed = -1;
         
-        Gui(std::shared_ptr<Window> p_mainWindow, std::shared_ptr<Renderer> p_renderer);
         void Init();
         void Update();
-        void Show();
         void ShowTopBar();
         void ShowToolsBar();
         void ShowCollection(std::shared_ptr<SceneCollection> currentCollection);
@@ -62,8 +65,6 @@ namespace Chotra {
         void ShowScoreBar();
         void ShowAssetsBar();
         void ShowDebuggingQuads();
-
-        void Render();
 
         void UpdateAllIcons();
         void MakeGeometryIcon(unsigned int i);

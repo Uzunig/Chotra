@@ -9,7 +9,7 @@
 #include "gui.h"
 #include "camera.h"
 #include "scene.h"
-#include "renderer.h"
+#include "renderer/renderer.h"
 #include "resource_manager.h"
 
 namespace Chotra {
@@ -43,9 +43,10 @@ namespace Chotra {
 
         ResourceManager::MakeCamera(glm::vec3(0.0f, 1.0f, 5.0f));
         ResourceManager::MakeScene("resources/level1.lv");
-
+        
         renderer = std::make_shared<Renderer>(width, hight);
-        //renderer->Init();
+        ResourceManager::p_renderer = renderer;
+
         gui = std::make_shared<Gui>(mainWindow, renderer);
         //gui->UpdateAllIcons();
 

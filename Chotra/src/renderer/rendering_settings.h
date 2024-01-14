@@ -7,11 +7,9 @@ namespace Chotra {
     {
     public:
         int renderingMode = 1;
-        bool passiveMode = false;
 
         bool enableMSAA = true;
         int samplesNumber = 4;
-        bool perspectiveProjection;
         float backgroundColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
         bool drawSkybox = true;
         bool bloom = true;

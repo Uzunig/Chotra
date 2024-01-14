@@ -4,44 +4,25 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <vector>
 #include <random>
 #include <memory>
 
 #include "shader.h"
 #include "quad.h"
-#include "shadow_map.h"
-#include "screen_texture.h"
 #include "rendering_settings.h"
+#include "renderer_base.h"
 
 
 namespace Chotra {
 
-    class Scene;
-    class Camera;
     class GaussianBlurer;
             
-    class Renderer : public RenderingSettings {
+    class Renderer : public RendererBase {
     public:
-
-        ShadowMap shadowMap;
-                
-        std::vector<std::shared_ptr<Quad>> quads;
-        std::shared_ptr<GaussianBlurer> gaussianBlurer;
-
-        glm::mat4 projection;
-        glm::mat4 view;
-                                       
-        unsigned int& width;
-        unsigned int& height;
-
+                           
         Shader pbrShader;
         //Shader lightsShader;
-        
 
         Shader screenDivideShader;
         Shader downSamplingShader;
@@ -61,41 +42,6 @@ namespace Chotra {
         Shader shaderDeferredGeometryPass;
         Shader shaderDeferredPreLightingPass;
         Shader shaderDeferredLightingPass;
-
-        Shader shaderRenderOnScreen;
-
-         /*
-        int renderingMode = 1;
-        bool passiveMode = false;
-
-        bool enableMSAA = true;
-        int samplesNumber = 4;
-        bool perspectiveProjection;    
-        float backgroundColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
-        bool drawSkybox = true;
-        bool bloom = true;
-        float exposure = 1.75f;
-        float backgroundExposure = 2.0f;
-        bool gammaCorrection = true;
-        float brightness = 0.0f;
-        float contrast = 0.6f;
-
-        bool showShadows = true;
-        float shadowBiasMin = 0.0009f;
-        float shadowBiasMax = 0.0006f;
-        float shadowOpacity = 0.5f;
-
-        int kernelSizeSSAO = 64;
-        float radiusSSAO = 0.5;
-        float biasSSAO = 0.025;
-
-        float biasSSR = 0.3f; // 20,0
-        float rayStep = 0.014f; // 0,014f
-        int iterationCount = 6; // 1400
-        float accuracySSR = 0.05f; // 0.05f
-        */
-                
-        ScreenTexture screenTexture; 
                   
         unsigned int gBuffer;           // G-Buffer
         unsigned int gPosition; //TExtures
@@ -157,17 +103,13 @@ namespace Chotra {
        
 
         
-        Renderer(unsigned int& width, unsigned int& height);
+        Renderer(unsigned int& width, unsigned int& hight);
                 
-        void Init();
-        void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
+        void ConfigureShaders();
+        virtual void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) override;
         void MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera, ScreenTexture& icon);
         void ForwardRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void DeferredRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
-        void PassiveRender();
-
-        void SetupDebuggingQuads();
-        void DrawDebuggingQuads();
         
         void ConfigureFramebufferMSAA();
         void RenderWithMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
@@ -191,8 +133,6 @@ namespace Chotra {
         void ConfigureLightingPass();
         void RenderPreLightingPass(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void RenderLightingPass();
-
-        void RenderToScreen();
 
         unsigned int CreateGeometryIcon(unsigned int i);
 

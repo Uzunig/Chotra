@@ -25,10 +25,10 @@ add_executable(Chotra
 	src/blur.cpp
 	src/blur.h
 
-    src/gui.cpp
+        src/gui.cpp
 	src/gui.h
 
-    src/material.cpp
+        src/material.cpp
 	src/material.h
 
 	src/material_texture.cpp
@@ -40,16 +40,19 @@ add_executable(Chotra
 	src/obj_model.cpp
 	src/obj_model.h
 
-    src/windows_platform_utils.cpp
+        src/windows_platform_utils.cpp
 	src/platform_utils.h
 
-	src/rendering_settings.cpp
-	src/rendering_settings.h
-	
-	src/renderer.cpp
-	src/renderer.h
+	src/renderer/rendering_settings.cpp
+	src/renderer/rendering_settings.h
 
-    src/resource_manager.cpp
+	src/renderer/renderer_base.cpp
+	src/renderer/renderer_base.h
+	
+	src/renderer/renderer.cpp
+	src/renderer/renderer.h
+
+        src/resource_manager.cpp
 	src/resource_manager.h
 
 	src/scene.cpp
@@ -82,8 +85,8 @@ add_executable(Chotra
 	src/quad.cpp
 	src/quad.h
 
-    src/window.h
-    src/window.cpp
+        src/window.h
+        src/window.cpp
 )
 
 target_include_directories(Chotra PUBLIC includes)
