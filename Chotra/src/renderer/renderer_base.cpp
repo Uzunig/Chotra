@@ -3,18 +3,23 @@
 
 namespace Chotra {
 
-    RendererBase::RendererBase(unsigned int& width, unsigned int& height)
+    RendererBase::RendererBase(const unsigned int& width, const unsigned int& height)
         : width(width), height(height)
+        , shadowMap(width, height)
         , screenTexture(width, height, GL_RGBA16F, GL_RGBA) 
         , renderToScreenShader("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") {
 
-        shadowMap.ConfigureShadowMap(width, height);
+        ConfigureFramebuffer();
 
         renderToScreenShader.Use();
         renderToScreenShader.SetInt("screenTexture", 0);
 
         screenQuad = std::make_shared<Quad>();
         SetupDebuggingQuads();
+    }
+
+    void RendererBase::Refresh() {
+
     }
 
     void RendererBase::SetMatrices(std::shared_ptr<Camera> camera)
@@ -38,6 +43,25 @@ namespace Chotra {
 
         // Рендерим прямоугольник
         screenQuad->RenderQuad();
+    }
+
+    void RendererBase::ConfigureFramebuffer() {
+
+        glGenFramebuffers(1, &framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+        glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture.GetId(), 0);
+
+        glGenRenderbuffers(1, &rbo);
+        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     void RendererBase::SetupDebuggingQuads() {

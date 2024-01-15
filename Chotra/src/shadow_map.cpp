@@ -8,9 +8,10 @@
 
 namespace Chotra {
 
-    ShadowMap::ShadowMap()
+    ShadowMap::ShadowMap(unsigned int width, unsigned int height)
         : simpleDepthShader("resources/shaders/shadow_depth.vs", "resources/shaders/shadow_depth.fs") {
 
+        ConfigureShadowMap(width, height);
     }
 
 

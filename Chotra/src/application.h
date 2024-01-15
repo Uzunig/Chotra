@@ -29,7 +29,7 @@ namespace Chotra {
 
     private:
         unsigned int width;
-        unsigned int hight;
+        unsigned int height;
 
         class GLFWContext& glfwContext;
         std::shared_ptr<class Window> mainWindow;

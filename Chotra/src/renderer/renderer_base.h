@@ -14,16 +14,19 @@
 
 namespace Chotra {
              
-    class RendererBase : public RenderingSettings {
+    class RendererBase : virtual public RenderingSettings {
 
     public:
-        RendererBase(unsigned int& width, unsigned int& height);
-        virtual void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) = 0;
+        RendererBase(const unsigned int& width, const unsigned int& height);
+        void Refresh();
         
 
     protected:
-        unsigned int& width;
-        unsigned int& height;
+        unsigned int width;
+        unsigned int height;
+        
+        unsigned int framebuffer; // Framebuffer without MSAA
+        unsigned int rbo;
 
         ScreenTexture screenTexture;
         Shader renderToScreenShader;
@@ -37,6 +40,7 @@ namespace Chotra {
         std::vector<std::shared_ptr<Quad>> debuggingQuads;
 
         void RenderToScreen();
+        void ConfigureFramebuffer();
 
         void SetMatrices(std::shared_ptr<Camera> camera);
         void SetProjectionMatrix(std::shared_ptr<Camera> camera);

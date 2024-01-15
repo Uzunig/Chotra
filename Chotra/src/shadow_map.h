@@ -17,7 +17,7 @@ namespace Chotra {
     class ShadowMap {
     public:
         
-        ShadowMap();
+        ShadowMap(unsigned int width, unsigned int height);
         unsigned int GetMap();
         glm::mat4 GetLightSpaceMatrix();
 
