@@ -11,11 +11,11 @@ namespace Chotra {
 
     Bloomer::Bloomer(const unsigned int& width, const unsigned int& height)
         : RendererBase(width, height)
-        , screenDivideShader("resources/shaders/screen_shader.vs", "resources/shaders/screen_divide_shader.fs")
-        , downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/downsampling.fs")
-        , combineShader("resources/shaders/screen_shader.vs", "resources/shaders/combine.fs")
-        , shaderBlur("resources/shaders/screen_shader.vs", "resources/shaders/blur.fs")
-        , shaderBloomFinal("resources/shaders/screen_shader.vs", "resources/shaders/bloom_final.fs")
+        , screenDivideShader("resources/shaders/screen_shader.vs", "resources/shaders/bloom/screen_divide_shader.fs")
+        , downSamplingShader("resources/shaders/screen_shader.vs", "resources/shaders/bloom/downsampling.fs")
+        , combineShader(     "resources/shaders/screen_shader.vs", "resources/shaders/bloom/combine.fs")
+        , shaderBlur(        "resources/shaders/screen_shader.vs", "resources/shaders/bloom/blur.fs")
+        , shaderBloomFinal(  "resources/shaders/screen_shader.vs", "resources/shaders/bloom/bloom_final.fs")
     {
         ConfigureBloom();
         ConfigureShaders();

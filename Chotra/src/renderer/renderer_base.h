@@ -14,12 +14,11 @@
 
 namespace Chotra {
              
-    class RendererBase : virtual public RenderingSettings {
+    class RendererBase : public RenderingSettings {
 
     public:
         RendererBase(const unsigned int& width, const unsigned int& height);
         void Refresh();
-        
 
     protected:
         unsigned int width;

@@ -1,4 +1,4 @@
-#include "renderer/renderer_base.h"
+#include "renderer_base.h"
 
 
 namespace Chotra {
@@ -7,7 +7,7 @@ namespace Chotra {
         : width(width), height(height)
         , shadowMap(width, height)
         , screenTexture(width, height, GL_RGBA16F, GL_RGBA) 
-        , renderToScreenShader("resources/shaders/screen_shader.vs", "resources/shaders/render_on_screen.fs") {
+        , renderToScreenShader("resources/shaders/screen_shader.vs", "resources/shaders/render_to_screen.fs") {
 
         ConfigureFramebuffer();
 
@@ -29,19 +29,20 @@ namespace Chotra {
     }
 
     void RendererBase::RenderToScreen() {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         renderToScreenShader.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
+
         renderToScreenShader.SetFloat("gamma", gammaCorrection ? 2.2f : 1.0f);
         renderToScreenShader.SetFloat("contrast", contrast);
         renderToScreenShader.SetFloat("brightness", brightness);
 
         glViewport(0, 0, width, height);
 
-        // Рендерим прямоугольник
         screenQuad->RenderQuad();
     }
 
@@ -59,8 +60,9 @@ namespace Chotra {
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+        }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 

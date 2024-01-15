@@ -1,4 +1,4 @@
-#include "renderer/renderer.h"
+#include "renderer.h"
 
 #include "shader.h"
 #include "environment.h"
