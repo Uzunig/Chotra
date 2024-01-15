@@ -9,13 +9,14 @@
 #include "gui.h"
 #include "camera.h"
 #include "scene.h"
+#include "renderer/renderer_base.h"
 #include "renderer/renderer.h"
 #include "resource_manager.h"
 
 namespace Chotra {
 
     Application::Application()
-        : width(1920), hight(1080),
+        : width(1920), height(1080),
         glfwContext(GLFWContext::GetInstance()) {
 
         Init();
@@ -35,7 +36,7 @@ namespace Chotra {
         if (GetCurrentDirectoryA(256, mainDir)) {}
         std::cout << mainDir << std::endl;
 
-        mainWindow = std::make_shared<Window>("Chotra Engine", width, hight); //1920 1080
+        mainWindow = std::make_shared<Window>("Chotra Engine", width, height); //1920 1080
         eventDispatcher = std::make_unique<EventDispatcher>();
 
         ResourceManager::MakeMiniCamera(glm::vec3(0.0f, 1.0f, 5.0f));
@@ -44,7 +45,7 @@ namespace Chotra {
         ResourceManager::MakeCamera(glm::vec3(0.0f, 1.0f, 5.0f));
         ResourceManager::MakeScene("resources/level1.lv");
         
-        renderer = std::make_shared<Renderer>(width, hight);
+        renderer = std::make_shared<Renderer>(width, height);
         ResourceManager::p_renderer = renderer;
 
         gui = std::make_shared<Gui>(mainWindow, renderer);

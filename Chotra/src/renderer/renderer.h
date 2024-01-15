@@ -12,24 +12,18 @@
 #include "quad.h"
 #include "rendering_settings.h"
 #include "renderer_base.h"
+#include "bloom.h"
 
 
 namespace Chotra {
 
     class GaussianBlurer;
             
-    class Renderer : public RendererBase {
+    class Renderer : public Bloomer {
     public:
-                           
+        
         Shader pbrShader;
         //Shader lightsShader;
-
-        Shader screenDivideShader;
-        Shader downSamplingShader;
-        Shader combineShader;
-
-        Shader shaderBlur;
-        Shader shaderBloomFinal;
 
         Shader backgroundShader;
 
@@ -52,11 +46,6 @@ namespace Chotra {
         unsigned int gMetalRoughAoMap;
         unsigned int rboG;          //Renderbuffer for depth
         
-
-        // Framebuffer without MSAA
-        unsigned int framebuffer;
-        unsigned int rbo;
-
         // Framebuffer without MSAA
         unsigned int framebufferPreLighting;
         unsigned int rboPreLighting;
@@ -75,17 +64,6 @@ namespace Chotra {
         unsigned int textureColorBufferMultiSampled;
         unsigned int rboMSAA;
         unsigned int intermediateFBO;
-
-                     
-        unsigned int hdrFBO;
-        unsigned int colorBuffers[2];
-        unsigned int rboDepth;
-        
-        unsigned int downPingpongFBO[16][2];
-        unsigned int downPingpongColorbuffers[16][2];
-
-        unsigned int upFBO[16];
-        unsigned int upColorbuffers[16];
                 
         unsigned int ssaoFBO;
         unsigned int ssaoBlurFBO;
@@ -103,10 +81,10 @@ namespace Chotra {
        
 
         
-        Renderer(unsigned int& width, unsigned int& hight);
+        Renderer(const unsigned int& width, const unsigned int& height);
                 
         void ConfigureShaders();
-        virtual void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) override;
+        void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera, ScreenTexture& icon);
         void ForwardRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
         void DeferredRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
@@ -114,11 +92,7 @@ namespace Chotra {
         void ConfigureFramebufferMSAA();
         void RenderWithMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
 
-        void ConfigureFramebuffer();
         void RenderWithoutMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
-
-        void ConfigureBloom();
-        void RenderBloom();
                         
         void ConfigureSSAO();
         void GenerateSSAOMap();
