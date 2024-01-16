@@ -43,6 +43,9 @@ add_executable(Chotra
 	src/renderer/renderer_base.cpp
 	src/renderer/renderer_base.h
 
+	src/renderer/renderer_deferred.cpp
+	src/renderer/renderer_deferred.h
+
 	src/renderer/bloom.cpp
 	src/renderer/bloom.h
 

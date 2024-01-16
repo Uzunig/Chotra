@@ -6,11 +6,12 @@ TO DO:
 Сreate a base class Renderer that will be inherited by other classes (DeferredRender, ForwardRender). Create class RenderManager that will lead all rendering process.
 
 Optimize class Quad
-
 Pass debugging quads from Rederer to GUI
 To make textures vector and meshes vector using polymorphic classes
 
-
+Unique blur for all blur needs (bloom, SSR, SSAO)
+Lights at forward rendering 
+Environment 
 To pass to JSON format and to make loader for collection files 
 To change vector objModels to vector geometry that containes all types of geometry
 

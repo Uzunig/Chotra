@@ -19,7 +19,7 @@ namespace Chotra {
 
     class GaussianBlurer;
             
-    class Renderer : public Bloomer {
+    class Renderer : virtual public Bloomer {
     public:
         
         Shader pbrShader;

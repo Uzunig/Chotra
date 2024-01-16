@@ -10,7 +10,7 @@ namespace Chotra {
 
 
     Environment::Environment(std::string hdri_path, std::shared_ptr<SceneLight> sun) :
-        sunShader("resources/shaders/sun_shader.vs", "resources/shaders/sun_shader.fs"), sun(sun) {
+        sunShader("resources/shaders/environment/sun_shader.vs", "resources/shaders/environment/sun_shader.fs"), sun(sun) {
 
         if (LoadHDRi(hdri_path)) {
 
@@ -79,7 +79,7 @@ namespace Chotra {
 
     void Environment::SetCubeMap() {
 
-        Shader equirectangularToCubemapShader("resources/shaders/cubemap.vs", "resources/shaders/equirectangular_to_cubemap.fs");
+        Shader equirectangularToCubemapShader("resources/shaders/environment/cubemap.vs", "resources/shaders/environment/equirectangular_to_cubemap.fs");
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
@@ -117,7 +117,7 @@ namespace Chotra {
     void Environment::SetSkybox() {
 
         // PBR: создаем префильтрованную кубическую карту, и приводим размеры захвата FBO к размерам префильтрованной карты
-        Shader skyboxShader("resources/shaders/cubemap.vs", "resources/shaders/skybox.fs");
+        Shader skyboxShader("resources/shaders/environment/cubemap.vs", "resources/shaders/environment/skybox.fs");
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, skybox);
         for (unsigned int i = 0; i < 6; ++i)
@@ -168,7 +168,7 @@ namespace Chotra {
     void Environment::SetIrradianceMap() {
 
         // PBR: создаем кубическую карту облученности
-        Shader irradianceShader("resources/shaders/cubemap.vs", "resources/shaders/irradiance_convolution.fs");
+        Shader irradianceShader("resources/shaders/environment/cubemap.vs", "resources/shaders/environment/irradiance_convolution.fs");
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
 
@@ -209,7 +209,7 @@ namespace Chotra {
     void Environment::SetPrefilterMap() {
 
         // PBR: создаем префильтрованную кубическую карту, и приводим размеры захвата FBO к размерам префильтрованной карты
-        Shader prefilterShader("resources/shaders/cubemap.vs", "resources/shaders/prefilter.fs");
+        Shader prefilterShader("resources/shaders/environment/cubemap.vs", "resources/shaders/environment/prefilter.fs");
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
         for (unsigned int i = 0; i < 6; ++i)
@@ -262,7 +262,7 @@ namespace Chotra {
     void Environment::SetBrdfLUTTexture() {
 
         // PBR: генерируем 2D LUT-текстуру при помощи используемых уравнений BRDF
-        Shader brdfShader("resources/shaders/screen_shader.vs", "resources/shaders/brdf.fs");
+        Shader brdfShader("resources/shaders/screen_shader.vs", "resources/shaders/environment/brdf.fs");
 
         // Выделяем необходимое количество памяти для LUT-текстуры
         glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);

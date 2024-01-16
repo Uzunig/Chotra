@@ -1,4 +1,4 @@
-#include "renderer/renderer.h"
+#include "renderer.h"
 
 #include "shader.h"
 #include "environment.h"
@@ -18,14 +18,14 @@ namespace Chotra {
         lLo(width, height, GL_RGB16F, GL_RGB),
         lRoughAo(width, height, GL_RGB, GL_RGB),
         pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
-        backgroundShader("resources/shaders/background.vs", "resources/shaders/background.fs"),
+        backgroundShader("resources/shaders/environment/background.vs", "resources/shaders/environment/background.fs"),
         shaderSSAO("resources/shaders/screen_shader.vs", "resources/shaders/ssao.fs"),
         shaderSSAOBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssao_blur.fs"),
         shaderSSR("resources/shaders/screen_shader.vs", "resources/shaders/ssr.fs"),
         shaderSSRBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssr_blur.fs"),
-        shaderDeferredGeometryPass("resources/shaders/deferred_geometry_pass.vs", "resources/shaders/deferred_geometry_pass.fs"),
-        shaderDeferredPreLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred_pre_lighting_pass.fs"),
-        shaderDeferredLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred_lighting_pass.fs")
+        shaderDeferredGeometryPass("resources/shaders/deferred/deferred_geometry_pass.vs", "resources/shaders/deferred/deferred_geometry_pass.fs"),
+        shaderDeferredPreLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred/deferred_pre_lighting_pass.fs"),
+        shaderDeferredLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred/deferred_lighting_pass.fs")
         {
 
         ConfigureFramebufferMSAA();

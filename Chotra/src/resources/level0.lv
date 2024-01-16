@@ -1,0 +1,25 @@
+Type                 Path  
+
+ObjModel         resources/models/Model_Ambient/ground.obj
+
+Material         resources/models/Model_Ambient/ground.mtl
+
+
+
+
+                 Name               Geometry  Materiale         Position          Angle          Scale        Velocity         rVelocity       Visible    Brightness
+                         
+SceneObject    ground   OBJModel      1        1           0.0  0.0  0.0    0.0 0.0 0.0    0.5 0.5 0.5     0.0 0.0 0.0      0.0 0.0 0.0          1          1.0  
+
+                Name                  Geometry  Materiale        Position         Angle          Scale          Velocity        rVelocity       Visible     Brightness    Color             Intensity 
+
+SceneSun         sun      OBJModel     0           0           2.0 1.0 2.0     0.0 0.0 0.0   0.01 0.01 0.01    0.0 0.0 0.0     0.0 0.0 0.0        1            5.0      1.0 1.0 1.0           5.0
+
+
+
+               Name                 Geometry  Materiale        Position              Angle          Scale        Velocity         rVelocity       Visible      Brightness    Color           Intensity
+
+//SceneLight    light_0    OBJModel     0           0        -5.0  5.0  -5.0     0.0 0.0 0.0       0.1 0.1 0.1    0.0 0.0 0.0      0.0 0.0 0.0        1               100.0     1.0 1.0 1.0        100.0    
+
+
+Environment      resources/hdr/Sky.hdr

@@ -1,7 +1,7 @@
 #ifndef BLOOM_H
 #define BLOOM_H
 
-#include "renderer/renderer_base.h"
+#include "renderer_base.h"
 
 namespace Chotra {
     
