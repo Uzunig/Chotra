@@ -835,7 +835,7 @@ namespace Chotra {
         }
         ImGui::End();
     }
-
+    /*
     void Gui::ShowDebuggingQuads() {
 
         unsigned int width = p_mainWindow->GetWidth() / 3;
@@ -847,7 +847,7 @@ namespace Chotra {
         ImTextureID my_tex_id = (void*)p_renderer->gPosition;
         ImGui::Image(my_tex_id, ImVec2(width, height), uv_min, uv_max, tint_col, border_col);
 
-    }
+    }*/
 
     void Gui::Render() {
         ImGui::Render();

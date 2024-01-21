@@ -1,18 +1,23 @@
 #include "renderer_base.h"
 
 
+
 namespace Chotra {
 
     RendererBase::RendererBase(const unsigned int& width, const unsigned int& height)
         : width(width), height(height)
         , shadowMap(width, height)
         , screenTexture(width, height, GL_RGBA16F, GL_RGBA) 
+        , backgroundShader("resources/shaders/environment/background.vs", "resources/shaders/environment/background.fs")
         , renderToScreenShader("resources/shaders/screen_shader.vs", "resources/shaders/render_to_screen.fs") {
 
         ConfigureFramebuffer();
 
         renderToScreenShader.Use();
         renderToScreenShader.SetInt("screenTexture", 0);
+
+        backgroundShader.Use();
+        backgroundShader.SetInt("environmentMap", 0);
 
         screenQuad = std::make_shared<Quad>();
         SetupDebuggingQuads();
@@ -64,6 +69,14 @@ namespace Chotra {
             std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void RendererBase::DrawSkybox(std::shared_ptr<Environment> environment) {
+        backgroundShader.Use();
+        backgroundShader.SetMat4("projection", projection);
+        backgroundShader.SetMat4("view", view);
+        backgroundShader.SetFloat("exposure", backgroundExposure);
+        environment->Draw();
     }
 
     void RendererBase::SetupDebuggingQuads() {

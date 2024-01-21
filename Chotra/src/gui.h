@@ -64,7 +64,7 @@ namespace Chotra {
         void ShowPropertiesBar();
         void ShowScoreBar();
         void ShowAssetsBar();
-        void ShowDebuggingQuads();
+        //void ShowDebuggingQuads();
 
         void UpdateAllIcons();
         void MakeGeometryIcon(unsigned int i);
