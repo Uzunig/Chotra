@@ -46,6 +46,9 @@ add_executable(Chotra
 	src/renderer/renderer_ssao.cpp
 	src/renderer/renderer_ssao.h
 
+	src/renderer/renderer_ssr.cpp
+	src/renderer/renderer_ssr.h
+
 	src/renderer/renderer_deferred.cpp
 	src/renderer/renderer_deferred.h
 

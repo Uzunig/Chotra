@@ -16,7 +16,6 @@ namespace Chotra {
 
         screenQuad = std::make_shared<Quad>();
         SetupDebuggingQuads();
-        std::cout << "RendererBase() constructor" << std::endl;
     }
 
     void RendererBase::Refresh() {

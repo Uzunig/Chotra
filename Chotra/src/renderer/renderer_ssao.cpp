@@ -5,11 +5,10 @@
 
 namespace Chotra {
 
-    RendererSSAO::RendererSSAO(unsigned int width, unsigned int height)
+    RendererSSAO::RendererSSAO(const unsigned int&  width, const unsigned int& height)
         : RendererBase(width, height)
-        , width(width), height(height) 
-        , shaderSSAO("resources/shaders/screen_shader.vs", "resources/shaders/ssao.fs")
-        , shaderSSAOBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssao_blur.fs")
+        , shaderSSAO("resources/shaders/screen_shader.vs", "resources/shaders/ssao/ssao.fs")
+        , shaderSSAOBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssao/ssao_blur.fs")
 
     {
         ConfigureSSAO();
@@ -93,9 +92,8 @@ namespace Chotra {
 
     }
 
-    void RendererSSAO::GenerateSSAOMap() {
+    void RendererSSAO::GenerateSSAOMap(unsigned int& gViewPosition, unsigned int& gViewNormal) {
 
-        // 2. Генерируем текстуру для SSAO
         glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
         glClear(GL_COLOR_BUFFER_BIT);
         shaderSSAO.Use();

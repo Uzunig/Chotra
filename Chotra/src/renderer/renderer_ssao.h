@@ -17,15 +17,9 @@ namespace Chotra {
     class RendererSSAO : public virtual RendererBase{
 
     public:
-        RendererSSAO(unsigned int width, unsigned int height);
-
-        unsigned int gViewPosition;
-        unsigned int gViewNormal;
-        
+        RendererSSAO(const unsigned int& width, const unsigned int& height);
+                
     protected:
-
-        unsigned int width;
-        unsigned int height;
 
         Shader shaderSSAO;
         Shader shaderSSAOBlur;
@@ -38,7 +32,7 @@ namespace Chotra {
         std::vector<glm::vec3> ssaoKernel;
 
         void ConfigureSSAO();
-        void GenerateSSAOMap();
+        void GenerateSSAOMap(unsigned int& gViewPosition, unsigned int& gViewNormal);
         
     };
 

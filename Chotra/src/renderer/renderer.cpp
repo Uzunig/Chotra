@@ -11,6 +11,7 @@ namespace Chotra {
     Renderer::Renderer(const unsigned int& width, const unsigned int& height)
         : Bloomer(width, height)
         , RendererSSAO(width, height)
+        , RendererSSR(width, height)
         , RendererBase(width, height)
         , lScreenTexture(width, height, GL_RGBA16F, GL_RGBA)
         , lFresnelSchlickRoughness(width, height, GL_RGB16F, GL_RGB) 
@@ -21,10 +22,8 @@ namespace Chotra {
         , lRoughAo(width, height, GL_RGB, GL_RGB)
         , pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs")
         , backgroundShader("resources/shaders/environment/background.vs", "resources/shaders/environment/background.fs")
-        //, shaderSSAO("resources/shaders/screen_shader.vs", "resources/shaders/ssao.fs")
-        //, shaderSSAOBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssao_blur.fs")
-        , shaderSSR("resources/shaders/screen_shader.vs", "resources/shaders/ssr.fs")
-        , shaderSSRBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssr_blur.fs")
+        //, shaderSSR("resources/shaders/screen_shader.vs", "resources/shaders/ssr.fs")
+       // , shaderSSRBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssr_blur.fs")
         , shaderDeferredGeometryPass("resources/shaders/deferred/deferred_geometry_pass.vs", "resources/shaders/deferred/deferred_geometry_pass.fs")
         , shaderDeferredPreLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred/deferred_pre_lighting_pass.fs")
         , shaderDeferredLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred/deferred_lighting_pass.fs")
@@ -35,8 +34,7 @@ namespace Chotra {
 
         ConfigureGeometryPass();
 
-        //ConfigureSSAO();
-        ConfigureSSR();
+        //ConfigureSSR();
 
         ConfigurePreLightingPass();
         ConfigureLightingPass();
@@ -144,8 +142,8 @@ namespace Chotra {
 
         RenderGeometryPass(scene, camera);
 
-        GenerateSSAOMap();
-        GenerateSSRMap();
+        GenerateSSAOMap(gViewPosition, gViewNormal);
+        GenerateSSRMap(gViewPosition, gViewNormal);
 
         RenderPreLightingPass(scene, camera);
         RenderLightingPass();
@@ -319,178 +317,6 @@ namespace Chotra {
             scene->environment->Draw();
         }
     }
-/*
-    void Renderer::ConfigureSSAO() {
-
-        glGenFramebuffers(1, &ssaoFBO);
-        glGenFramebuffers(1, &ssaoBlurFBO);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-
-        // Цветовой буфер SSAO 
-        glGenTextures(1, &ssaoColorBuffer);
-        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
-
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "SSAO Framebuffer not complete!" << std::endl;
-
-        // И стадия размытия
-        glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
-        glGenTextures(1, &ssaoMap);
-        glBindTexture(GL_TEXTURE_2D, ssaoMap);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoMap, 0);
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "SSAO Blur Framebuffer not complete!" << std::endl;
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        // Генерируем ядро выборки
-        std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0); // генерируем случайное число типа float в диапазоне между 0.0 и 1.0
-        std::default_random_engine generator;
-
-        for (unsigned int i = 0; i < 64; ++i)
-        {
-            glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
-            sample = glm::normalize(sample);
-            sample *= randomFloats(generator);
-            float scale = float(i) / 64.0;
-
-            // Масштабируем точки выборки, чтобы они распологались ближе к центру ядра
-            scale = lerp(0.1f, 1.0f, scale * scale);
-            sample *= scale;
-            ssaoKernel.push_back(sample);
-        }
-
-        // Генерируем текстуру шума
-        std::vector<glm::vec3> ssaoNoise;
-        for (unsigned int i = 0; i < 16; i++)
-        {
-            glm::vec3 noise(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, 0.0f); // поворот вокруг z-оси (в касательном пространстве)
-            ssaoNoise.push_back(noise);
-        }
-
-        glGenTextures(1, &noiseTexture);
-        glBindTexture(GL_TEXTURE_2D, noiseTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-
-        shaderSSAO.Use();
-        shaderSSAO.SetInt("gViewPosition", 0);
-        shaderSSAO.SetInt("gViewNormal", 1);
-        shaderSSAO.SetInt("texNoise", 2);
-
-        shaderSSAOBlur.Use();
-        shaderSSAOBlur.SetInt("ssaoInput", 0);
-
-    }
-
-    void Renderer::GenerateSSAOMap() {
-
-        // 2. Генерируем текстуру для SSAO
-        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-        glClear(GL_COLOR_BUFFER_BIT);
-        shaderSSAO.Use();
-
-        // Посылаем ядро + поворот 
-        for (unsigned int i = 0; i < 64; ++i) {
-            shaderSSAO.SetVec3("samples[" + std::to_string(i) + "]", ssaoKernel[i]);
-        }
-        shaderSSAO.SetMat4("projection", projection);
-        shaderSSAO.SetMat4("view", view);
-        shaderSSAO.SetInt("kernelSize", kernelSizeSSAO);
-        shaderSSAO.SetFloat("radius", radiusSSAO);
-        shaderSSAO.SetFloat("biasSSAO", biasSSAO);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, gViewPosition); // gPosition in view space
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, gViewNormal);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, noiseTexture);
-
-        screenQuad->RenderQuad();
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-        // 3. Размываем SSAO-текстуру, чтобы убрать шум
-        glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        shaderSSAOBlur.Use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-        screenQuad->RenderQuad();
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-    */
-    void Renderer::ConfigureSSR() {
-
-        glGenFramebuffers(1, &ssrFBO);
-        
-        glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
-
-        glGenTextures(1, &ssrUvMap);
-        glBindTexture(GL_TEXTURE_2D, ssrUvMap);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssrUvMap, 0);
-                
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "SSR Framebuffer not complete!" << std::endl;
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-       
-        shaderSSR.Use();
-        shaderSSR.SetInt("gViewPosition", 0);
-        shaderSSR.SetInt("gViewNormal", 1);
-        shaderSSR.SetInt("previousMap", 2);
-                
-    }
-
-
-    void Renderer::GenerateSSRMap() {
-
-        // 2. Генерируем текстуру для SSR        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-        glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
-        glClear(GL_COLOR_BUFFER_BIT);
-        shaderSSR.Use();
-
-        shaderSSR.SetMat4("projection", projection);
-        shaderSSR.SetMat4("view", view);
-
-        shaderSSR.SetFloat("biasSSR", biasSSR);
-        shaderSSR.SetFloat("rayStep", rayStep);
-        shaderSSR.SetInt("iterationCount", iterationCount);
-        shaderSSR.SetFloat("accuracySSR", accuracySSR);
-
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, gViewPosition); // gPosition in view space
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, gViewNormal);
-        // glActiveTexture(GL_TEXTURE2);
-         //glBindTexture(GL_TEXTURE_2D, screenTexturePrevious.GetId()); // screen texture from the previous frame (I'm not sure it is correct or not)
-
-        screenQuad->RenderQuad();
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                
-    }
-
 
     void Renderer::ConfigureGeometryPass() {
         // Конфигурирование g-буфера фреймбуфера
