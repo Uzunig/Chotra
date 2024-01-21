@@ -1,5 +1,5 @@
-#ifndef BASE_RENDERER_H
-#define BASE_RENDERER_H
+#ifndef RENDERER_BASE_H
+#define RENDERER_BASE_H
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,7 +13,7 @@
 #include "quad.h"
 
 namespace Chotra {
-             
+
     class RendererBase : public RenderingSettings {
 
     public:

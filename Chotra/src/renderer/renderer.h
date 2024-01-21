@@ -13,13 +13,14 @@
 #include "rendering_settings.h"
 #include "renderer_base.h"
 #include "bloom.h"
+#include "renderer_ssao.h"
 
 
 namespace Chotra {
 
     class GaussianBlurer;
             
-    class Renderer : virtual public Bloomer {
+    class Renderer : public Bloomer, public RendererSSAO {
     public:
         
         Shader pbrShader;
@@ -27,8 +28,8 @@ namespace Chotra {
 
         Shader backgroundShader;
 
-        Shader shaderSSAO;
-        Shader shaderSSAOBlur;
+        //Shader shaderSSAO;
+        //Shader shaderSSAOBlur;
 
         Shader shaderSSR;
         Shader shaderSSRBlur;
@@ -39,9 +40,9 @@ namespace Chotra {
                   
         unsigned int gBuffer;           // G-Buffer
         unsigned int gPosition; //TExtures
-        unsigned int gViewPosition; 
+        //unsigned int gViewPosition; 
         unsigned int gNormal;
-        unsigned int gViewNormal;
+        //unsigned int gViewNormal;
         unsigned int gAlbedoMap;
         unsigned int gMetalRoughAoMap;
         unsigned int rboG;          //Renderbuffer for depth
@@ -64,13 +65,13 @@ namespace Chotra {
         unsigned int textureColorBufferMultiSampled;
         unsigned int rboMSAA;
         unsigned int intermediateFBO;
-                
+        /*
         unsigned int ssaoFBO;
         unsigned int ssaoBlurFBO;
         unsigned int ssaoColorBuffer;
         unsigned int ssaoMap;
         unsigned int noiseTexture;
-        std::vector<glm::vec3> ssaoKernel;
+        std::vector<glm::vec3> ssaoKernel;*/
 
         unsigned int ssrFBO;
         unsigned int ssrUvMap;
@@ -94,8 +95,8 @@ namespace Chotra {
 
         void RenderWithoutMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
                         
-        void ConfigureSSAO();
-        void GenerateSSAOMap();
+        //void ConfigureSSAO();
+        //void GenerateSSAOMap();
 
         void ConfigureSSR();
         void GenerateSSRMap();

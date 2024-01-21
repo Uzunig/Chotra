@@ -9,30 +9,33 @@
 namespace Chotra {
 
     Renderer::Renderer(const unsigned int& width, const unsigned int& height)
-        : Bloomer(width, height),
-        lScreenTexture(width, height, GL_RGBA16F, GL_RGBA),
-        lFresnelSchlickRoughness(width, height, GL_RGB16F, GL_RGB),
-        lDiffuse(width, height, GL_RGB16F, GL_RGB),
-        lkD(width, height, GL_RGB16F, GL_RGB),
-        lBrdf(width, height, GL_RGB16F, GL_RGB),
-        lLo(width, height, GL_RGB16F, GL_RGB),
-        lRoughAo(width, height, GL_RGB, GL_RGB),
-        pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs"),
-        backgroundShader("resources/shaders/environment/background.vs", "resources/shaders/environment/background.fs"),
-        shaderSSAO("resources/shaders/screen_shader.vs", "resources/shaders/ssao.fs"),
-        shaderSSAOBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssao_blur.fs"),
-        shaderSSR("resources/shaders/screen_shader.vs", "resources/shaders/ssr.fs"),
-        shaderSSRBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssr_blur.fs"),
-        shaderDeferredGeometryPass("resources/shaders/deferred/deferred_geometry_pass.vs", "resources/shaders/deferred/deferred_geometry_pass.fs"),
-        shaderDeferredPreLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred/deferred_pre_lighting_pass.fs"),
-        shaderDeferredLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred/deferred_lighting_pass.fs")
+        : Bloomer(width, height)
+        , RendererSSAO(width, height)
+        , RendererBase(width, height)
+        , lScreenTexture(width, height, GL_RGBA16F, GL_RGBA)
+        , lFresnelSchlickRoughness(width, height, GL_RGB16F, GL_RGB) 
+        , lDiffuse(width, height, GL_RGB16F, GL_RGB)
+        , lkD(width, height, GL_RGB16F, GL_RGB)
+        , lBrdf(width, height, GL_RGB16F, GL_RGB)
+        , lLo(width, height, GL_RGB16F, GL_RGB)
+        , lRoughAo(width, height, GL_RGB, GL_RGB)
+        , pbrShader("resources/shaders/pbr_shader.vs", "resources/shaders/pbr_shader.fs")
+        , backgroundShader("resources/shaders/environment/background.vs", "resources/shaders/environment/background.fs")
+        //, shaderSSAO("resources/shaders/screen_shader.vs", "resources/shaders/ssao.fs")
+        //, shaderSSAOBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssao_blur.fs")
+        , shaderSSR("resources/shaders/screen_shader.vs", "resources/shaders/ssr.fs")
+        , shaderSSRBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssr_blur.fs")
+        , shaderDeferredGeometryPass("resources/shaders/deferred/deferred_geometry_pass.vs", "resources/shaders/deferred/deferred_geometry_pass.fs")
+        , shaderDeferredPreLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred/deferred_pre_lighting_pass.fs")
+        , shaderDeferredLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred/deferred_lighting_pass.fs")
         {
+
 
         ConfigureFramebufferMSAA();
 
         ConfigureGeometryPass();
 
-        ConfigureSSAO();
+        //ConfigureSSAO();
         ConfigureSSR();
 
         ConfigurePreLightingPass();
@@ -316,12 +319,7 @@ namespace Chotra {
             scene->environment->Draw();
         }
     }
-
-    float lerp(float a, float b, float f)
-    {
-        return a + f * (b - a);
-    }
-
+/*
     void Renderer::ConfigureSSAO() {
 
         glGenFramebuffers(1, &ssaoFBO);
@@ -435,7 +433,7 @@ namespace Chotra {
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
-
+    */
     void Renderer::ConfigureSSR() {
 
         glGenFramebuffers(1, &ssrFBO);

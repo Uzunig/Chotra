@@ -7,7 +7,7 @@ namespace Chotra {
     
     class Shader;
 
-    class Bloomer : public RendererBase {
+    class Bloomer : public virtual RendererBase {
     public:
         
         Bloomer(const unsigned int& width, const unsigned int& height);
