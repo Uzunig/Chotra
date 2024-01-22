@@ -49,7 +49,6 @@ namespace Chotra {
         int fps = 0;
     };
 
-
 } // namspace Chotra
 
 #endif
