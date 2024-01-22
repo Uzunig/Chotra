@@ -9,8 +9,8 @@ namespace Chotra {
 
     RendererSSR::RendererSSR(const unsigned int& width, const unsigned int& height)
         : RendererBase(width, height)
-        , shaderSSR("resources/shaders/screen_shader.vs", "resources/shaders/ssr.fs")
-        , shaderSSRBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssr_blur.fs")
+        , shaderSSR("resources/shaders/screen_shader.vs", "resources/shaders/ssr/ssr.fs")
+        , shaderSSRBlur("resources/shaders/screen_shader.vs", "resources/shaders/ssr/ssr_blur.fs")
     {
         ConfigureSSR();
     }
