@@ -21,7 +21,10 @@ namespace Chotra {
         , shaderDeferredPreLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred/deferred_pre_lighting_pass.fs")
         , shaderDeferredLightingPass("resources/shaders/screen_shader.vs", "resources/shaders/deferred/deferred_lighting_pass.fs")
     {
+        ConfigureGeometryPass();
 
+        ConfigurePreLightingPass();
+        ConfigureLightingPass();
     }
     void RendererDeferred::DeferredRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
 
