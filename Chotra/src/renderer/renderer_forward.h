@@ -15,13 +15,10 @@ namespace Chotra {
         void MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera, ScreenTexture& iconTexture);
 
     protected:
-
         Shader pbrShader;
         //Shader lightsShader;
 
         // Framebuffer with MSAA
-        unsigned int miniFramebufferMSAA;
-
         unsigned int framebufferMSAA;
         unsigned int textureColorBufferMultiSampled;
         unsigned int rboMSAA;
@@ -29,7 +26,6 @@ namespace Chotra {
 
         void ConfigureShaders();    
         void ConfigureFramebufferMSAA();
-
     };
 
 } // namespace Chotra

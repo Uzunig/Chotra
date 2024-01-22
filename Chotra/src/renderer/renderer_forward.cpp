@@ -5,10 +5,6 @@
 
 namespace Chotra {
 
-
-
-
-   
     Chotra::RendererForward::RendererForward()
         : RendererBase(width, height)
         , pbrShader("resources/shaders/forward/pbr_shader.vs", "resources/shaders/forward/pbr_shader.fs")
@@ -72,6 +68,7 @@ namespace Chotra {
     void RendererForward::ForwardRenderWithMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
 
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferMSAA);
+        glViewport(0, 0, width, height);
 
         // 2. Рендерим сцену как обычно, но используем при этом сгенерированную карту глубины/тени
         //glViewport(0, 0, width, height);
@@ -130,8 +127,8 @@ namespace Chotra {
     }
 
     void RendererForward::ForwardRenderWithoutMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera) {
-        
-glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
         // 2. Рендерим сцену как обычно, но используем при этом сгенерированную карту глубины/тени
         glViewport(0, 0, width, height);
@@ -201,22 +198,23 @@ glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
 
         glBindTexture(GL_TEXTURE_2D, iconTexture.GetId());
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, iconTexture.GetId(), 0);	// нам нужен только цветовой буфер
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, iconTexture.GetId(), 0); //attach icon texture
 
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+        }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        glViewport(0, 0, 100, 100);
         ForwardRenderWithMSAA(scene, camera);
 
         glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
 
         glBindTexture(GL_TEXTURE_2D, screenTexture.GetId());
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture.GetId(), 0);	// нам нужен только цветовой буфер
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture.GetId(), 0);	//reattach screen texture
 
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+        }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         this->width = width;

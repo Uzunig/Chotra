@@ -4,12 +4,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <vector>
-#include <random>
 #include <memory>
 
-#include "shader.h"
-#include "quad.h"
 #include "rendering_settings.h"
 #include "renderer_base.h"
 #include "bloom.h"
