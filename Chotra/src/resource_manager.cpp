@@ -77,7 +77,7 @@ namespace Chotra {
         miniScene->rootCollection->sceneObjects[0]->ChangeMaterialIndex(i);
         miniScene->rootCollection->sceneObjects[0]->ChangeGeometryIndex(0);
         ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
-        p_renderer->MiniRender(miniScene, miniCamera, iconTexture);
+        p_renderer->IconRender(miniScene, miniCamera, iconTexture);
         SetMaterialIcon(i, iconTexture.GetId());
     }
 
@@ -143,7 +143,7 @@ namespace Chotra {
         miniScene->rootCollection->sceneObjects[0]->ChangeGeometryIndex(i);
         miniScene->rootCollection->sceneObjects[0]->ChangeMaterialIndex(0);
         ScreenTexture iconTexture(100, 100, GL_RGB, GL_RGB);
-        p_renderer->MiniRender(miniScene, miniCamera, iconTexture);
+        p_renderer->IconRender(miniScene, miniCamera, iconTexture);
         SetGeometryIcon(i, iconTexture.GetId());
     }
 

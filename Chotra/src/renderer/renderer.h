@@ -14,44 +14,22 @@
 #include "renderer_base.h"
 #include "bloom.h"
 #include "renderer_deferred.h"
+#include "renderer_forward.h"
 
 
 namespace Chotra {
          
-    class Renderer : public Bloomer, public RendererDeferred {
+    class Renderer : public Bloomer, public RendererDeferred, RendererForward {
     public:
         
-        Shader pbrShader;
-        //Shader lightsShader;
-
-        // Framebuffer with MSAA
-        unsigned int miniFramebufferMSAA;
-
-        unsigned int framebufferMSAA;
-        unsigned int textureColorBufferMultiSampled;
-        unsigned int rboMSAA;
-        unsigned int intermediateFBO;
-                       
-        unsigned int quadVAO = 0;
-        unsigned int quadVBO;
-
-       
-
-        
         Renderer(const unsigned int& width, const unsigned int& height);
-                
-        void ConfigureShaders();
+               
         void Render(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
-        void MiniRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera, ScreenTexture& icon);
+        void IconRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera, ScreenTexture& icon);
+    
+    protected:
         void ForwardRender(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
-        
-        void ConfigureFramebufferMSAA();
-        void RenderWithMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
-
-        void RenderWithoutMSAA(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
-
-        unsigned int CreateGeometryIcon(unsigned int i);
-
+  
     };
 
 } // namespace Chotra
